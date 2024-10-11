@@ -8,10 +8,7 @@ import {
 import { expect, test } from '@playwright/test';
 
 test.describe('InApp Campaigns', () => {
-  test('login to WEB SDK app and create InApp Campaigns', async ({
-    page,
-    request
-  }) => {
+  test('login to WEB SDK app and create InApp Campaigns', async ({ page, request }) => {
     await page.goto('/');
 
     await page
@@ -40,15 +37,11 @@ test.describe('InApp Campaigns', () => {
     // Wait for the network request to complete
     const response = await page.waitForResponse(
       (response) =>
-        response
-          .url()
-          .includes('/api/v2/apps/643e3df7b58b2c3a5e6bd605/segments') &&
+        response.url().includes('/api/v2/apps/643e3df7b58b2c3a5e6bd605/segments') &&
         response.status() === expectedStatusCode
     );
     const responseData = await response.json();
-    const segmentIds = responseData.data.map(
-      (segment: { id: string }) => segment.id
-    );
+    const segmentIds = responseData.data.map((segment: { id: string }) => segment.id);
 
     // Act
     const responseDelete = await request.delete(
@@ -95,18 +88,12 @@ test.describe('InApp Campaigns', () => {
     await page.getByRole('menuitem', { name: 'Alias' }).click();
     await page.locator('input.form-control').fill('66f3c08fb58b2ca11eea1a4d');
     await page.getByRole('button', { name: 'Estimate segment' }).click();
-    await expect(
-      page.getByText('1 of 29 users match this criteria')
-    ).toBeVisible();
+    await expect(page.getByText('1 of 29 users match this criteria')).toBeVisible();
     await page.getByRole('button', { name: 'Save Segment' }).click();
-    await page
-      .getByRole('textbox', { name: 'Segment name' })
-      .fill('Playwright Segment');
+    await page.getByRole('textbox', { name: 'Segment name' }).fill('Playwright Segment');
     await page.getByRole('button', { name: 'Save', exact: true }).click();
 
-    await expect(
-      page.getByRole('link', { name: 'Playwright Segment' })
-    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Playwright Segment' })).toBeVisible();
 
     await page.getByText('Campaigns').click();
     await page.getByTestId('duplicateCampaignBtn').first().click();
@@ -153,10 +140,7 @@ test.describe('InApp Campaigns', () => {
     await page.getByRole('button', { name: 'Save & Continue' }).click();
 
     await page.getByRole('button', { name: 'Send Campaign' }).click();
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: 'Send Campaign' })
-      .click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Send Campaign' }).click();
 
     await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText('Scheduled')).not.toBeVisible();
@@ -178,13 +162,10 @@ test.describe('InApp Campaigns', () => {
       'Playwright campgain',
       { timeout: 20000 }
     );
-    await expect(page.getByRole('button', { name: 'Dismiss' })).toHaveText(
-      'Dismiss',
-      { timeout: 20000 }
-    );
+    await expect(page.getByRole('button', { name: 'Dismiss' })).toHaveText('Dismiss', {
+      timeout: 20000
+    });
     await page.getByRole('button', { name: 'Dismiss' }).click();
-    await expect(
-      page.getByRole('button', { name: 'Dismiss' })
-    ).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Dismiss' })).not.toBeVisible();
   });
 });
