@@ -8,7 +8,9 @@ export default defineConfig({
   testDir: './tests',
   globalSetup: require.resolve('./config/global.setup.ts'),
   timeout: 60_000,
-  expect: { timeout: 10_000 },
+  expect: {
+    timeout: 10_000
+  },
   fullyParallel: false,
   retries: 0,
   workers: undefined,

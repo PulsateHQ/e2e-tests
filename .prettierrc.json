@@ -7,7 +7,7 @@
   "importOrderSortSpecifiers": true,
   "plugins": ["@trivago/prettier-plugin-sort-imports"],
   "useTabs": false,
-  "printWidth": 90,
+  "printWidth": 80,
   "trailingComma": "none",
   "bracketSpacing": true
 }
