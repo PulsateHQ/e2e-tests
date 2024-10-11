@@ -1,36 +1,36 @@
-import { BASE_URL } from "./config/env.config";
-import { defineConfig, devices } from "@playwright/test";
-import * as path from "path";
+import { BASE_URL } from './config/env.config';
+import { defineConfig, devices } from '@playwright/test';
+import * as path from 'path';
 
-export const STORAGE_STATE = path.join(__dirname, "tmp/session.json");
+export const STORAGE_STATE = path.join(__dirname, 'tmp/session.json');
 
 export default defineConfig({
-  testDir: "./tests",
-  globalSetup: require.resolve("./config/global.setup.ts"),
+  testDir: './tests',
+  globalSetup: require.resolve('./config/global.setup.ts'),
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,
   retries: 0,
   workers: undefined,
-  reporter: "html",
+  reporter: 'html',
   use: {
     baseURL: BASE_URL,
     actionTimeout: 0,
-    trace: "on",
-    video: "retain-on-failure",
-    screenshot: "only-on-failure",
+    trace: 'on',
+    video: 'retain-on-failure',
+    screenshot: 'only-on-failure'
   },
   projects: [
     {
-      name: "firefox",
+      name: 'firefox',
       grepInvert: /@logged/,
       use: {
-        ...devices["Desktop Firefox"],
-      },
+        ...devices['Desktop Firefox']
+      }
     },
     {
-      name: "setup",
-      testMatch: "*.setup.ts",
-    },
-  ],
+      name: 'setup',
+      testMatch: '*.setup.ts'
+    }
+  ]
 });
