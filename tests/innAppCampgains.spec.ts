@@ -19,6 +19,7 @@ test.describe('InApp Campaigns', () => {
         name: 'Username or Email'
       })
       .fill(`${USER_LOGIN_ADMIN}`);
+
     await page
       .getByRole('textbox', {
         name: 'Password Forgot your password?'
