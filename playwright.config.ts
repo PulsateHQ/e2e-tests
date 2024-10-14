@@ -25,9 +25,26 @@ export default defineConfig({
   projects: [
     {
       name: 'firefox',
-      grepInvert: /@logged/,
       use: {
         ...devices['Desktop Firefox']
+      }
+    },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chromium']
+      }
+    },
+    {
+      name: 'chrome',
+      use: {
+        ...devices['Desktop Chrome']
+      }
+    },
+    {
+      name: 'safari',
+      use: {
+        ...devices['Desktop Safari']
       }
     },
     {
