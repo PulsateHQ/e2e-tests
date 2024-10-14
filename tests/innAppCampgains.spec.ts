@@ -8,7 +8,7 @@ import {
 import { expect, test } from '@playwright/test';
 
 test.describe('InApp Campaigns', () => {
-  test('login to WEB SDK app and create InApp Campaigns', async ({
+  test.only('login to WEB SDK app and create InApp Campaigns', async ({
     page,
     request
   }) => {
