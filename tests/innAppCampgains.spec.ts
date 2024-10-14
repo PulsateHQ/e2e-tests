@@ -250,7 +250,7 @@ test.describe('InApp Campaigns', () => {
       .click();
 
     await page.waitForLoadState('domcontentloaded');
-    await expect(page.getByText('Scheduled')).not.toBeVisible();
+    await expect(page.getByText('Scheduled')).toBeHidden();
 
     await page.locator('li.ms-1.dropdown.nav-item').click();
     await page
@@ -303,6 +303,6 @@ test.describe('InApp Campaigns', () => {
       page.getByRole('button', {
         name: 'Dismiss'
       })
-    ).not.toBeVisible();
+    ).toBeHidden();
   });
 });
