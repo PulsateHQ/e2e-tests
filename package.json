@@ -29,6 +29,7 @@
     "test:tiger": "dotenv -e .env.tiger -- npx playwright test --ui",
     "test:tiger:headed": "dotenv -e .env.tiger -- npx playwright test --headed --project=chromium",
     "test:tiger:headless": "dotenv -e .env.tiger -- npx playwright test --project=chromium",
+    "test:codegen:tiger": "npx playwright codegen https://controltiger.furiousapi.com",
     "test:whale": "dotenv -e .env.whale -- npx playwright test --ui",
     "test:whale:headed": "dotenv -e .env.whale -- npx playwright test --headed --project=chromium",
     "test:whale:headless": "dotenv -e .env.whale -- npx playwright test --project=chromium",

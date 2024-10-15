@@ -30,24 +30,6 @@ export default defineConfig({
       }
     },
     {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chromium']
-      }
-    },
-    {
-      name: 'chrome',
-      use: {
-        ...devices['Desktop Chrome']
-      }
-    },
-    {
-      name: 'safari',
-      use: {
-        ...devices['Desktop Safari']
-      }
-    },
-    {
       name: 'setup',
       testMatch: '*.setup.ts'
     }
