@@ -4,7 +4,7 @@ import {
   USER_LOGIN_RECEIVER_IN_APP,
   USER_PASSWORD_ADMIN,
   USER_PASSWORD_RECEIVER_IN_APP
-} from '../config/env.config';
+} from '@_config/env.config';
 import { expect, test } from '@playwright/test';
 
 test.describe('InApp Campaigns', () => {
@@ -193,6 +193,7 @@ test.describe('InApp Campaigns', () => {
         exact: true
       })
       .click();
+    // eslint-disable-next-line playwright/no-conditional-in-test
     if (
       !(await page
         .getByRole('row', {
