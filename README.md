@@ -18,7 +18,6 @@ This project contains end-to-end tests for the CMS project, implemented using Pl
    ```bash
    npm install
    ```
-   
 4. Setup husky:
    ```bash
    npx husky
