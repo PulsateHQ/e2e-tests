@@ -1,10 +1,14 @@
-import { BasePage } from '@_src/pages/base.page';
+import { BasePage } from '@_src/ui/pages/base.page';
 import { Page } from '@playwright/test';
 
 export class ForgotPasswordPage extends BasePage {
   url = '/admins/forgot_password';
 
   forgotPasswordEmailInput = this.page.getByRole('textbox', { name: 'Email' });
+
+  emailFormatIncorrectError = this.page
+    .getByRole('tooltip')
+    .filter({ hasText: 'Email format is incorrect (ex: john@xyz.com)' });
 
   resetYourPasswordButton = this.page.getByRole('button', {
     name: 'Reset your password'

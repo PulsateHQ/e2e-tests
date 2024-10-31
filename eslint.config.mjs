@@ -23,7 +23,13 @@ export default [
   eslintPluginPlaywright.configs['flat/recommended'],
   {
     rules: {
-      'playwright/no-nested-step': 'off'
+      'playwright/no-nested-step': 'off',
+      'playwright/expect-expect': [
+        'error',
+        {
+          assertFunctionNames: ['expect', 'validateErrorVisibility']
+        }
+      ]
     },
     settings: {
       playwright: {
