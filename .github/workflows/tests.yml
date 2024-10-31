@@ -24,11 +24,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install firefox
 
+      - name: Install dotenv-cli
+        run: npm install -g dotenv-cli
+
       - name: Create env file
         run: |
           cat << EOF > .env
           BASE_URL=${{ vars.BASE_URL }}
-          USER_LOGIN_ADMIN=${{ secrets.USER_LOGIN_ADMIN }}
+          USER_LOGIN_ADMIN=${{ vars.USER_LOGIN_ADMIN }}
           USER_PASSWORD_ADMIN=${{ secrets.USER_PASSWORD_ADMIN }}
           ENVIRONMENT=${{ github.event.client_payload.environment }}
           EOF
