@@ -1,7 +1,7 @@
 import { BASE_URL } from '@_config/env.config';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { CompanyRegistrationModel } from '@_src/ui/models/user.model';
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker/locale/en';
 
 const registrationData: CompanyRegistrationModel = {
   fullName: faker.internet.username(),

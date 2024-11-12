@@ -16,5 +16,17 @@ function requireEnvVariable(envVariableName: string): string {
 }
 
 export const BASE_URL = requireEnvVariable('BASE_URL');
-export const USER_LOGIN_ADMIN = requireEnvVariable('USER_LOGIN_ADMIN');
-export const USER_PASSWORD_ADMIN = requireEnvVariable('USER_PASSWORD_ADMIN');
+export const SDK_API_URL = requireEnvVariable('SDK_API_URL');
+export const UI_INTEGRATION_LOGIN_ADMIN = requireEnvVariable(
+  'UI_INTEGRATION_LOGIN_ADMIN'
+);
+export const UI_INTEGRATION_PASSWORD_ADMIN = requireEnvVariable(
+  'UI_INTEGRATION_PASSWORD_ADMIN'
+);
+export const UI_INTEGRATION_APP_ID = requireEnvVariable(
+  'UI_INTEGRATION_APP_ID'
+);
+export const API_E2E_ACCESS_TOKEN_ADMIN = requireEnvVariable(
+  'API_E2E_ACCESS_TOKEN_ADMIN'
+);
+export const API_E2E_APP_ID = requireEnvVariable('API_E2E_APP_ID');

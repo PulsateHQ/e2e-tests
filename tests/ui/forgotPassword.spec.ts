@@ -1,14 +1,14 @@
 import { BASE_URL } from '@_config/env.config';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { LoginUserModel } from '@_src/ui/models/user.model';
+import { UIIntegrationLoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('Forgot Password Functionality', () => {
   const expectedURL = `${BASE_URL}/admins/forgot_password`;
-  const incorrectEmail: LoginUserModel = {
+  const incorrectEmail: UIIntegrationLoginUserModel = {
     userEmail: 'incorrect_email.com',
     userPassword: ''
   };
-  const loginUserData: LoginUserModel = {
+  const loginUserData: UIIntegrationLoginUserModel = {
     userEmail: 'randomEmail@pulsate.com',
     userPassword: ''
   };
@@ -20,13 +20,14 @@ test.describe('Forgot Password Functionality', () => {
   test('should display an error message for incorrect email format', async ({
     forgotPasswordPage
   }) => {
+    const loginURL = await forgotPasswordPage.validateUrl();
+
     await forgotPasswordPage.resetYourPassword(incorrectEmail.userEmail);
     await forgotPasswordPage.validateErrorVisibility(
       forgotPasswordPage.forgotPasswordEmailInput,
       forgotPasswordPage.emailFormatIncorrectError
     );
 
-    const loginURL = await forgotPasswordPage.validateUrl();
     expect(loginURL).toBe(expectedURL);
   });
 
@@ -35,8 +36,9 @@ test.describe('Forgot Password Functionality', () => {
     loginPage
   }) => {
     await forgotPasswordPage.resetYourPassword(loginUserData.userEmail);
-    await expect(forgotPasswordPage.forgotPasswordSucceedMessage).toBeVisible();
     await forgotPasswordPage.backToSignInButton.click();
+
+    await expect(forgotPasswordPage.forgotPasswordSucceedMessage).toBeVisible();
     await expect.soft(loginPage.loginButton).toBeVisible();
   });
 });
