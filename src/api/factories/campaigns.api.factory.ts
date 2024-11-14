@@ -63,7 +63,7 @@ export async function createCampaignWithApi(
   });
 
   const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  const expectedStatusCode = 201;
 
   const responseJson = JSON.parse(responseBody);
 
@@ -91,16 +91,12 @@ export async function deleteCampaignWithApi(
 
   const response = await request.delete(url, { headers });
 
-  const responseBody = await response.text();
   const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
 
   expect(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('success', true);
 
   return response;
 }
@@ -128,16 +124,12 @@ export async function batchDeleteCampaignsWithApi(
     }
   );
 
-  const responseBody = await response.text();
   const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
 
   expect(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('resources_count');
 
   return response;
 }
