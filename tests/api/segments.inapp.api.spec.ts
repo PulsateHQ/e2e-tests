@@ -1,3 +1,4 @@
+// tests/api/segments.inapp.api.spec.ts
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   API_E2E_APP_ID
@@ -12,10 +13,9 @@ import {
   deleteUserWithApi,
   getUsersWithApi
 } from '@_src/api/factories/users.api.factory';
-import { CreateSegmentPayload } from '@_src/api/models/create-segment.api.model';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
-import { faker } from '@faker-js/faker';
 
 test.describe('Test', () => {
   test('should import users, validate the number of users, and delete users', async ({
@@ -111,25 +111,10 @@ test.describe('Test', () => {
     );
 
     // Act (Create Segment)
-    const createSegmentPayload: CreateSegmentPayload = {
-      name: faker.lorem.word(),
-      groups: [
-        {
-          join_type: '+',
-          rules: [
-            {
-              type: 'all_users',
-              match_type: 'equal',
-              match_value: 'true'
-            }
-          ]
-        }
-      ]
-    };
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentPayload
+      createSegmentAllUsersPayload
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -137,7 +122,7 @@ test.describe('Test', () => {
     expect(createSegmentResponse.status()).toBe(200);
     expect(createSegmentResponseJson.segment).toHaveProperty(
       'name',
-      createSegmentPayload.name
+      createSegmentAllUsersPayload.name
     );
     expect(createSegmentResponseJson.segment.groups.length).toBe(1);
 
@@ -153,7 +138,7 @@ test.describe('Test', () => {
     expect(getSegmentsResponseAfterCreation.status()).toBe(200);
     expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(1);
     expect(getSegmentsResponseJsonAfterCreation.data[0].name).toBe(
-      createSegmentPayload.name
+      createSegmentAllUsersPayload.name
     );
   });
 });
