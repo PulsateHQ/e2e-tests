@@ -1,5 +1,5 @@
 import { CreateCampaignPayload } from '@_src/api/models/create-campaigns.api.model';
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker/locale/en';
 
 export const createCampaignPayload: CreateCampaignPayload = {
   state_machine_notifications_state: 'initial',

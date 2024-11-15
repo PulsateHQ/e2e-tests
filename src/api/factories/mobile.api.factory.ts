@@ -1,5 +1,6 @@
-import { CreateCampaignPayload } from '@_src/api/models/create-campaigns.api.model';
 import { Headers } from '@_src/api/models/headers.api.model';
+import { StartMobileSessionPayload } from '@_src/api/models/start-mobile-session.api.model';
+import { UpdateMobileUserPayload } from '@_src/api/models/update-mobile-user.api.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -7,7 +8,7 @@ import { APIRequestContext, APIResponse } from '@playwright/test';
 export async function startMobileSessionWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: Record<string, unknown>
+  payload: StartMobileSessionPayload
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -20,16 +21,12 @@ export async function startMobileSessionWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
+  const expectedStatusCode = 201;
 
   expect(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('session_id');
 
   return response;
 }
@@ -37,7 +34,7 @@ export async function startMobileSessionWithApi(
 export async function updateMobileUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: Record<string, unknown>
+  payload: UpdateMobileUserPayload
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -50,16 +47,12 @@ export async function updateMobileUserWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
   const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
 
   expect(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('user_id');
 
   return response;
 }

@@ -1,6 +1,6 @@
-// tests/api/campaign.inapp.api.spec.ts
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
+  API_E2E_ACCESS_TOKEN_SDK,
   API_E2E_APP_ID
 } from '@_config/env.config';
 import {
@@ -11,14 +11,23 @@ import {
 } from '@_src/api/factories/campaigns.api.factory';
 import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
+  startMobileSessionWithApi,
+  updateMobileUserWithApi
+} from '@_src/api/factories/mobile.api.factory';
+import {
   batchDeleteSegmentsWithApi,
   createSegmentWithApi,
   getSegmentsWithApi
 } from '@_src/api/factories/segments.api.factory';
 import { createCampaignPayload } from '@_src/api/test-data/create-inapp-large-campaign-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
+import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
+import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
+import {
+  APIE2ELoginUserModel,
+  APIE2ETokenSDKModel
+} from '@_src/ui/models/user.model';
 
 test.describe('Test', () => {
   test('should import users, create segment and create campaign, get campaign and remove campaign', async ({
@@ -139,8 +148,12 @@ test.describe('Test', () => {
       apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
       apiE2EAppId: `${API_E2E_APP_ID}`
     };
+
     const csvFilePath = 'src/api/test-data/import.data.users.csv';
 
+    const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
+      apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
+    };
     // Act
     await importUsersWithApi(
       request,
@@ -206,5 +219,24 @@ test.describe('Test', () => {
     );
     expect(createdCampaign).toBeDefined();
     expect(createdCampaign.name).toBe(createCampaignPayload.name);
+
+    await startMobileSessionWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      startMobileSessionPayload
+    );
+
+    // Update user actions with the campaign guid
+    updateMobileUserPayload.user_actions.forEach((action) => {
+      action.guid = createCampaignResponseJson.guid;
+    });
+
+    const updateMobileUserWithApiResponse = await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      updateMobileUserPayload
+    );
+    const updateMobileUserWithApiResponseJson =
+      await updateMobileUserWithApiResponse.json();
   });
 });

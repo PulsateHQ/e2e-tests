@@ -1,4 +1,3 @@
-// tests/api/segments.inapp.api.spec.ts
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   API_E2E_APP_ID

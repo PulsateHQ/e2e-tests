@@ -1,5 +1,5 @@
 import { CreateSegmentPayload } from '@_src/api/models/create-segment.api.model';
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker/locale/en';
 
 export const createSegmentAllUsersPayload: CreateSegmentPayload = {
   name: faker.lorem.word(),
