@@ -133,3 +133,34 @@ export async function batchDeleteCampaignsWithApi(
 
   return response;
 }
+
+export async function getCampaignCombinedStatsWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  campaignId: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
+
+  const response = await request.get(url, { headers });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('export_url');
+  expect(responseJson).toHaveProperty('type');
+  expect(responseJson).toHaveProperty('send');
+  expect(responseJson).toHaveProperty('sdk');
+
+  return response;
+}

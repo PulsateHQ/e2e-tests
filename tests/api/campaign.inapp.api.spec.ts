@@ -7,6 +7,7 @@ import {
   batchDeleteCampaignsWithApi,
   createCampaignWithApi,
   deleteCampaignWithApi,
+  getCampaignCombinedStatsWithApi,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
 import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
@@ -226,17 +227,74 @@ test.describe('Test', () => {
       startMobileSessionPayload
     );
 
-    // Update user actions with the campaign guid
     updateMobileUserPayload.user_actions.forEach((action) => {
       action.guid = createCampaignResponseJson.guid;
     });
 
-    const updateMobileUserWithApiResponse = await updateMobileUserWithApi(
+    await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       updateMobileUserPayload
     );
-    const updateMobileUserWithApiResponseJson =
-      await updateMobileUserWithApiResponse.json();
+
+    const getCampaignCombinedStatsWithApiResponse =
+      await getCampaignCombinedStatsWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        createCampaignResponseJson.id
+      );
+
+    async function waitForCampaignStats(
+      request,
+      campaignId,
+      maxRetries = 10,
+      delay = 2000
+    ) {
+      for (let i = 0; i < maxRetries; i++) {
+        const response = await getCampaignCombinedStatsWithApi(
+          request,
+          APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+          campaignId
+        );
+        const responseJson = await response.json();
+
+        if (
+          responseJson.send === 1 &&
+          responseJson.in_app.send.total_uniq === 1 &&
+          responseJson.in_app.delivery.total_uniq === 1 &&
+          responseJson.in_app.dismiss.total_uniq === 1 &&
+          responseJson.in_app.impression.total_uniq === 1
+        ) {
+          return responseJson;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+
+      throw new Error(
+        'Campaign stats did not reach the expected values within the timeout period'
+      );
+    }
+
+    // Usage
+    const getCampaignCombinedStatsWithApiResponseJson =
+      await waitForCampaignStats(request, createCampaignResponseJson.id);
+
+    expect(getCampaignCombinedStatsWithApiResponseJson).toHaveProperty(
+      'send',
+      1
+    );
+    expect(
+      getCampaignCombinedStatsWithApiResponseJson.in_app.send
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignCombinedStatsWithApiResponseJson.in_app.delivery
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignCombinedStatsWithApiResponseJson.in_app.dismiss
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignCombinedStatsWithApiResponseJson.in_app.impression
+    ).toHaveProperty('total_uniq', 1);
   });
 });
