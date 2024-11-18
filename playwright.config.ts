@@ -25,6 +25,7 @@ export default defineConfig({
   projects: [
     {
       name: 'firefox',
+      testDir: './tests/api',
       use: {
         ...devices['Desktop Firefox']
       }
