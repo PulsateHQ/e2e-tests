@@ -15,6 +15,7 @@ function requireEnvVariable(envVariableName: string): string {
   return envVariableValue;
 }
 
+export const BASE_URL = requireEnvVariable('BASE_URL');
 export const SDK_API_URL = requireEnvVariable('SDK_API_URL');
 export const API_E2E_ACCESS_TOKEN_ADMIN = requireEnvVariable(
   'API_E2E_ACCESS_TOKEN_ADMIN'
