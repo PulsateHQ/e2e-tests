@@ -1,10 +1,11 @@
 import {
   BASE_URL,
-  USER_LOGIN_ADMIN,
-  USER_PASSWORD_ADMIN
+  UI_INTEGRATION_APP_ID,
+  UI_INTEGRATION_LOGIN_ADMIN,
+  UI_INTEGRATION_PASSWORD_ADMIN
 } from '@_config/env.config';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { LoginUserModel } from '@_src/ui/models/user.model';
+import { UIIntegrationLoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('Login Functionality', () => {
   test('should reject login with incorrect password and display error messages', async ({
@@ -12,18 +13,18 @@ test.describe('Login Functionality', () => {
   }) => {
     const expectedURL = `${BASE_URL}/admins/sign_in`;
 
-    const loginUserDataMissingPassword: LoginUserModel = {
-      userEmail: `${USER_LOGIN_ADMIN}`,
+    const loginUserDataMissingPassword: UIIntegrationLoginUserModel = {
+      userEmail: `${UI_INTEGRATION_LOGIN_ADMIN}`,
       userPassword: ``
     };
 
-    const loginUserDataMissingEmail: LoginUserModel = {
+    const loginUserDataMissingEmail: UIIntegrationLoginUserModel = {
       userEmail: ``,
-      userPassword: `${USER_PASSWORD_ADMIN}`
+      userPassword: `${UI_INTEGRATION_PASSWORD_ADMIN}`
     };
 
-    const loginUserDataIncorrectPassword: LoginUserModel = {
-      userEmail: `${USER_LOGIN_ADMIN}`,
+    const loginUserDataIncorrectPassword: UIIntegrationLoginUserModel = {
+      userEmail: `${UI_INTEGRATION_LOGIN_ADMIN}`,
       userPassword: `incorrect_password`
     };
 
@@ -81,14 +82,14 @@ test.describe('Login Functionality', () => {
     dashboardPage,
     mainNavigationComponent
   }) => {
-    const loginUserData: LoginUserModel = {
-      userEmail: `${USER_LOGIN_ADMIN}`,
-      userPassword: `${USER_PASSWORD_ADMIN}`
+    const loginUserData: UIIntegrationLoginUserModel = {
+      userEmail: `${UI_INTEGRATION_LOGIN_ADMIN}`,
+      userPassword: `${UI_INTEGRATION_PASSWORD_ADMIN}`
     };
 
     await loginPage.login(loginUserData);
 
-    const expectedURL = `${BASE_URL}/mobile/apps/${process.env.APP_ID}/dashboard_beta`;
+    const expectedURL = `${BASE_URL}/mobile/apps/${UI_INTEGRATION_APP_ID}/dashboard_beta`;
 
     const dashboardURL = await dashboardPage.validateUrl();
 

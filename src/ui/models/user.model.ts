@@ -1,4 +1,4 @@
-export interface LoginUserModel {
+export interface UIIntegrationLoginUserModel {
   userEmail: string;
   userPassword: string;
 }
@@ -14,4 +14,9 @@ export interface CompanyRegistrationModel {
   companyName: string;
   appName: string;
   activationCode: string;
+}
+
+export interface APIE2ELoginUserModel {
+  apiE2EAccessTokenAdmin: string;
+  apiE2EAppId: string;
 }
