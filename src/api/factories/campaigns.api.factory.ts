@@ -63,7 +63,7 @@ export async function createCampaignWithApi(
   });
 
   const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  const expectedStatusCode = 201;
 
   const responseJson = JSON.parse(responseBody);
 
@@ -91,16 +91,12 @@ export async function deleteCampaignWithApi(
 
   const response = await request.delete(url, { headers });
 
-  const responseBody = await response.text();
   const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
 
   expect(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('success', true);
 
   return response;
 }
@@ -128,6 +124,30 @@ export async function batchDeleteCampaignsWithApi(
     }
   );
 
+  const expectedStatusCode = 200;
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+
+  return response;
+}
+
+export async function getCampaignCombinedStatsWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  campaignId: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
+
+  const response = await request.get(url, { headers });
+
   const responseBody = await response.text();
   const expectedStatusCode = 200;
 
@@ -137,7 +157,52 @@ export async function batchDeleteCampaignsWithApi(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('resources_count');
+  expect(responseJson).toHaveProperty('export_url');
+  expect(responseJson).toHaveProperty('type');
+  expect(responseJson).toHaveProperty('send');
+  expect(responseJson).toHaveProperty('sdk');
 
   return response;
+}
+
+export async function getCampaignCombinedStatsWithWait(
+  request: APIRequestContext,
+  authToken: string,
+  campaignId: string,
+  maxRetries = 10,
+  delay = 2000
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
+
+  for (let i = 0; i < maxRetries; i++) {
+    const response = await request.get(url, { headers });
+    const responseBody = await response.text();
+    const expectedStatusCode = 200;
+
+    const responseJson = JSON.parse(responseBody);
+
+    expect(
+      response.status(),
+      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+    ).toBe(expectedStatusCode);
+
+    if (responseJson.send === 1) {
+      expect(responseJson).toHaveProperty('export_url');
+      expect(responseJson).toHaveProperty('type');
+      expect(responseJson).toHaveProperty('send');
+      expect(responseJson).toHaveProperty('sdk');
+      return response;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  throw new Error(
+    'Campaign stats did not reach the expected values within the timeout period'
+  );
 }

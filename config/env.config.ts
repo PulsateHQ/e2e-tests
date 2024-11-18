@@ -30,3 +30,6 @@ export const API_E2E_ACCESS_TOKEN_ADMIN = requireEnvVariable(
   'API_E2E_ACCESS_TOKEN_ADMIN'
 );
 export const API_E2E_APP_ID = requireEnvVariable('API_E2E_APP_ID');
+export const API_E2E_ACCESS_TOKEN_SDK = requireEnvVariable(
+  'API_E2E_ACCESS_TOKEN_SDK'
+);
