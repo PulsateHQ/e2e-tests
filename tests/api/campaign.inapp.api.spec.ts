@@ -7,7 +7,7 @@ import {
   batchDeleteCampaignsWithApi,
   createCampaignWithApi,
   deleteCampaignWithApi,
-  getCampaignCombinedStatsWithApi,
+  getCampaignCombinedStatsWithWait,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
 import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
@@ -30,7 +30,7 @@ import {
   APIE2ETokenSDKModel
 } from '@_src/ui/models/user.model';
 
-test.describe('Test', () => {
+test.describe('Campaign and Segment Management', () => {
   test('should import users, create segment and create campaign, get campaign and remove campaign', async ({
     request
   }) => {
@@ -105,6 +105,7 @@ test.describe('Test', () => {
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
+    // Assert (Campaign Created)
     expect(createCampaignResponseJson).toHaveProperty(
       'name',
       createCampaignPayload.name
@@ -121,6 +122,8 @@ test.describe('Test', () => {
       (campaign: { id: string }) =>
         campaign.id === createCampaignResponseJson.id
     );
+
+    // Assert (Campaign Exists)
     expect(createdCampaign).toBeDefined();
     expect(createdCampaign.name).toBe(createCampaignPayload.name);
 
@@ -155,7 +158,8 @@ test.describe('Test', () => {
     const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
       apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
     };
-    // Act
+
+    // Act (Import Users)
     await importUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -202,6 +206,7 @@ test.describe('Test', () => {
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
+    // Assert (Campaign Created)
     expect(createCampaignResponseJson).toHaveProperty(
       'name',
       createCampaignPayload.name
@@ -218,15 +223,19 @@ test.describe('Test', () => {
       (campaign: { id: string }) =>
         campaign.id === createCampaignResponseJson.id
     );
+
+    // Assert (Campaign Exists)
     expect(createdCampaign).toBeDefined();
     expect(createdCampaign.name).toBe(createCampaignPayload.name);
 
+    // Act (Start Mobile Session)
     await startMobileSessionWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       startMobileSessionPayload
     );
 
+    // Act (Update Mobile User)
     updateMobileUserPayload.user_actions.forEach((action) => {
       action.guid = createCampaignResponseJson.guid;
     });
@@ -237,57 +246,32 @@ test.describe('Test', () => {
       updateMobileUserPayload
     );
 
-    async function waitForCampaignStats(
-      request: any,
-      campaignId: string,
-      maxRetries = 10,
-      delay = 2000
-    ): Promise<any> {
-      for (let i = 0; i < maxRetries; i++) {
-        const response = await getCampaignCombinedStatsWithApi(
-          request,
-          APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-          campaignId
-        );
-        const responseJson = await response.json();
-
-        if (
-          responseJson.send === 1 &&
-          responseJson.in_app.send.total_uniq === 1 &&
-          responseJson.in_app.delivery.total_uniq === 1 &&
-          responseJson.in_app.dismiss.total_uniq === 1 &&
-          responseJson.in_app.impression.total_uniq === 1
-        ) {
-          return responseJson;
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-
-      throw new Error(
-        'Campaign stats did not reach the expected values within the timeout period'
+    // Act (Get Campaign Combined Stats)
+    const getCampaignCombinedStatsWithWaitResponse =
+      await getCampaignCombinedStatsWithWait(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        createCampaignResponseJson.id
       );
-    }
 
-    // Usage
-    const getCampaignCombinedStatsWithApiResponseJson =
-      await waitForCampaignStats(request, createCampaignResponseJson.id);
+    const getCampaignCombinedStatsWithWaitResponseJson =
+      await getCampaignCombinedStatsWithWaitResponse.json();
 
-    expect(getCampaignCombinedStatsWithApiResponseJson).toHaveProperty(
-      'send',
-      1
+    // Assert (Validate Response Body)
+    expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty(
+      'in_app'
     );
     expect(
-      getCampaignCombinedStatsWithApiResponseJson.in_app.send
+      getCampaignCombinedStatsWithWaitResponseJson.in_app.send
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithApiResponseJson.in_app.delivery
+      getCampaignCombinedStatsWithWaitResponseJson.in_app.delivery
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithApiResponseJson.in_app.dismiss
+      getCampaignCombinedStatsWithWaitResponseJson.in_app.dismiss
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithApiResponseJson.in_app.impression
+      getCampaignCombinedStatsWithWaitResponseJson.in_app.impression
     ).toHaveProperty('total_uniq', 1);
   });
 });

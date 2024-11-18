@@ -16,7 +16,7 @@ import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
 
-test.describe('Test', () => {
+test.describe('User and Segment Management', () => {
   test('should import users, validate the number of users, and delete users', async ({
     request
   }) => {
@@ -66,7 +66,7 @@ test.describe('Test', () => {
     expect(getUsersResponseJsonAfterDeletion.data.length).toBe(0);
   });
 
-  test('should import users, validate the number of users, and get segment and create segment and remove segment', async ({
+  test('should import users, validate the number of users, and manage segments', async ({
     request
   }) => {
     // Arrange
