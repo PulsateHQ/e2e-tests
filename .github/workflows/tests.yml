@@ -55,12 +55,27 @@ jobs:
         with:
           github-token: ${{ secrets.E2E_PAT }}
           script: |
-            const status = '${{ job.status }}'.toLowerCase();
-            await github.rest.repos.createCommitStatus({
-              owner: 'PulsateHQ',
-              repo: 'smokesignals',
-              sha: '${{ github.event.client_payload.commit_sha }}',
-              state: status,
-              description: 'E2E tests completed with status: ${{ job.status }}',
-              context: 'e2e-tests/${{ github.event.client_payload.environment }}'
-            });
+            try {
+              const status = '${{ job.status }}'.toLowerCase();
+              console.log('Attempting to create status with:', {
+                owner: 'PulsateHQ',
+                repo: 'smokesignals',
+                sha: '${{ github.event.client_payload.commit_sha }}',
+                state: status,
+                context: 'e2e-tests/${{ github.event.client_payload.environment }}'
+              });
+              
+              const response = await github.rest.repos.createCommitStatus({
+                owner: 'PulsateHQ',
+                repo: 'smokesignals',
+                sha: '${{ github.event.client_payload.commit_sha }}',
+                state: status,
+                description: 'E2E tests completed with status: ${{ job.status }}',
+                context: 'e2e-tests/${{ github.event.client_payload.environment }}'
+              });
+
+              console.log('GitHub API response:', response);
+            } catch (error) {
+              console.error('Failed to update PR status:', error);
+              core.setFailed(`Failed to update PR status: ${error.message}`);
+            }
