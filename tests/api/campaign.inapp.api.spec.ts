@@ -237,19 +237,12 @@ test.describe('Test', () => {
       updateMobileUserPayload
     );
 
-    const getCampaignCombinedStatsWithApiResponse =
-      await getCampaignCombinedStatsWithApi(
-        request,
-        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        createCampaignResponseJson.id
-      );
-
     async function waitForCampaignStats(
-      request,
-      campaignId,
+      request: any,
+      campaignId: string,
       maxRetries = 10,
       delay = 2000
-    ) {
+    ): Promise<any> {
       for (let i = 0; i < maxRetries; i++) {
         const response = await getCampaignCombinedStatsWithApi(
           request,
