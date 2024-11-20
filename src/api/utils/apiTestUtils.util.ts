@@ -11,53 +11,9 @@ import {
   deleteUserWithApi,
   getUsersWithApi
 } from '@_src/api/factories/users.api.factory';
-import { Headers } from '@_src/api/models/headers.api.model';
-import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
-import { APIRequestContext, APIResponse, test } from '@playwright/test';
-
-export async function getCampaignCombinedStatsWithWait(
-  request: APIRequestContext,
-  authToken: string,
-  campaignId: string,
-  maxRetries = 10,
-  delay = 2000
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
-
-  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
-
-  for (let i = 0; i < maxRetries; i++) {
-    const response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
-
-    if (responseJson.send === 1) {
-      expect(responseJson).toHaveProperty('export_url');
-      expect(responseJson).toHaveProperty('type');
-      expect(responseJson).toHaveProperty('send');
-      expect(responseJson).toHaveProperty('sdk');
-      return response;
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, delay));
-  }
-
-  throw new Error(
-    'Campaign stats did not reach the expected values within the timeout period'
-  );
-}
+import { APIRequestContext, test } from '@playwright/test';
 
 export async function deleteAllUsers(
   request: APIRequestContext,

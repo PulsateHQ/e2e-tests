@@ -6,6 +6,7 @@ import {
 import {
   createCampaignWithApi,
   deleteCampaignWithApi,
+  getCampaignCombinedStatsWithApi,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
 import {
@@ -22,7 +23,6 @@ import {
   deleteAllCampaigns,
   deleteAllSegments,
   deleteAllUsers,
-  getCampaignCombinedStatsWithWait,
   importRandomUsers
 } from '@_src/api/utils/apiTestUtils.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
@@ -177,12 +177,12 @@ test.describe('Campaign and Segment Management', () => {
       updateMobileUserPayload
     );
 
-    // Get Campaign Combined Stats
     const getCampaignCombinedStatsWithWaitResponse =
-      await getCampaignCombinedStatsWithWait(
+      await getCampaignCombinedStatsWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        createCampaignResponseJson.id
+        createCampaignResponseJson.id,
+        1
       );
 
     const getCampaignCombinedStatsWithWaitResponseJson =

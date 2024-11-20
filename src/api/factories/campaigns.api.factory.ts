@@ -137,7 +137,8 @@ export async function batchDeleteCampaignsWithApi(
 export async function getCampaignCombinedStatsWithApi(
   request: APIRequestContext,
   authToken: string,
-  campaignId: string
+  campaignId: string,
+  expectedSend: number
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -146,21 +147,24 @@ export async function getCampaignCombinedStatsWithApi(
 
   const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
 
-  const response = await request.get(url, { headers });
+  let response: APIResponse;
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  await expect(async () => {
+    response = await request.get(url, { headers });
+    const responseBody = await response.text();
+    const expectedStatusCode = 200;
 
-  const responseJson = JSON.parse(responseBody);
+    const responseJson = JSON.parse(responseBody);
 
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('export_url');
-  expect(responseJson).toHaveProperty('type');
-  expect(responseJson).toHaveProperty('send');
-  expect(responseJson).toHaveProperty('sdk');
+    expect(
+      response.status(),
+      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+    ).toBe(expectedStatusCode);
+    expect(responseJson).toHaveProperty('export_url');
+    expect(responseJson).toHaveProperty('type');
+    expect(responseJson).toHaveProperty('send', expectedSend);
+    expect(responseJson).toHaveProperty('sdk');
+  }).toPass({ timeout: 10_000 });
 
-  return response;
+  return response!;
 }
