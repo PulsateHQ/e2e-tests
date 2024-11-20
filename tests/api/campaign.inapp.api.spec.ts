@@ -4,7 +4,6 @@ import {
   API_E2E_APP_ID
 } from '@_config/env.config';
 import {
-  batchDeleteCampaignsWithApi,
   createCampaignWithApi,
   deleteCampaignWithApi,
   getCampaignsWithApi
@@ -15,6 +14,7 @@ import {
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
+import { getUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createCampaignPayload } from '@_src/api/test-data/create-inapp-large-campaign-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
@@ -57,13 +57,11 @@ test.describe('Campaign and Segment Management', () => {
   test('should import users, create segment and create campaign, get campaign and remove campaign', async ({
     request
   }) => {
-    const csvFilePath = 'src/api/test-data/import.data.users.csv';
     const numberOfUsers = 5;
 
     await importRandomUsers(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      csvFilePath,
       APIE2ELoginUserModel.apiE2EAppId,
       numberOfUsers
     );
@@ -86,10 +84,7 @@ test.describe('Campaign and Segment Management', () => {
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
-    expect(createCampaignResponseJson).toHaveProperty(
-      'name',
-      createCampaignPayload.name
-    );
+    expect(createCampaignResponseJson.name).toBe(createCampaignPayload.name);
 
     // Get Campaigns
     const getCampaignsResponse = await getCampaignsWithApi(
@@ -127,16 +122,13 @@ test.describe('Campaign and Segment Management', () => {
   test('should create segment and create campaign, start mobile session user and update mobile session user', async ({
     request
   }) => {
-    const csvFilePath = 'src/api/test-data/import.data.users.csv';
+    const numberOfUsers = 1;
 
-    // Import Users
-    await importUsersWithApi(
+    await importRandomUsers(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      {
-        file: csvFilePath,
-        app_id: APIE2ELoginUserModel.apiE2EAppId
-      }
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
     );
 
     // Create Segment
@@ -157,10 +149,16 @@ test.describe('Campaign and Segment Management', () => {
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
-    expect(createCampaignResponseJson).toHaveProperty(
-      'name',
-      createCampaignPayload.name
+    expect(createCampaignResponseJson.name).toBe(createCampaignPayload.name);
+
+    const getUsersResponse = await getUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
+    const getUsersResponseJson = await getUsersResponse.json();
+
+    startMobileSessionPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionWithApi(

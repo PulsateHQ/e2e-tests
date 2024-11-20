@@ -11,7 +11,8 @@ import { getUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import {
   deleteAllSegments,
-  deleteAllUsers
+  deleteAllUsers,
+  importRandomUsers
 } from '@_src/api/utils/apiTestUtils.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
@@ -33,15 +34,13 @@ test.describe('User and Segment Management', () => {
   test('should import users, validate the number of users, and delete users', async ({
     request
   }) => {
-    const csvFilePath = 'src/api/test-data/import.data.users.csv';
+    const numberOfUsers = 2;
 
-    await importUsersWithApi(
+    await importRandomUsers(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      {
-        file: csvFilePath,
-        app_id: APIE2ELoginUserModel.apiE2EAppId
-      }
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
     );
 
     const getUsersResponse = await getUsersWithApi(
@@ -56,15 +55,13 @@ test.describe('User and Segment Management', () => {
   test('should import users, validate the number of users, and manage segments', async ({
     request
   }) => {
-    const csvFilePath = 'src/api/test-data/import.data.users.csv';
+    const numberOfUsers = 2;
 
-    await importUsersWithApi(
+    await importRandomUsers(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      {
-        file: csvFilePath,
-        app_id: APIE2ELoginUserModel.apiE2EAppId
-      }
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
     );
 
     const getUsersResponse = await getUsersWithApi(

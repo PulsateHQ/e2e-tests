@@ -15,7 +15,7 @@ import { Headers } from '@_src/api/models/headers.api.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
-import { APIRequestContext, APIResponse } from '@playwright/test';
+import { APIRequestContext, APIResponse, test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -61,70 +61,92 @@ export async function getCampaignCombinedStatsWithWait(
   );
 }
 
-// Utility function to delete all users
 export async function deleteAllUsers(
   request: APIRequestContext,
   token: string
 ): Promise<void> {
-  const getUsersResponse = await getUsersWithApi(request, token);
-  const getUsersResponseJson = await getUsersResponse.json();
+  await test.step('Deleting all users', async () => {
+    const getUsersResponse = await getUsersWithApi(request, token);
+    const getUsersResponseJson = await getUsersResponse.json();
+    const initialUserCount = getUsersResponseJson.data.length;
 
-  for (const user of getUsersResponseJson.data) {
-    await deleteUserWithApi(request, token, user.id);
-  }
+    for (const user of getUsersResponseJson.data) {
+      await deleteUserWithApi(request, token, user.id);
+    }
 
-  const getUsersResponseAfterDeletion = await getUsersWithApi(request, token);
-  const getUsersResponseJsonAfterDeletion =
-    await getUsersResponseAfterDeletion.json();
-  expect(getUsersResponseAfterDeletion.status()).toBe(200);
-  expect(getUsersResponseJsonAfterDeletion.data.length).toBe(0);
+    const getUsersResponseAfterDeletion = await getUsersWithApi(request, token);
+    const getUsersResponseJsonAfterDeletion =
+      await getUsersResponseAfterDeletion.json();
+    const finalUserCount = getUsersResponseJsonAfterDeletion.data.length;
+
+    expect(getUsersResponseAfterDeletion.status()).toBe(200);
+    expect(finalUserCount).toBe(0);
+
+    await test.step(`Deleted ${initialUserCount} users, ${finalUserCount} remaining.`, async () => {});
+  });
 }
 
-// Utility function to delete all segments
 export async function deleteAllSegments(
   request: APIRequestContext,
   token: string
 ): Promise<void> {
-  const getSegmentsResponse = await getSegmentsWithApi(request, token);
-  const getSegmentsResponseJson = await getSegmentsResponse.json();
+  await test.step('Deleting all segments', async () => {
+    const getSegmentsResponse = await getSegmentsWithApi(request, token);
+    const getSegmentsResponseJson = await getSegmentsResponse.json();
+    const initialSegmentCount = getSegmentsResponseJson.data.length;
 
-  await batchDeleteSegmentsWithApi(
-    request,
-    token,
-    getSegmentsResponseJson.data.map((segment: { id: string }) => segment.id)
-  );
+    await batchDeleteSegmentsWithApi(
+      request,
+      token,
+      getSegmentsResponseJson.data.map((segment: { id: string }) => segment.id)
+    );
 
-  const getSegmentsResponseAfterDeletion = await getSegmentsWithApi(
-    request,
-    token
-  );
-  const getSegmentsResponseJsonAfterDeletion =
-    await getSegmentsResponseAfterDeletion.json();
-  expect(getSegmentsResponseAfterDeletion.status()).toBe(200);
-  expect(getSegmentsResponseJsonAfterDeletion.data.length).toBe(0);
+    const getSegmentsResponseAfterDeletion = await getSegmentsWithApi(
+      request,
+      token
+    );
+    const getSegmentsResponseJsonAfterDeletion =
+      await getSegmentsResponseAfterDeletion.json();
+    const finalSegmentCount = getSegmentsResponseJsonAfterDeletion.data.length;
+
+    expect(getSegmentsResponseAfterDeletion.status()).toBe(200);
+    expect(finalSegmentCount).toBe(0);
+
+    await test.step(`Deleted ${initialSegmentCount} segments, ${finalSegmentCount} remaining.`, async () => {});
+  });
 }
 
 export async function deleteAllCampaigns(
   request: APIRequestContext,
   token: string
 ): Promise<void> {
-  const getCampaignsResponse = await getCampaignsWithApi(request, token);
-  const getCampaignsResponseJson = await getCampaignsResponse.json();
+  await test.step('Deleting all campaigns', async () => {
+    const getCampaignsResponse = await getCampaignsWithApi(request, token);
+    const getCampaignsResponseJson = await getCampaignsResponse.json();
+    const initialCampaignCount = getCampaignsResponseJson.data.length;
 
-  await batchDeleteCampaignsWithApi(
-    request,
-    token,
-    getCampaignsResponseJson.data.map((campaign: { id: string }) => campaign.id)
-  );
+    await batchDeleteCampaignsWithApi(
+      request,
+      token,
+      getCampaignsResponseJson.data.map(
+        (campaign: { id: string }) => campaign.id
+      )
+    );
 
-  const getCampaignsResponseAfterDeletion = await getCampaignsWithApi(
-    request,
-    token
-  );
-  const getCampaignsResponseJsonAfterDeletion =
-    await getCampaignsResponseAfterDeletion.json();
-  expect(getCampaignsResponseAfterDeletion.status()).toBe(200);
-  expect(getCampaignsResponseJsonAfterDeletion.data.length).toBe(0);
+    const getCampaignsResponseAfterDeletion = await getCampaignsWithApi(
+      request,
+      token
+    );
+    const getCampaignsResponseJsonAfterDeletion =
+      await getCampaignsResponseAfterDeletion.json();
+    const finalCampaignCount =
+      getCampaignsResponseJsonAfterDeletion.data.length;
+
+    expect(getCampaignsResponseAfterDeletion.status()).toBe(200);
+    expect(finalCampaignCount).toBe(0);
+
+    await test.step(`Deleted ${initialCampaignCount} campaigns, ${finalCampaignCount} remaining.`, async () => {});
+  });
 }
 
 function generateRandomUser(): string {
@@ -140,31 +162,26 @@ function generateRandomUser(): string {
   return `${userAlias},${emailAddress},${firstName},${lastName},${smsPhoneNumber},${currentCity},${age},${gender}`;
 }
 
-export function appendRandomUsersToCsv(
-  filePath: string,
-  numberOfUsers: number
-): void {
-  const csvFilePath = path.resolve(filePath);
-  let csvContent = fs.readFileSync(csvFilePath, 'utf-8');
+function generateCsvContent(numberOfUsers: number): Buffer {
+  let csvContent =
+    'userAlias,emailAddress,firstName,lastName,smsPhoneNumber,currentCity,age,gender';
 
   for (let i = 0; i < numberOfUsers; i++) {
     const randomUser = generateRandomUser();
     csvContent += `\n${randomUser}`;
   }
 
-  fs.writeFileSync(csvFilePath, csvContent, 'utf-8');
+  return Buffer.from(csvContent, 'utf-8');
 }
 
 export async function importRandomUsers(
   request: APIRequestContext,
   authToken: string,
-  filePath: string,
   appId: string,
   numberOfUsers: number
 ): Promise<void> {
-  appendRandomUsersToCsv(filePath, numberOfUsers);
-  await importUsersWithApi(request, authToken, {
-    file: filePath,
-    app_id: appId
+  await test.step(`Appending ${numberOfUsers} random users to CSV content`, async () => {
+    const csvContent = generateCsvContent(numberOfUsers);
+    await importUsersWithApi(request, authToken, { csvContent, app_id: appId });
   });
 }
