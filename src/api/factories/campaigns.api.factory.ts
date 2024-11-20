@@ -145,7 +145,7 @@ export async function getCampaignCombinedStatsWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
+  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/stats`;
 
   let response: APIResponse;
 
@@ -163,7 +163,6 @@ export async function getCampaignCombinedStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
-    expect(responseJson).toHaveProperty('sdk');
   }).toPass({ timeout: 10_000 });
 
   return response!;

@@ -5,4 +5,10 @@ node_modules/
 /playwright/.cache/
 
 .env.tiger
+.env.leopard
+.env.puma
+.env.sealion
+.env.jaguar
+.env.whale
+.env.bear
 .env.local

@@ -13,7 +13,7 @@ export default defineConfig({
   },
   fullyParallel: false,
   retries: 0,
-  workers: undefined,
+  workers: 1,
   reporter: 'html',
   use: {
     baseURL: BASE_URL,
