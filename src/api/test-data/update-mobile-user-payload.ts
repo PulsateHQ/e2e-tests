@@ -2,7 +2,7 @@ import { UpdateMobileUserPayload } from '@_src/api/models/update-mobile-user.api
 import { faker } from '@faker-js/faker/locale/en';
 
 export const updateMobileUserPayload: UpdateMobileUserPayload = {
-  alias: 'michal1@pulsatehq.com',
+  alias: '',
   current_location: [49.4302321, 19.9674985],
   custom_tags: [],
   occurred_at: 1663059515,

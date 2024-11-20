@@ -4,26 +4,27 @@ import {
   API_E2E_APP_ID
 } from '@_config/env.config';
 import {
-  batchDeleteCampaignsWithApi,
   createCampaignWithApi,
   deleteCampaignWithApi,
-  getCampaignCombinedStatsWithWait,
+  getCampaignCombinedStatsWithApi,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
-import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
   startMobileSessionWithApi,
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
-import {
-  batchDeleteSegmentsWithApi,
-  createSegmentWithApi,
-  getSegmentsWithApi
-} from '@_src/api/factories/segments.api.factory';
+import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
+import { getUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createCampaignPayload } from '@_src/api/test-data/create-inapp-large-campaign-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
 import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
+import {
+  deleteAllCampaigns,
+  deleteAllSegments,
+  deleteAllUsers,
+  importRandomUsers
+} from '@_src/api/utils/apiTestUtils.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
   APIE2ELoginUserModel,
@@ -31,73 +32,49 @@ import {
 } from '@_src/ui/models/user.model';
 
 test.describe('Campaign and Segment Management', () => {
+  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
+    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
+    apiE2EAppId: `${API_E2E_APP_ID}`
+  };
+
+  const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
+    apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
+  };
+
+  test.beforeEach(async ({ request }) => {
+    await deleteAllCampaigns(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    await deleteAllSegments(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+  });
+
   test('should import users, create segment and create campaign, get campaign and remove campaign', async ({
     request
   }) => {
-    // Arrange
-    const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-      apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-      apiE2EAppId: `${API_E2E_APP_ID}`
-    };
-    const csvFilePath = 'src/api/test-data/import.data.users.csv';
+    const numberOfUsers = 5;
 
-    // Act (Import Users)
-    await importUsersWithApi(
+    await importRandomUsers(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      {
-        file: csvFilePath,
-        app_id: APIE2ELoginUserModel.apiE2EAppId
-      }
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
     );
 
-    // Act (Get Segments)
-    const getSegmentsResponseBeforeCampaign = await getSegmentsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    const getSegmentsResponseBeforeCampaignJSON =
-      await getSegmentsResponseBeforeCampaign.json();
-
-    // Act (Batch Delete Segments)
-    await batchDeleteSegmentsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      getSegmentsResponseBeforeCampaignJSON.data.map(
-        (segment: { id: string }) => segment.id
-      )
-    );
-
-    // Act (Get Campaigns)
-    const getCampaignsResponseBeforeCampaign = await getCampaignsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    const getCampaignsResponseBeforeCampaignJson =
-      await getCampaignsResponseBeforeCampaign.json();
-
-    // Act (Batch Delete Campaigns)
-    await batchDeleteCampaignsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      getCampaignsResponseBeforeCampaignJson.data.map(
-        (campaign: { id: string }) => campaign.id
-      )
-    );
-
-    // Act (Create Segment)
-    const segmentsResponseAfterCreation = await createSegmentWithApi(
+    // Create Segment
+    const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createSegmentAllUsersPayload
     );
-    const getSegmentsResponseJsonAfterCreation =
-      await segmentsResponseAfterCreation.json();
+    const createSegmentResponseJson = await createSegmentResponse.json();
 
-    // Act (Create Campaign)
-    createCampaignPayload.segment_ids = [
-      getSegmentsResponseJsonAfterCreation.segment.id
-    ];
+    // Create Campaign
+    createCampaignPayload.segment_ids = [createSegmentResponseJson.segment.id];
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -105,13 +82,10 @@ test.describe('Campaign and Segment Management', () => {
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
-    // Assert (Campaign Created)
-    expect(createCampaignResponseJson).toHaveProperty(
-      'name',
-      createCampaignPayload.name
-    );
+    // Assert Campaign Created
+    expect(createCampaignResponseJson.name).toBe(createCampaignPayload.name);
 
-    // Act (Get Campaigns)
+    // Get Campaigns
     const getCampaignsResponse = await getCampaignsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -123,18 +97,18 @@ test.describe('Campaign and Segment Management', () => {
         campaign.id === createCampaignResponseJson.id
     );
 
-    // Assert (Campaign Exists)
+    // Assert Campaign Exists
     expect(createdCampaign).toBeDefined();
     expect(createdCampaign.name).toBe(createCampaignPayload.name);
 
-    // Act (Delete Campaign)
+    // Delete Campaign
     await deleteCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createdCampaign.id
     );
 
-    // Assert (Verify Deletion)
+    // Verify Deletion
     const getCampaignsResponseAfterDeletion = await getCampaignsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -147,58 +121,25 @@ test.describe('Campaign and Segment Management', () => {
   test('should create segment and create campaign, start mobile session user and update mobile session user', async ({
     request
   }) => {
-    // Arrange
-    const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-      apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-      apiE2EAppId: `${API_E2E_APP_ID}`
-    };
+    const numberOfUsers = 1;
 
-    const csvFilePath = 'src/api/test-data/import.data.users.csv';
-
-    const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
-      apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
-    };
-
-    // Act (Import Users)
-    await importUsersWithApi(
+    await importRandomUsers(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      {
-        file: csvFilePath,
-        app_id: APIE2ELoginUserModel.apiE2EAppId
-      }
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
     );
 
-    // Act (Get Campaigns)
-    const getCampaignsResponseBeforeCampaign = await getCampaignsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    const getCampaignsResponseBeforeCampaignJson =
-      await getCampaignsResponseBeforeCampaign.json();
-
-    // Act (Batch Delete Campaign)
-    await batchDeleteCampaignsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      getCampaignsResponseBeforeCampaignJson.data.map(
-        (campaign: { id: string }) => campaign.id
-      )
-    );
-
-    // Act (Create Segment)
-    const segmentsResponseAfterCreation = await createSegmentWithApi(
+    // Create Segment
+    const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createSegmentAllUsersPayload
     );
-    const getSegmentsResponseJsonAfterCreation =
-      await segmentsResponseAfterCreation.json();
+    const createSegmentResponseJson = await createSegmentResponse.json();
 
-    // Act (Create Campaign)
-    createCampaignPayload.segment_ids = [
-      getSegmentsResponseJsonAfterCreation.segment.id
-    ];
+    // Create Campaign
+    createCampaignPayload.segment_ids = [createSegmentResponseJson.segment.id];
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -206,36 +147,26 @@ test.describe('Campaign and Segment Management', () => {
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
-    // Assert (Campaign Created)
-    expect(createCampaignResponseJson).toHaveProperty(
-      'name',
-      createCampaignPayload.name
-    );
+    // Assert Campaign Created
+    expect(createCampaignResponseJson.name).toBe(createCampaignPayload.name);
 
-    // Act (Get Campaigns)
-    const getCampaignsResponse = await getCampaignsWithApi(
+    const getUsersResponse = await getUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
-    const getCampaignsResponseJson = await getCampaignsResponse.json();
+    const getUsersResponseJson = await getUsersResponse.json();
 
-    const createdCampaign = getCampaignsResponseJson.data.find(
-      (campaign: { id: string }) =>
-        campaign.id === createCampaignResponseJson.id
-    );
+    startMobileSessionPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
-    // Assert (Campaign Exists)
-    expect(createdCampaign).toBeDefined();
-    expect(createdCampaign.name).toBe(createCampaignPayload.name);
-
-    // Act (Start Mobile Session)
+    // Start Mobile Session
     await startMobileSessionWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       startMobileSessionPayload
     );
 
-    // Act (Update Mobile User)
+    // Update Mobile User
     updateMobileUserPayload.user_actions.forEach((action) => {
       action.guid = createCampaignResponseJson.guid;
     });
@@ -246,18 +177,18 @@ test.describe('Campaign and Segment Management', () => {
       updateMobileUserPayload
     );
 
-    // Act (Get Campaign Combined Stats)
     const getCampaignCombinedStatsWithWaitResponse =
-      await getCampaignCombinedStatsWithWait(
+      await getCampaignCombinedStatsWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        createCampaignResponseJson.id
+        createCampaignResponseJson.id,
+        1
       );
 
     const getCampaignCombinedStatsWithWaitResponseJson =
       await getCampaignCombinedStatsWithWaitResponse.json();
 
-    // Assert (Validate Response Body)
+    // Assert Validate Response Body
     expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty(
       'in_app'
     );

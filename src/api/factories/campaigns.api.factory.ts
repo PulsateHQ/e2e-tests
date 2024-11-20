@@ -137,40 +137,8 @@ export async function batchDeleteCampaignsWithApi(
 export async function getCampaignCombinedStatsWithApi(
   request: APIRequestContext,
   authToken: string,
-  campaignId: string
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
-
-  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
-
-  const response = await request.get(url, { headers });
-
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('export_url');
-  expect(responseJson).toHaveProperty('type');
-  expect(responseJson).toHaveProperty('send');
-  expect(responseJson).toHaveProperty('sdk');
-
-  return response;
-}
-
-export async function getCampaignCombinedStatsWithWait(
-  request: APIRequestContext,
-  authToken: string,
   campaignId: string,
-  maxRetries = 10,
-  delay = 2000
+  expectedSend: number
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -179,8 +147,10 @@ export async function getCampaignCombinedStatsWithWait(
 
   const url = `${apiUrls.campaignsUrlV2}/${campaignId}/combined_stats`;
 
-  for (let i = 0; i < maxRetries; i++) {
-    const response = await request.get(url, { headers });
+  let response: APIResponse;
+
+  await expect(async () => {
+    response = await request.get(url, { headers });
     const responseBody = await response.text();
     const expectedStatusCode = 200;
 
@@ -190,19 +160,11 @@ export async function getCampaignCombinedStatsWithWait(
       response.status(),
       `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
     ).toBe(expectedStatusCode);
+    expect(responseJson).toHaveProperty('export_url');
+    expect(responseJson).toHaveProperty('type');
+    expect(responseJson).toHaveProperty('send', expectedSend);
+    expect(responseJson).toHaveProperty('sdk');
+  }).toPass({ timeout: 10_000 });
 
-    if (responseJson.send === 1) {
-      expect(responseJson).toHaveProperty('export_url');
-      expect(responseJson).toHaveProperty('type');
-      expect(responseJson).toHaveProperty('send');
-      expect(responseJson).toHaveProperty('sdk');
-      return response;
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, delay));
-  }
-
-  throw new Error(
-    'Campaign stats did not reach the expected values within the timeout period'
-  );
+  return response!;
 }

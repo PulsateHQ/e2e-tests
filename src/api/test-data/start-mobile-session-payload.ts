@@ -2,7 +2,7 @@ import { StartMobileSessionPayload } from '@_src/api/models/start-mobile-session
 import { faker } from '@faker-js/faker/locale/en';
 
 export const startMobileSessionPayload: StartMobileSessionPayload = {
-  alias: 'michal1@pulsatehq.com',
+  alias: '',
   device: {
     type: 'android',
     token: faker.string.uuid(),
