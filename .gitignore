@@ -5,4 +5,8 @@ node_modules/
 /playwright/.cache/
 
 .env.tiger
+.env.leopard
+.env.puma
+.env.tiger
+.env.tiger
 .env.local
