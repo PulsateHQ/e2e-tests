@@ -2,7 +2,6 @@ import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   API_E2E_APP_ID
 } from '@_config/env.config';
-import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
   createSegmentWithApi,
   getSegmentsWithApi
