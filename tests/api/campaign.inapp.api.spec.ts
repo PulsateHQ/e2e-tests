@@ -8,7 +8,6 @@ import {
   deleteCampaignWithApi,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
-import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
   startMobileSessionWithApi,
   updateMobileUserWithApi

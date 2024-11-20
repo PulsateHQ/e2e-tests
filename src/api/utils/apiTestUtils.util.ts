@@ -16,8 +16,6 @@ import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, APIResponse, test } from '@playwright/test';
-import * as fs from 'fs';
-import * as path from 'path';
 
 export async function getCampaignCombinedStatsWithWait(
   request: APIRequestContext,
