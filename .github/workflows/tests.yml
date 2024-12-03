@@ -40,9 +40,6 @@ jobs:
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps firefox
-      - name: Install dotenv-cli
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: npm install -g dotenv-cli
 
   test:
     needs: [prepare-env]
@@ -73,8 +70,6 @@ jobs:
           path: |
             node_modules
           key: node_modules-${{ hashFiles('package-lock.json') }}-${{ inputs.version }}
-      - name: Install dotenv-cli
-        run: npm install -g dotenv-cli
       - name: Create env file
         run: |
           cat << EOF > .env
@@ -86,7 +81,7 @@ jobs:
           ENVIRONMENT=${{ github.event.client_payload.environment }}
           EOF
       - name: Run Playwright tests
-        run: dotenv -e .env -- npx playwright test --project=firefox
+        run: npx dotenv -e .env -- npx playwright test --project=firefox
       - name: Archive test results
         if: success() || failure()
         uses: actions/upload-artifact@v4
