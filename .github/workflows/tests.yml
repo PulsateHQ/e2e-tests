@@ -62,6 +62,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
           registry-url: 'https://npm.pkg.github.com'
+      - name: Check if dotenv-cli is installed
+        run: npm list -g --depth=0
       - name: Create env file
         run: |
           cat << EOF > .env
