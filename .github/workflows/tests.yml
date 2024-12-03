@@ -79,14 +79,21 @@ jobs:
       - name: List installed packages
         run: npm list
       - name: Create env file
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+          API_E2E_APP_ID: ${{ vars.API_E2E_APP_ID }}
+          SDK_API_URL: ${{ vars.SDK_API_URL }}
+          API_E2E_ACCESS_TOKEN_ADMIN: ${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }}
+          API_E2E_ACCESS_TOKEN_SDK: ${{ secrets.API_E2E_ACCESS_TOKEN_SDK }}
+          ENVIRONMENT: ${{ github.event.client_payload.environment }}
         run: |
           touch .env
-          echo BASE_URL=${{ vars.BASE_URL }} >> .env
-          echo API_E2E_APP_ID=${{ vars.API_E2E_APP_ID }} >> .env
-          echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env
-          echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env
-          echo API_E2E_ACCESS_TOKEN_SDK=${{ secrets.API_E2E_ACCESS_TOKEN_SDK }} >> .env
-          echo ENVIRONMENT=${{ github.event.client_payload.environment }} >> .env
+          echo BASE_URL=$BASE_URL >> .env
+          echo API_E2E_APP_ID=$API_E2E_APP_ID >> .env
+          echo SDK_API_URL=$SDK_API_URL >> .env
+          echo API_E2E_ACCESS_TOKEN_ADMIN=$API_E2E_ACCESS_TOKEN_ADMIN >> .env
+          echo API_E2E_ACCESS_TOKEN_SDK=$API_E2E_ACCESS_TOKEN_SDK >> .env
+          echo ENVIRONMENT=$ENVIRONMENT >> .env
       - name: Run Playwright tests
         run: npx dotenv -e .env -- npx playwright test --project=firefox
 
