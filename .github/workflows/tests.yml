@@ -78,6 +78,8 @@ jobs:
           key: node_modules-${{ hashFiles('package-lock.json') }}
       - name: List installed packages
         run: npm list
+      - name: Install dotenv-cli
+        run: npm install -g dotenv-cli
       - name: Create env file
         run: |
           cat << EOF > .env
