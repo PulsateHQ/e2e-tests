@@ -19,7 +19,16 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
       - name: Get installed Playwright version
         id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
+        run: |
+          PLAYWRIGHT_VERSION=$(node -e "
+          const pkgLock = require('./package-lock.json');
+          const playwrightVersion =
+            (pkgLock.dependencies && pkgLock.dependencies['@playwright/test'] && pkgLock.dependencies['@playwright/test'].version) ||
+            (pkgLock.devDependencies && pkgLock.devDependencies['@playwright/test'] && pkgLock.devDependencies['@playwright/test'].version) ||
+            'not-found';
+          console.log(playwrightVersion);
+          ")
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
       - name: Cache playwright binaries
         uses: actions/cache@v4
         id: playwright-cache
@@ -53,23 +62,6 @@ jobs:
           node-version: '20'
           cache: 'npm'
           registry-url: 'https://npm.pkg.github.com'
-      - name: Get installed Playwright version
-        id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
-      - name: Cache playwright binaries
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-cache
-        with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}-${{ inputs.version }}
       - name: Create env file
         run: |
           cat << EOF > .env
@@ -82,6 +74,12 @@ jobs:
           EOF
       - name: Run Playwright tests
         run: npx dotenv -e .env -- npx playwright test --project=firefox
+
+  reports:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - name: Archive test results
         if: success() || failure()
         uses: actions/upload-artifact@v4
@@ -97,7 +95,7 @@ jobs:
           report_paths: './playwright-report/results.xml'
 
   update-pr-status:
-    needs: [test]
+    needs: [reports]
     runs-on: ubuntu-latest
     if: always()
     steps:
