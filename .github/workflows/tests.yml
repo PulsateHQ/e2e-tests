@@ -5,28 +5,76 @@ on:
     types: [run-e2e-tests]
 
 jobs:
-  test:
+  prepare-env:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     environment: ${{ github.event.client_payload.environment }}
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}-${{ inputs.version }}
       - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install firefox
-
+      - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps firefox
       - name: Install dotenv-cli
+        if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install -g dotenv-cli
 
+  test:
+    needs: [prepare-env]
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}-${{ inputs.version }}
+      - name: Install dotenv-cli
+        run: npm install -g dotenv-cli
       - name: Create env file
         run: |
           cat << EOF > .env
@@ -37,20 +85,28 @@ jobs:
           API_E2E_ACCESS_TOKEN_SDK=${{ secrets.API_E2E_ACCESS_TOKEN_SDK }}
           ENVIRONMENT=${{ github.event.client_payload.environment }}
           EOF
-
       - name: Run Playwright tests
         run: dotenv -e .env -- npx playwright test --project=firefox
-
-      - name: Upload test results
-        if: always()
+      - name: Archive test results
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ github.event.client_payload.environment }}
-          path: playwright-report/
-          retention-days: 7
+          name: test-reports-smoke-tests
+          path: |
+            playwright-report/**/*.*
+            test-results/**/*.*
+      - name: Publish smoke test report
+        if: success() || failure()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: './playwright-report/results.xml'
 
+  update-pr-status:
+    needs: [test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Update PR Status
-        if: always()
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.E2E_PAT }}
@@ -64,7 +120,7 @@ jobs:
                 state: status,
                 context: 'e2e-tests/${{ github.event.client_payload.environment }}'
               });
-              
+
               const response = await github.rest.repos.createCommitStatus({
                 owner: 'PulsateHQ',
                 repo: 'smokesignals',

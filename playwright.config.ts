@@ -31,6 +31,27 @@ export default defineConfig({
       }
     },
     {
+      name: 'chrome',
+      testDir: './tests/api',
+      use: {
+        ...devices['Desktop Chrome']
+      }
+    },
+    {
+      name: 'webkit',
+      testDir: './tests/api',
+      use: {
+        ...devices['Desktop Safari']
+      }
+    },
+    {
+      name: 'chromium',
+      testDir: './tests/api',
+      use: {
+        ...devices['Desktop Chromium']
+      }
+    },
+    {
       name: 'setup',
       testMatch: '*.setup.ts'
     }
