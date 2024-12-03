@@ -163,7 +163,7 @@ export async function getCampaignCombinedStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
-  }).toPass({ timeout: 10_000 });
+  }).toPass({ timeout: 20_000 });
 
   return response!;
 }

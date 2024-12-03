@@ -15,8 +15,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: "npm"
-          registry-url: "https://npm.pkg.github.com"
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
@@ -55,7 +55,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          registry-url: "https://npm.pkg.github.com"
+          registry-url: 'https://npm.pkg.github.com'
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
@@ -99,7 +99,7 @@ jobs:
         if: success() || failure()
         uses: mikepenz/action-junit-report@v4
         with:
-          report_paths: "./playwright-report/results.xml"
+          report_paths: './playwright-report/results.xml'
 
   update-pr-status:
     needs: [test]
