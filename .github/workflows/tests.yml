@@ -61,6 +61,7 @@ jobs:
     needs: [prepare-env]
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    environment: ${{ github.event.client_payload.environment }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -78,8 +79,6 @@ jobs:
           key: node_modules-${{ hashFiles('package-lock.json') }}
       - name: List installed packages
         run: npm list
-      - name: Install dotenv-cli
-        run: npm install -g dotenv-cli
       - name: Create env file
         run: |
           cat << EOF > .env
