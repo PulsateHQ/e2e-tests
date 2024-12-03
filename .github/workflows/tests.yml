@@ -49,6 +49,8 @@ jobs:
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps firefox
+      - name: List installed packages
+        run: npm list
 
   test:
     needs: [prepare-env]
@@ -62,12 +64,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
           registry-url: 'https://npm.pkg.github.com'
-      - name: Validate dotenv-cli installation
-        run: |
-          if ! npm list -g dotenv-cli; then
-            echo "dotenv-cli is not installed"
-            exit 1
-          fi
+      - name: List installed packages
+        run: npm list
       - name: Create env file
         run: |
           touch .env
