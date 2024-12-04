@@ -28,7 +28,6 @@ jobs:
           PLAYWRIGHT_VERSION=$(node -e "
           const pkgLock = require('./package-lock.json');
           const version = pkgLock.packages['node_modules/@playwright/test']?.version || 'not-found';
-          console.log(version);
           ")
           echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV  
       - name: Cache playwright binaries
@@ -121,25 +120,14 @@ jobs:
           script: |
             try {
               const status = '${{ job.status }}'.toLowerCase();
-              console.log('Attempting to create status with:', {
-                owner: 'PulsateHQ',
-                repo: 'smokesignals',
-                sha: '${{ github.event.client_payload.commit_sha }}',
-                state: status,
-                context: 'e2e-tests/${{ github.event.client_payload.environment }}'
-              });
-
-              const response = await github.rest.repos.createCommitStatus({
+              await github.rest.repos.createCommitStatus({
                 owner: 'PulsateHQ',
                 repo: 'smokesignals',
                 sha: '${{ github.event.client_payload.commit_sha }}',
                 state: status,
                 description: 'E2E tests completed with status: ${{ job.status }}',
-                context: 'e2e-tests/${{ github.event.client_payload.environment }}'
-              });
-
-              console.log('GitHub API response:', response);
+              context: 'e2e-tests/${{ github.event.client_payload.environment }}'
+            });
             } catch (error) {
-              console.error('Failed to update PR status:', error);
-              core.setFailed(`Failed to update PR status: ${error.message}`);
+            core.setFailed(`Failed to update PR status: ${error.message}`);
             }
