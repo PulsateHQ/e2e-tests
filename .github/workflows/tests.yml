@@ -24,16 +24,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
       - name: Get installed Playwright version
         id: playwright-version
-        run: |
-          PLAYWRIGHT_VERSION=$(node -e "
-          const pkgLock = require('./package-lock.json');
-          const playwrightVersion =
-            (pkgLock.dependencies && pkgLock.dependencies['@playwright/test'] && pkgLock.dependencies['@playwright/test'].version) ||
-            (pkgLock.devDependencies && pkgLock.devDependencies['@playwright/test'] && pkgLock.devDependencies['@playwright/test'].version) ||
-            'not-found';
-          console.log(playwrightVersion);
-          ")
-          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+        run: echo "PLAYWRIGHT_VERSION=$(node -e \"console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)\")" >> $GITHUB_ENV
       - name: Cache playwright binaries
         uses: actions/cache@v4
         id: playwright-cache
