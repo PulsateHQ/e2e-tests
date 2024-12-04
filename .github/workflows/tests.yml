@@ -86,14 +86,24 @@ jobs:
           echo ENVIRONMENT=${{ github.event.client_payload.environment }} >> .env
       - name: Run Playwright tests
         run: npx dotenv -e .env -- npx playwright test --project=firefox
-      - name: List test results
-        run: ls -R playwright-report test-results
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            playwright-report
+            test-results
 
   reports:
     needs: [test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: .
       - name: List test results before archiving
         run: ls -R playwright-report test-results
       - name: Archive test results
