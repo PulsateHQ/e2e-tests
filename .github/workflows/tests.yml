@@ -104,8 +104,6 @@ jobs:
         with:
           name: test-results
           path: .
-      - name: List test results before archiving
-        run: ls -R playwright-report test-results
       - name: Archive test results
         if: success() || failure()
         uses: actions/upload-artifact@v4
