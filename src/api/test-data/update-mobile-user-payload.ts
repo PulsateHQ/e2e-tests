@@ -29,24 +29,5 @@ export const updateMobileUserPayload: UpdateMobileUserPayload = {
     lastName: faker.person.lastName(),
     phone: faker.phone.number()
   },
-  user_actions: [
-    {
-      guid: '',
-      key: 'in_app_delivery',
-      occurred_at_array: ['1730990106'],
-      type: 'campaign'
-    },
-    {
-      guid: '',
-      key: 'in_app_impression',
-      occurred_at_array: ['1730990106'],
-      type: 'campaign'
-    },
-    {
-      guid: '',
-      key: 'in_app_dismiss',
-      occurred_at_array: ['1730990106'],
-      type: 'campaign'
-    }
-  ]
+  user_actions: []
 };

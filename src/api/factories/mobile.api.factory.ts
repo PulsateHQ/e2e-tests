@@ -56,3 +56,65 @@ export async function updateMobileUserWithApi(
 
   return response;
 }
+
+export async function getInboxMessagesWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  alias: string,
+  expectedTotalUnread: number
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.getInboxMessageUrlV2}?alias=${alias}`;
+
+  let response: APIResponse;
+
+  await expect(async () => {
+    response = await request.get(url, { headers });
+    const responseBody = await response.text();
+    const expectedStatusCode = 200;
+
+    const responseJson = JSON.parse(responseBody);
+
+    expect(
+      response.status(),
+      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+    ).toBe(expectedStatusCode);
+    expect(responseJson).toHaveProperty('categories');
+    expect(responseJson).toHaveProperty('inbox_items');
+    expect(responseJson).toHaveProperty('total_unread', expectedTotalUnread);
+  }).toPass({ timeout: 20_000 });
+
+  return response!;
+}
+
+export async function getMessagesWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  alias: string,
+  campaignGuid: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const response = await request.get(
+    `${apiUrls.getMessagesUrlV2}?alias=${alias}&campaign_guid=${campaignGuid}`,
+    {
+      headers
+    }
+  );
+
+  const expectedStatusCode = 200;
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+
+  return response;
+}

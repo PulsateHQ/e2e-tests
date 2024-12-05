@@ -5,23 +5,21 @@ import {
 } from '@_config/env.config';
 import {
   createCampaignWithApi,
-  deleteCampaignWithApi,
-  getCampaignCombinedStatsWithApi,
-  getCampaignsWithApi
+  getCampaignCombinedStatsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
 import {
+  getInboxMessagesWithApi,
   startMobileSessionWithApi,
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
 import { getUsersWithApi } from '@_src/api/factories/users.api.factory';
-import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/create-inapp-large-campaign-payload';
+import { createCampaignPayloadFeedPost } from '@_src/api/test-data/create-feed-campaign-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
 import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
-import { inAppDeliveryAction } from '@_src/api/test-data/user-actions/in-app-delivery-payload';
-import { inAppDismissAction } from '@_src/api/test-data/user-actions/in-app-dismiss-payload';
-import { inAppImpressionAction } from '@_src/api/test-data/user-actions/in-app-impression-payload';
+import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/user-actions/feed-post-button-click-payload';
+import { feedPostFrontImpressionAction } from '@_src/api/test-data/user-actions/feed-post-impression-payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -34,7 +32,7 @@ import {
   APIE2ETokenSDKModel
 } from '@_src/ui/models/user.model';
 
-test.describe('In-App Campaign Tests', () => {
+test.describe('Feed Post Campaign Tests', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
     apiE2EAppId: `${API_E2E_APP_ID}`
@@ -56,76 +54,7 @@ test.describe('In-App Campaign Tests', () => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
   });
 
-  test('should create and delete an In-App Large campaign', async ({
-    request
-  }) => {
-    const numberOfUsers = 5;
-
-    await importRandomUsers(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      APIE2ELoginUserModel.apiE2EAppId,
-      numberOfUsers
-    );
-
-    // Create Segment
-    const createSegmentResponse = await createSegmentWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
-    );
-    const createSegmentResponseJson = await createSegmentResponse.json();
-
-    // Create Campaign
-    createCampaignPayloadInAppLarge.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    const createCampaignResponse = await createCampaignWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignPayloadInAppLarge
-    );
-    const createCampaignResponseJson = await createCampaignResponse.json();
-
-    // Assert Campaign Created
-    expect(createCampaignResponseJson.name).toBe(
-      createCampaignPayloadInAppLarge.name
-    );
-
-    // Get Campaigns
-    const getCampaignsResponse = await getCampaignsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    const getCampaignsResponseJson = await getCampaignsResponse.json();
-
-    const createdCampaign = getCampaignsResponseJson.data.find(
-      (campaign: { id: string }) =>
-        campaign.id === createCampaignResponseJson.id
-    );
-
-    // Assert Campaign Exists
-    expect(createdCampaign).toBeDefined();
-    expect(createdCampaign.name).toBe(createCampaignPayloadInAppLarge.name);
-
-    // Delete Campaign
-    await deleteCampaignWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createdCampaign.id
-    );
-
-    // Verify Deletion
-    const getCampaignsResponseAfterDeletion = await getCampaignsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    const getCampaignsResponseJsonAfterDeletion =
-      await getCampaignsResponseAfterDeletion.json();
-    expect(getCampaignsResponseJsonAfterDeletion.data.length).toBe(0);
-  });
-
-  test('should create an In-App Large campaign with a dismiss button and update mobile session user to click it', async ({
+  test('should create an Feed Post campaign with a URL button and update mobile session user to click it', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -146,19 +75,19 @@ test.describe('In-App Campaign Tests', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignPayloadInAppLarge.segment_ids = [
+    createCampaignPayloadFeedPost.segment_ids = [
       createSegmentResponseJson.segment.id
     ];
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignPayloadInAppLarge
+      createCampaignPayloadFeedPost
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignPayloadInAppLarge.name
+      createCampaignPayloadFeedPost.name
     );
 
     const getUsersResponse = await getUsersWithApi(
@@ -168,6 +97,7 @@ test.describe('In-App Campaign Tests', () => {
     const getUsersResponseJson = await getUsersResponse.json();
 
     startMobileSessionPayload.alias = getUsersResponseJson.data[0].alias;
+    const alias = getUsersResponseJson.data[0].alias;
     updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
@@ -177,11 +107,24 @@ test.describe('In-App Campaign Tests', () => {
       startMobileSessionPayload
     );
 
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      1
+    );
+
+    // await getMessagesWithApi(
+    //   request,
+    //   APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+    //   alias,
+    //   campaignGuid
+    // );
+
     // Update Mobile User
     const userActions = [
-      inAppDeliveryAction,
-      inAppImpressionAction,
-      inAppDismissAction
+      feedPostFrontImpressionAction,
+      feedPostFrontButtonClickOneAction
     ];
 
     userActions.forEach((action) => {
@@ -192,6 +135,13 @@ test.describe('In-App Campaign Tests', () => {
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       { ...updateMobileUserPayload, user_actions: userActions }
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      0
     );
 
     const getCampaignCombinedStatsWithWaitResponse =
@@ -206,20 +156,22 @@ test.describe('In-App Campaign Tests', () => {
       await getCampaignCombinedStatsWithWaitResponse.json();
 
     // Assert Validate Response Body
-    expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty(
-      'in_app'
-    );
+    expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty('card');
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.send
+      getCampaignCombinedStatsWithWaitResponseJson.card.send
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.delivery
+      getCampaignCombinedStatsWithWaitResponseJson.card.delivery
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.dismiss
+      getCampaignCombinedStatsWithWaitResponseJson.card.clicks
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.impression
+      getCampaignCombinedStatsWithWaitResponseJson.card.front.front_impression
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignCombinedStatsWithWaitResponseJson.card.front
+        .front_button_click_one
     ).toHaveProperty('total_uniq', 1);
   });
 });

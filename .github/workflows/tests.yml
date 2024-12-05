@@ -29,7 +29,7 @@ jobs:
           const pkgLock = require('./package-lock.json');
           const version = pkgLock.packages['node_modules/@playwright/test']?.version || 'not-found';
           ")
-          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV  
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
       - name: Cache playwright binaries
         uses: actions/cache@v4
         id: playwright-cache
