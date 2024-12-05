@@ -20,9 +20,6 @@ import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-sess
 import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
 import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/user-actions/feed-post-button-click-payload';
 import { feedPostFrontImpressionAction } from '@_src/api/test-data/user-actions/feed-post-impression-payload';
-import { inAppDeliveryAction } from '@_src/api/test-data/user-actions/in-app-delivery-payload';
-import { inAppDismissAction } from '@_src/api/test-data/user-actions/in-app-dismiss-payload';
-import { inAppImpressionAction } from '@_src/api/test-data/user-actions/in-app-impression-payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -101,7 +98,6 @@ test.describe('Feed Post Campaign Tests', () => {
 
     startMobileSessionPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    const campaignGuid = createCampaignResponseJson.guid;
     updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
