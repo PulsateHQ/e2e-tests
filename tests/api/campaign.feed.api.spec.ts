@@ -9,7 +9,6 @@ import {
 } from '@_src/api/factories/campaigns.api.factory';
 import {
   getInboxMessagesWithApi,
-  getMessagesWithApi,
   startMobileSessionWithApi,
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
@@ -19,6 +18,11 @@ import { createCampaignPayloadFeedPost } from '@_src/api/test-data/create-feed-c
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
 import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
+import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/user-actions/feed-post-button-click-payload';
+import { feedPostFrontImpressionAction } from '@_src/api/test-data/user-actions/feed-post-impression-payload';
+import { inAppDeliveryAction } from '@_src/api/test-data/user-actions/in-app-delivery-payload';
+import { inAppDismissAction } from '@_src/api/test-data/user-actions/in-app-dismiss-payload';
+import { inAppImpressionAction } from '@_src/api/test-data/user-actions/in-app-impression-payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -122,14 +126,26 @@ test.describe('Feed Post Campaign Tests', () => {
     // );
 
     // Update Mobile User
-    updateMobileUserPayload.user_actions.forEach((action) => {
+    const userActions = [
+      feedPostFrontImpressionAction,
+      feedPostFrontButtonClickOneAction
+    ];
+
+    userActions.forEach((action) => {
       action.guid = createCampaignResponseJson.guid;
     });
 
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      updateMobileUserPayload
+      { ...updateMobileUserPayload, user_actions: userActions }
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      0
     );
 
     const getCampaignCombinedStatsWithWaitResponse =
@@ -144,20 +160,22 @@ test.describe('Feed Post Campaign Tests', () => {
       await getCampaignCombinedStatsWithWaitResponse.json();
 
     // Assert Validate Response Body
-    expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty(
-      'in_app'
-    );
+    expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty('card');
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.send
+      getCampaignCombinedStatsWithWaitResponseJson.card.send
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.delivery
+      getCampaignCombinedStatsWithWaitResponseJson.card.delivery
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.dismiss
+      getCampaignCombinedStatsWithWaitResponseJson.card.clicks
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.impression
+      getCampaignCombinedStatsWithWaitResponseJson.card.front.front_impression
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignCombinedStatsWithWaitResponseJson.card.front
+        .front_button_click_one
     ).toHaveProperty('total_uniq', 1);
   });
 });
