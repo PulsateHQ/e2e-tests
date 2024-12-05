@@ -19,6 +19,9 @@ import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/create-inap
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
 import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
+import { inAppDeliveryAction } from '@_src/api/test-data/user-actions/in-app-delivery-payload';
+import { inAppDismissAction } from '@_src/api/test-data/user-actions/in-app-dismiss-payload';
+import { inAppImpressionAction } from '@_src/api/test-data/user-actions/in-app-impression-payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -175,14 +178,20 @@ test.describe('In-App Campaign Tests', () => {
     );
 
     // Update Mobile User
-    updateMobileUserPayload.user_actions.forEach((action) => {
+    const userActions = [
+      inAppDeliveryAction,
+      inAppImpressionAction,
+      inAppDismissAction
+    ];
+
+    userActions.forEach((action) => {
       action.guid = createCampaignResponseJson.guid;
     });
 
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      updateMobileUserPayload
+      { ...updateMobileUserPayload, user_actions: userActions }
     );
 
     const getCampaignCombinedStatsWithWaitResponse =
