@@ -9,6 +9,7 @@ export interface CampaignGoal {
 export interface CampaignButton {
   label: string;
   destination_type: string;
+  destination?: string;
   txt_color: string;
   btn_color: string;
 }
@@ -65,6 +66,18 @@ export interface InAppNotification {
   large: CampaignLargeNotification;
 }
 
+export interface CardNotification {
+  front_parts: {
+    admin_header_with_message: CampaignAdminHeaderWithMessage;
+    image: CampaignImage;
+    headline: CampaignHeadline;
+    text: CampaignText;
+    call_to_action: CampaignCallToAction;
+  };
+  type: string;
+  goals: CampaignGoal[];
+}
+
 export interface CreateCampaignPayload {
   state_machine_notifications_state: string;
   duplication_source_id: string;
@@ -73,7 +86,8 @@ export interface CreateCampaignPayload {
   name: string;
   control_group: null;
   goals: CampaignGoal[];
-  in_app_notification: InAppNotification;
+  in_app_notification?: InAppNotification;
+  card_notification?: CardNotification;
   segment_ids: string[];
   beacon_ids: string[];
   geofence_ids: string[];

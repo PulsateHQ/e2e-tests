@@ -56,3 +56,58 @@ export async function updateMobileUserWithApi(
 
   return response;
 }
+
+export async function getInboxMessagesWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  alias: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const response = await request.get(
+    `${apiUrls.getInboxMessageUrlV2}?alias=${alias}`,
+    {
+      headers
+    }
+  );
+
+  const expectedStatusCode = 200;
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+
+  return response;
+}
+
+export async function getMessagesWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  alias: string,
+  campaignGuid: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const response = await request.get(
+    `${apiUrls.getMessagesUrlV2}?alias=${alias}&campaign_guid=${campaignGuid}`,
+    {
+      headers
+    }
+  );
+
+  const expectedStatusCode = 200;
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+
+  return response;
+}
