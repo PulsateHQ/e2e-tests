@@ -90,6 +90,13 @@ jobs:
           path: |
             playwright-report/**/*.*
             test-results/**/*.*
+      - name: Determine Test Status
+        id: test-status
+        run: |
+          if [ ${{ job.status }} == 'failure' ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
 
   reports:
     needs: [test]
@@ -113,21 +120,40 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Slack Notification - E2E Test Results
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "E2E Test Results 🧪",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result }}\n• PR Number: #${{ github.event.client_payload.pr_number }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      
       - name: Update PR Status
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.E2E_PAT }}
           script: |
             try {
-              const status = '${{ job.status }}'.toLowerCase();
+              const status = '${{ needs.test.result }}'.toLowerCase();
               await github.rest.repos.createCommitStatus({
                 owner: 'PulsateHQ',
                 repo: 'smokesignals',
                 sha: '${{ github.event.client_payload.commit_sha }}',
-                state: status,
-                description: 'E2E tests completed with status: ${{ job.status }}',
-              context: 'e2e-tests/${{ github.event.client_payload.environment }}'
-            });
+                state: status === 'success' ? 'success' : 'failure',
+                description: `E2E tests completed with status: ${{ needs.test.result }}`,
+                context: 'e2e-tests/${{ github.event.client_payload.environment }}'
+              });
             } catch (error) {
-            core.setFailed(`Failed to update PR status: ${error.message}`);
+              core.setFailed(`Failed to update PR status: ${error.message}`);
             }
