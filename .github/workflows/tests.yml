@@ -90,13 +90,6 @@ jobs:
           path: |
             playwright-report/**/*.*
             test-results/**/*.*
-      - name: Determine Test Status
-        id: test-status
-        run: |
-          if [ ${{ job.status }} == 'failure' ]; then
-            echo "status=failure" >> $GITHUB_OUTPUT
-          else
-            echo "status=success" >> $GITHUB_OUTPUT
 
   reports:
     needs: [test]
@@ -145,13 +138,13 @@ jobs:
           github-token: ${{ secrets.E2E_PAT }}
           script: |
             try {
-              const status = '${{ needs.test.result }}'.toLowerCase();
+              const status = '${{ needs.test.steps['Run Playwright tests'].outcome }}'.toLowerCase();
               await github.rest.repos.createCommitStatus({
                 owner: 'PulsateHQ',
                 repo: 'smokesignals',
                 sha: '${{ github.event.client_payload.commit_sha }}',
                 state: status === 'success' ? 'success' : 'failure',
-                description: `E2E tests completed with status: ${{ needs.test.result }}`,
+                description: `E2E tests completed with status: ${status}`,
                 context: 'e2e-tests/${{ github.event.client_payload.environment }}'
               });
             } catch (error) {
