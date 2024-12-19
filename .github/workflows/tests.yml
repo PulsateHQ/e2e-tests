@@ -116,7 +116,7 @@ jobs:
           report_paths: './playwright-report/results.xml'
 
   update-pr-status:
-    needs: [reports]
+    needs: [test, reports]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -133,8 +133,17 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result }}\n• PR Number: #${{ github.event.client_payload.pr_number }}"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: <${{ github.event.client_payload.html_url }}|#${{ github.event.client_payload.pr_number }} ${{ github.event.client_payload.pr_title }}>\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>"
                   }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "🔗 Run started at: <!date^${{ fromJson(github.event.client_payload.timestamp || 0) }}^{date_short} at {time}|Timestamp unavailable>"
+                    }
+                  ]
                 }
               ]
             }
