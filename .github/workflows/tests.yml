@@ -1,4 +1,4 @@
-name: Run E2E Tests
+name: Run E2E Tests for PR ${{ github.event.client_payload.pr_title }}
 
 on:
   repository_dispatch:
