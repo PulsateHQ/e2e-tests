@@ -81,7 +81,10 @@ jobs:
           echo API_E2E_ACCESS_TOKEN_SDK=${{ secrets.API_E2E_ACCESS_TOKEN_SDK }} >> .env
           echo ENVIRONMENT=${{ github.event.client_payload.environment }} >> .env
       - name: Run Playwright tests
+        id: run-tests
         run: npx dotenv -e .env -- npx playwright test --project=firefox
+      - name: Set Test Outcome
+        run: echo "TEST_OUTCOME=${{ steps.run-tests.outcome }}" >> $GITHUB_ENV
       - name: Archive test results
         if: success() || failure()
         uses: actions/upload-artifact@v4
@@ -135,7 +138,7 @@ jobs:
       - name: Update PR Status
         uses: actions/github-script@v7
         env:
-          TEST_OUTCOME: ${{ needs.test.steps['Run Playwright tests'].outcome }}
+          TEST_OUTCOME: ${{ needs.test.outputs['run-tests'].outcome }}
         with:
           github-token: ${{ secrets.E2E_PAT }}
           script: |
