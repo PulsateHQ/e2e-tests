@@ -56,6 +56,8 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     environment: ${{ github.event.client_payload.environment }}
+    outputs:
+      test_outcome: ${{ steps.set-outcome.outputs.test_outcome }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -84,7 +86,8 @@ jobs:
         id: run-tests
         run: npx dotenv -e .env -- npx playwright test --project=firefox
       - name: Set Test Outcome
-        run: echo "TEST_OUTCOME=${{ steps.run-tests.outcome }}" >> $GITHUB_ENV
+        id: set-outcome
+        run: echo "test_outcome=${{ steps.run-tests.outcome }}" >> "$GITHUB_OUTPUT"
       - name: Archive test results
         if: success() || failure()
         uses: actions/upload-artifact@v4
@@ -111,7 +114,7 @@ jobs:
         with:
           report_paths: './playwright-report/results.xml'
 
-  update-pr-status:
+  notify-and-update-pr-statu:
     needs: [test, reports]
     runs-on: ubuntu-latest
     if: always()
@@ -137,19 +140,16 @@ jobs:
 
       - name: Update PR Status
         uses: actions/github-script@v7
-        env:
-          TEST_OUTCOME: ${{ needs.test.outputs['run-tests'].outcome }}
         with:
           github-token: ${{ secrets.E2E_PAT }}
           script: |
             try {
-              const status = process.env.TEST_OUTCOME.toLowerCase();
               await github.rest.repos.createCommitStatus({
                 owner: 'PulsateHQ',
                 repo: 'smokesignals',
                 sha: '${{ github.event.client_payload.commit_sha }}',
-                state: status === 'success' ? 'success' : 'failure',
-                description: `E2E tests completed with status: ${status}`,
+                state: '${{ needs.test.outputs.test_outcome }}' === 'success' ? 'success' : 'failure',
+                description: 'E2E tests completed with status: ${{ needs.test.outputs.test_outcome }}',
                 context: 'e2e-tests/${{ github.event.client_payload.environment }}'
               });
             } catch (error) {
