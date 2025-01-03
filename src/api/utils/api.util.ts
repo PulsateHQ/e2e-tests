@@ -5,6 +5,7 @@ export const apiUrls = {
   segmentsUrlV1: `${BASE_URL}/api/v1/apps/${API_E2E_APP_ID}/segments`,
   segmentsUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/segments`,
   campaignsUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/campaigns`,
+  usersUrlV1: `${BASE_URL}/api/v1/apps/${API_E2E_APP_ID}/users`,
   usersUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/users`,
   combinedStatsUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/campaigns/combined_stats`,
   startSessionUrlV4: `${SDK_API_URL}/api/mobile/v4/sessions/start`,

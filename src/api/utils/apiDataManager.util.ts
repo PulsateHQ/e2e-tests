@@ -9,8 +9,10 @@ import {
 } from '@_src/api/factories/segments.api.factory';
 import {
   deleteUserWithApi,
-  getUsersWithApi
+  getAllUsersWithApi
 } from '@_src/api/factories/users.api.factory';
+import { UserRequest } from '@_src/api/models/user.api.model';
+import { userRequestPayload } from '@_src/api/test-data/user-payload/create-users';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, test } from '@playwright/test';
@@ -20,7 +22,7 @@ export async function deleteAllUsers(
   token: string
 ): Promise<void> {
   await test.step('Deleting all users', async () => {
-    const getUsersResponse = await getUsersWithApi(request, token);
+    const getUsersResponse = await getAllUsersWithApi(request, token);
     const getUsersResponseJson = await getUsersResponse.json();
     const initialUserCount = getUsersResponseJson.data.length;
 
@@ -28,7 +30,10 @@ export async function deleteAllUsers(
       await deleteUserWithApi(request, token, user.id);
     }
 
-    const getUsersResponseAfterDeletion = await getUsersWithApi(request, token);
+    const getUsersResponseAfterDeletion = await getAllUsersWithApi(
+      request,
+      token
+    );
     const getUsersResponseJsonAfterDeletion =
       await getUsersResponseAfterDeletion.json();
     const finalUserCount = getUsersResponseJsonAfterDeletion.data.length;
@@ -138,4 +143,24 @@ export async function importRandomUsers(
     const csvContent = generateCsvContent(numberOfUsers);
     await importUsersWithApi(request, authToken, { csvContent, app_id: appId });
   });
+}
+
+export function getFreshUserPayload(): UserRequest {
+  return {
+    age: faker.number.int({ min: 18, max: 100 }),
+    alias: faker.internet.username({ firstName: 'Piotr' }),
+    current_city: faker.location.city(),
+    current_country: faker.location.country(),
+    current_location: [faker.location.longitude(), faker.location.latitude()],
+    email: faker.internet.email(),
+    firstName: faker.person.firstName(),
+    gender: 'man',
+    lastName: faker.person.lastName(),
+    phone: faker.phone.number(),
+    device: {
+      ...userRequestPayload.device,
+      guid: faker.string.uuid()
+    },
+    custom_tags: userRequestPayload.custom_tags
+  };
 }
