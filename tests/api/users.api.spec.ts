@@ -4,9 +4,9 @@ import {
 } from '@_config/env.config';
 import {
   createUserWithApi,
+  deleteUserWithApi,
   getAllUsersWithApi,
   getUserWithApi,
-  unsubscribeUserWithApi,
   upsertUserWithApi
 } from '@_src/api/factories/users.api.factory';
 import { userRequestPayload } from '@_src/api/test-data/user-payload/create-users';
@@ -92,7 +92,7 @@ test.describe('User Management', () => {
     );
   });
 
-  test('should create a user, unsubscribe the user, and verify the user count', async ({
+  test('should create a user, remove the user, and verify the user count', async ({
     request
   }) => {
     // Arrange
@@ -123,7 +123,7 @@ test.describe('User Management', () => {
     const getUsersResponseJson = await getUsersResponse.json();
     const userId = getUsersResponseJson.data[0].id;
 
-    const unsubscribeUserWithApiResponse = await unsubscribeUserWithApi(
+    const deleteUserWithApiResponse = await deleteUserWithApi(
       request,
       apiE2EAccessTokenAdmin,
       userId
@@ -146,7 +146,7 @@ test.describe('User Management', () => {
     expect(getUsersResponse.status()).toBe(200);
     expect(getUsersResponseJson.data.length).toBe(2);
 
-    expect(unsubscribeUserWithApiResponse.status()).toBe(200);
+    expect(deleteUserWithApiResponse.status()).toBe(200);
 
     expect(getAllUsersWithApiAfterUnsubscribe.status()).toBe(200);
     expect(getAllUsersWithApiAfterUnsubscribeJson.data.length).toBe(1);
