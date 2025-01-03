@@ -14,7 +14,7 @@ import {
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { getUsersWithApi } from '@_src/api/factories/users.api.factory';
+import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/create-inapp-large-campaign-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
@@ -27,7 +27,7 @@ import {
   deleteAllSegments,
   deleteAllUsers,
   importRandomUsers
-} from '@_src/api/utils/apiTestUtils.util';
+} from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
   APIE2ELoginUserModel,
@@ -45,15 +45,17 @@ test.describe('In-App Campaign Tests', () => {
   };
 
   test.beforeEach(async ({ request }) => {
-    await deleteAllCampaigns(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
+    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+
     await deleteAllSegments(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+
+    await deleteAllCampaigns(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
   });
 
   test('should create and delete an In-App Large campaign', async ({
@@ -161,7 +163,7 @@ test.describe('In-App Campaign Tests', () => {
       createCampaignPayloadInAppLarge.name
     );
 
-    const getUsersResponse = await getUsersWithApi(
+    const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );

@@ -6,13 +6,13 @@ import {
   createSegmentWithApi,
   getSegmentsWithApi
 } from '@_src/api/factories/segments.api.factory';
-import { getUsersWithApi } from '@_src/api/factories/users.api.factory';
+import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import {
   deleteAllSegments,
   deleteAllUsers,
   importRandomUsers
-} from '@_src/api/utils/apiTestUtils.util';
+} from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
 
@@ -42,7 +42,7 @@ test.describe('User and Segment Management', () => {
       numberOfUsers
     );
 
-    const getUsersResponse = await getUsersWithApi(
+    const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
@@ -63,7 +63,7 @@ test.describe('User and Segment Management', () => {
       numberOfUsers
     );
 
-    const getUsersResponse = await getUsersWithApi(
+    const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );

@@ -13,7 +13,7 @@ import {
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { getUsersWithApi } from '@_src/api/factories/users.api.factory';
+import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createCampaignPayloadFeedPost } from '@_src/api/test-data/create-feed-campaign-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
@@ -25,7 +25,7 @@ import {
   deleteAllSegments,
   deleteAllUsers,
   importRandomUsers
-} from '@_src/api/utils/apiTestUtils.util';
+} from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
   APIE2ELoginUserModel,
@@ -43,15 +43,17 @@ test.describe('Feed Post Campaign Tests', () => {
   };
 
   test.beforeEach(async ({ request }) => {
-    await deleteAllCampaigns(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
+    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+
     await deleteAllSegments(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+
+    await deleteAllCampaigns(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
   });
 
   test('should create an Feed Post campaign with a URL button and update mobile session user to click it', async ({
@@ -90,7 +92,7 @@ test.describe('Feed Post Campaign Tests', () => {
       createCampaignPayloadFeedPost.name
     );
 
-    const getUsersResponse = await getUsersWithApi(
+    const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
@@ -113,13 +115,6 @@ test.describe('Feed Post Campaign Tests', () => {
       alias,
       1
     );
-
-    // await getMessagesWithApi(
-    //   request,
-    //   APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-    //   alias,
-    //   campaignGuid
-    // );
 
     // Update Mobile User
     const userActions = [
