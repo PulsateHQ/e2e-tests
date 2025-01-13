@@ -1,4 +1,5 @@
 export interface Headers {
-  Authorization: string;
+  Authorization?: string;
+  Cookie?: string;
   [key: string]: string;
 }

@@ -1,7 +1,9 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID
+  API_E2E_APP_ID,
+  SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
 import {
   createUserWithApi,
   deleteUserWithApi,
@@ -21,8 +23,17 @@ import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
 test.describe('User Management', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
+    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
+
+  test.beforeAll(async ({ request }) => {
+    await superAdminsFeatureFLagDefaultBatchUpdate(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
+      ['APIE2ELoginUserModel.apiE2EAppId']
+    );
+  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);

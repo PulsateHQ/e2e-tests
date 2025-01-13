@@ -1,7 +1,6 @@
 import { UserRequest } from '@_src/api/models/user.api.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-// Template payload with static values
 export const userRequestPayload: UserRequest = {
   age: faker.number.int({ min: 18, max: 100 }),
   alias: faker.internet.username({ firstName: 'Piotr' }),

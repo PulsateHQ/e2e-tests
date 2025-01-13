@@ -1,7 +1,8 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   API_E2E_ACCESS_TOKEN_SDK,
-  API_E2E_APP_ID
+  API_E2E_APP_ID,
+  SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import {
   createCampaignWithApi,
@@ -14,14 +15,15 @@ import {
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
-import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/create-inapp-large-campaign-payload';
-import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
-import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
-import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
-import { inAppDeliveryAction } from '@_src/api/test-data/user-actions/in-app-delivery-payload';
-import { inAppDismissAction } from '@_src/api/test-data/user-actions/in-app-dismiss-payload';
-import { inAppImpressionAction } from '@_src/api/test-data/user-actions/in-app-impression-payload';
+import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/campaign/create-inapp-large-campaign-payload';
+import { inAppDeliveryAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-delivery-payload';
+import { inAppDismissAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-dismiss-payload';
+import { inAppImpressionAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-impression-payload';
+import { startMobileSessionPayload } from '@_src/api/test-data/mobile-user-actions/start-mobile-session-payload';
+import { updateMobileUserPayload } from '@_src/api/test-data/mobile-user-actions/update-mobile-user-payload';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -37,12 +39,21 @@ import {
 test.describe('In-App Campaign Tests', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
+    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
 
   const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
     apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
   };
+
+  test.beforeAll(async ({ request }) => {
+    await superAdminsFeatureFLagDefaultBatchUpdate(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
+      ['APIE2ELoginUserModel.apiE2EAppId']
+    );
+  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
