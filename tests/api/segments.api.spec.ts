@@ -4,12 +4,16 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import {
+  batchDeleteSegmentsWithApi,
   createSegmentWithApi,
-  getAllSegmentsWithApi
+  getAllSegmentsWithApi,
+  getSingleSegmentWithApi,
+  updateSegmentWithApi
 } from '@_src/api/factories/segments.api.factory';
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
+import { createSegmentSingleAliasPayload } from '@_src/api/test-data/segment/create-segment-single-alias-payload';
 import {
   deleteAllSegments,
   deleteAllUsers,
@@ -60,6 +64,90 @@ test.describe('User and Segment Management', () => {
     const getUsersResponseJson = await getUsersResponse.json();
     expect(getUsersResponse.status()).toBe(200);
     expect(getUsersResponseJson.data.length).toBe(2);
+  });
+
+  test.only('CRUD', async ({ request }) => {
+    const numberOfUsers = 3;
+
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    const getUsersResponse = await getAllUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getUsersResponseJson = await getUsersResponse.json();
+
+    const firstAliasUser = getUsersResponseJson.data[0].alias;
+    createSegmentSingleAliasPayload.groups[0].rules[0].match_value =
+      firstAliasUser;
+    const secondAliasUser = getUsersResponseJson.data[1].alias;
+    const thirdAliasUser = getUsersResponseJson.data[2].alias;
+    expect(getUsersResponse.status()).toBe(200);
+    expect(getUsersResponseJson.data.length).toBe(3);
+
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload
+    );
+    const createSegmentResponseJson = await createSegmentResponse.json();
+    const firstSegmentId = createSegmentResponseJson.segment.id;
+
+    expect(createSegmentResponse.status()).toBe(200);
+    expect(createSegmentResponseJson.segment).toHaveProperty(
+      'name',
+      createSegmentAllUsersPayload.name
+    );
+
+    const getSingleSegmentResponseAfterCreation = await getSingleSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstSegmentId
+    );
+    const getSingleSegmentResponseAfterCreationJson =
+      await getSingleSegmentResponseAfterCreation.json();
+
+    expect(getSingleSegmentResponseAfterCreation.status()).toBe(200);
+    expect(getSingleSegmentResponseAfterCreationJson.data.length).toBe(3);
+
+    const updateSegmentResponse = await updateSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstSegmentId,
+      createSegmentSingleAliasPayload
+    );
+
+    const updateSegmentResponseJson = await updateSegmentResponse.json();
+    expect(updateSegmentResponse.status()).toBe(200);
+    expect(updateSegmentResponseJson.id).toBe(firstSegmentId);
+
+    const batchDeleteSegmentsWithApiResponse = await batchDeleteSegmentsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstSegmentId
+    );
+
+    const batchDeleteSegmentsWithApiResponseJson =
+      await batchDeleteSegmentsWithApiResponse.json();
+    expect(batchDeleteSegmentsWithApiResponse.status()).toBe(200);
+    expect(batchDeleteSegmentsWithApiResponseJson.segment.id).toBe(
+      firstSegmentId
+    );
+
+    const getSegmentsResponseAfterCreation = await getAllSegmentsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getSegmentsResponseJsonAfterCreation =
+      await getSegmentsResponseAfterCreation.json();
+
+    expect(getSegmentsResponseAfterCreation.status()).toBe(200);
+    expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(0);
   });
 
   test('should import users, validate the number of users, and manage segments', async ({

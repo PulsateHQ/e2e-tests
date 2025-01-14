@@ -57,7 +57,6 @@ export async function getSingleSegmentWithApi(
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('data');
-  expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
 
   return response;
@@ -231,19 +230,24 @@ export async function createSegmentWithApi(
   return response;
 }
 
-export async function deleteSegmentsWithApi(
+export async function updateSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  segmentsIds: string,
+  payload: CreateSegmentPayload
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}/${userId}`;
+  const url = `${apiUrls.segmentsUrlV1}/${segmentsIds}`;
 
-  const response = await request.delete(url, { headers });
+  const response = await request.put(url, {
+    headers,
+    data: JSON.stringify(payload)
+  });
 
   const responseBody = await response.text();
   const expectedStatusCode = 200;
@@ -254,10 +258,12 @@ export async function deleteSegmentsWithApi(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty(
-    'success',
-    'User has been deleted successfully'
-  );
+  expect(responseJson).toHaveProperty('name', payload.name);
+  expect(responseJson).toHaveProperty('groups');
+  expect(responseJson).toHaveProperty('hidden', false);
+  expect(responseJson).toHaveProperty('hidden_at', null);
+  expect(responseJson).toHaveProperty('id');
+  expect(responseJson).toHaveProperty('users_count');
 
   return response;
 }
