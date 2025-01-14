@@ -15,7 +15,6 @@ import {
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/campaign/create-inapp-large-campaign-payload';
 import { inAppDeliveryAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-delivery-payload';
@@ -46,14 +45,6 @@ test.describe('In-App Campaign Tests', () => {
   const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
     apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
   };
-
-  test.beforeAll(async ({ request }) => {
-    await superAdminsFeatureFLagDefaultBatchUpdate(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-      ['APIE2ELoginUserModel.apiE2EAppId']
-    );
-  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);

@@ -5,7 +5,7 @@ import {
 import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
   batchDeleteSegmentsWithApi,
-  getSegmentsWithApi
+  getAllSegmentsWithApi
 } from '@_src/api/factories/segments.api.factory';
 import {
   deleteUserWithApi,
@@ -50,7 +50,7 @@ export async function deleteAllSegments(
   token: string
 ): Promise<void> {
   await test.step('Deleting all segments', async () => {
-    const getSegmentsResponse = await getSegmentsWithApi(request, token);
+    const getSegmentsResponse = await getAllSegmentsWithApi(request, token);
     const getSegmentsResponseJson = await getSegmentsResponse.json();
     const initialSegmentCount = getSegmentsResponseJson.data.length;
 
@@ -60,7 +60,7 @@ export async function deleteAllSegments(
       getSegmentsResponseJson.data.map((segment: { id: string }) => segment.id)
     );
 
-    const getSegmentsResponseAfterDeletion = await getSegmentsWithApi(
+    const getSegmentsResponseAfterDeletion = await getAllSegmentsWithApi(
       request,
       token
     );
