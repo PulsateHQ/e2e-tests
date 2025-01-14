@@ -18,14 +18,14 @@ export const featureFlagsTestData: FeatureFlagsRequest = {
         ff_push_notifications_full_access: true,
         ff_external_goal_file_upload_section: false,
         ff_excluded_from_cron_jobs: false,
-        ff_change_notification_button_colors: false,
-        ff_notifications_extra_buttons_enabled: false,
+        ff_change_notification_button_colors: true,
+        ff_notifications_extra_buttons_enabled: true,
         ff_q2_in_app: false,
         ff_campaigns_goals: false,
         ff_messages: false,
         ff_segment_delivery: false,
         ff_web_sdk: false,
-        ff_csv_users_upload: false,
+        ff_csv_users_upload: true,
         ff_pulsate_beta: true,
         ff_dashboard_beta: true,
         sms_delivery: false,
@@ -45,7 +45,7 @@ export const featureFlagsTestData: FeatureFlagsRequest = {
         ff_old_app_and_device_stats: false,
         ff_opportunities_dashboard: false,
         ff_opportunities_stats: false,
-        ff_small_in_app: false
+        ff_small_in_app: true
       }
     }
   ]

@@ -7,6 +7,7 @@ import {
   createSegmentWithApi,
   getAllSegmentsWithApi
 } from '@_src/api/factories/segments.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
 import {
@@ -24,13 +25,13 @@ test.describe('User and Segment Management', () => {
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
 
-  // test.beforeAll(async ({ request }) => {
-  //   await superAdminsFeatureFLagDefaultBatchUpdate(
-  //     request,
-  //     APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-  //     ['APIE2ELoginUserModel.apiE2EAppId']
-  //   );
-  // });
+  test.beforeAll(async ({ request }) => {
+    await superAdminsFeatureFLagDefaultBatchUpdate(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
+      [API_E2E_APP_ID]
+    );
+  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
