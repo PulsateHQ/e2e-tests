@@ -5,6 +5,7 @@ import {
 } from '@_config/env.config';
 import {
   batchDeleteSegmentsWithApi,
+  createSegmentFromFile,
   createSegmentWithApi,
   duplicateSegmentWithApi,
   estimateSegmentsWithApi,
@@ -315,5 +316,46 @@ test.describe('Segment Management', () => {
 
     expect(getSegmentsResponseAfterCreation.status()).toBe(200);
     expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(3);
+  });
+
+  test('import segment', async ({ request }) => {
+    // Arrange
+    const numberOfUsers = 3;
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    const getUsersResponse = await getAllUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getUsersResponseJson = await getUsersResponse.json();
+    const firstAliasUser = getUsersResponseJson.data[0].alias;
+    const secondAliasUser = getUsersResponseJson.data[1].alias;
+
+    // Create initial segment
+    createSegmentSingleAliasPayload.groups[0].rules[0].match_value =
+      firstAliasUser;
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload
+    );
+
+    await createSegmentFromFile(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      'test',
+      'custom_tag',
+      [firstAliasUser, secondAliasUser]
+    );
+
+    // Assert
+    expect(getUsersResponse.status()).toBe(200);
+    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
+    expect(createSegmentResponse.status()).toBe(200);
   });
 });

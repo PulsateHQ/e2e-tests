@@ -121,7 +121,7 @@ function generateRandomUser(): string {
   return `${userAlias},${emailAddress},${firstName},${lastName},${smsPhoneNumber},${currentCity},${age},${gender}`;
 }
 
-function generateCsvContent(numberOfUsers: number): Buffer {
+function generateCsvContentForUsersImport(numberOfUsers: number): Buffer {
   let csvContent =
     'userAlias,emailAddress,firstName,lastName,smsPhoneNumber,currentCity,age,gender';
 
@@ -140,7 +140,7 @@ export async function importRandomUsers(
   numberOfUsers: number
 ): Promise<void> {
   await test.step(`Appending ${numberOfUsers} random users to CSV content`, async () => {
-    const csvContent = generateCsvContent(numberOfUsers);
+    const csvContent = generateCsvContentForUsersImport(numberOfUsers);
     await importUsersWithApi(request, authToken, { csvContent, app_id: appId });
   });
 }
@@ -163,4 +163,12 @@ export function getFreshUserPayload(): UserRequest {
     },
     custom_tags: userRequestPayload.custom_tags
   };
+}
+
+export function generateCsvContentForAliases(aliases: string[]): Buffer {
+  let csvContent = 'User_Alias';
+  for (const alias of aliases) {
+    csvContent += `\n${alias}`;
+  }
+  return Buffer.from(csvContent, 'utf-8');
 }

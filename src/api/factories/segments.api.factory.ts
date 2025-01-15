@@ -1,6 +1,7 @@
 import { CreateSegmentPayload } from '@_src/api/models/create-segment.api.model';
 import { Headers } from '@_src/api/models/headers.api.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { generateCsvContentForAliases } from '@_src/api/utils/apiDataManager.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -310,6 +311,43 @@ export async function duplicateSegmentWithApi(
   return response;
 }
 
+export async function createSegmentFromFile(
+  request: APIRequestContext,
+  authToken: string,
+  segmentName: string,
+  customTag: string,
+  aliases: string[]
+): Promise<APIResponse> {
+  const csvContent = generateCsvContentForAliases(aliases);
+
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: '*/*',
+    ContentType: 'multipart/form-data'
+  };
+
+  const response = await request.post(
+    `${apiUrls.segmentsUrlV2}/create_from_file`,
+    {
+      headers,
+      multipart: {
+        file: {
+          name: 'segment_file_with_aliases.csv',
+          mimeType: 'text/csv',
+          buffer: csvContent
+        },
+        segment_name: segmentName,
+        custom_tag: customTag
+      }
+    }
+  );
+
+  const expectedStatusCode = 200;
+  expect(response.status()).toBe(expectedStatusCode);
+
+  return response;
+}
+
 export async function batchDeleteSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -334,6 +372,7 @@ export async function batchDeleteSegmentsWithApi(
   );
 
   const responseBody = await response.text();
+
   const expectedStatusCode = 200;
 
   const responseJson = JSON.parse(responseBody);
