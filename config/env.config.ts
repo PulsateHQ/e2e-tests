@@ -1,16 +1,16 @@
 import * as dotenv from 'dotenv';
-import * as path from 'path';
 
-const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+// Remove unused path import and just keep the basic dotenv config
 dotenv.config({
-  path: path.resolve(__dirname, envFile),
   override: true
 });
 
 function requireEnvVariable(envVariableName: string): string {
   const envVariableValue = process.env[envVariableName];
-  if (envVariableValue === undefined) {
-    throw new Error(`Environment variable ${envVariableName} is not set.`);
+  if (!envVariableValue) {
+    throw new Error(
+      `Environment variable ${envVariableName} is not set. Please check your environment file.`
+    );
   }
   return envVariableValue;
 }
