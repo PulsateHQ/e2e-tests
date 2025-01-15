@@ -33,7 +33,7 @@ export async function getAllSegmentsWithApi(
   return response;
 }
 
-export async function getSingleSegmentWithApi(
+export async function getSingleSegmentUsersWithApi(
   request: APIRequestContext,
   authToken: string,
   segmentId: string
@@ -62,7 +62,7 @@ export async function getSingleSegmentWithApi(
   return response;
 }
 
-export async function getSingleSegmentUsersWithApi(
+export async function getSingleSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
   segmentId: string
@@ -85,16 +85,17 @@ export async function getSingleSegmentUsersWithApi(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('data');
-  expect(responseJson).toHaveProperty('bulk_actions');
-  expect(responseJson).toHaveProperty('metadata');
+  expect(responseJson).toHaveProperty('id');
+  expect(responseJson).toHaveProperty('created_at');
+  expect(responseJson).toHaveProperty('groups');
 
   return response;
 }
 
 export async function getTotalAudienceForSegmentWithApi(
   request: APIRequestContext,
-  authToken: string
+  authToken: string,
+  expectedTotalAudience: number
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -103,22 +104,26 @@ export async function getTotalAudienceForSegmentWithApi(
 
   const url = `${apiUrls.segmentsUrlV2}/total_audience`;
 
-  const response = await request.get(url, { headers });
+  let response: APIResponse;
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  await expect(async () => {
+    response = await request.get(url, { headers });
+    const responseBody = await response.text();
+    const expectedStatusCode = 200;
 
-  const responseJson = JSON.parse(responseBody);
+    const responseJson = JSON.parse(responseBody);
 
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('data');
-  expect(responseJson).toHaveProperty('bulk_actions');
-  expect(responseJson).toHaveProperty('metadata');
+    expect(
+      response.status(),
+      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+    ).toBe(expectedStatusCode);
+    expect(responseJson).toHaveProperty(
+      'total_audience',
+      expectedTotalAudience
+    );
+  }).toPass({ timeout: 20_000 });
 
-  return response;
+  return response!;
 }
 
 export async function getUserCountForAlias(
@@ -193,7 +198,8 @@ export async function estimateSegmentsWithApi(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('estimate');
+  expect(responseJson).toHaveProperty('max');
+  expect(responseJson).toHaveProperty('min');
 
   return response;
 }
@@ -259,6 +265,42 @@ export async function updateSegmentWithApi(
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('name', payload.name);
+  expect(responseJson).toHaveProperty('groups');
+  expect(responseJson).toHaveProperty('hidden', false);
+  expect(responseJson).toHaveProperty('hidden_at', null);
+  expect(responseJson).toHaveProperty('id');
+  expect(responseJson).toHaveProperty('users_count');
+
+  return response;
+}
+
+export async function duplicateSegmentWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  segmentsIds: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  const url = `${apiUrls.segmentsUrlV1}/${segmentsIds}/duplicate`;
+
+  const response = await request.post(url, {
+    headers
+  });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('name');
   expect(responseJson).toHaveProperty('groups');
   expect(responseJson).toHaveProperty('hidden', false);
   expect(responseJson).toHaveProperty('hidden_at', null);
