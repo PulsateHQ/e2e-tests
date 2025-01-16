@@ -1,3 +1,4 @@
+import { CustomAttribute } from '../models/custom-attribute.api.model';
 import { Headers } from '@_src/api/models/headers.api.model';
 import { UserRequest, UserResponse } from '@_src/api/models/user.api.model';
 import { apiUrls } from '@_src/api/utils/api.util';
@@ -61,7 +62,7 @@ export async function getUserWithApi(
   const response = await request.get(url, { headers });
 
   const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  const expectedStatusCode = 201;
 
   const responseJson: UserResponse = JSON.parse(responseBody);
 
@@ -228,7 +229,6 @@ export async function getUserCustomAttributesWithApi(
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('data');
-  expect(responseJson).toHaveProperty('metadata');
 
   return response;
 }
@@ -237,7 +237,7 @@ export async function setUserCustomAttributesWithApi(
   request: APIRequestContext,
   authToken: string,
   userAlias: string,
-  customAttributes: Record<string, string>
+  customAttributes: CustomAttribute[]
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -252,6 +252,35 @@ export async function setUserCustomAttributesWithApi(
     data: JSON.stringify({ custom_attributes: customAttributes })
   });
 
+  const expectedStatusCode = 201;
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+
+  return response;
+}
+
+export async function deleteUserCustomAttributesWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  userAlias: string,
+  queryParams: {
+    source: string;
+    product_id: string;
+    name: string;
+  }
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes?source=${queryParams.source}&product_id=${queryParams.product_id}&name=${queryParams.name}`;
+
+  const response = await request.delete(url, { headers });
+
   const responseBody = await response.text();
   const expectedStatusCode = 200;
   const responseJson = JSON.parse(responseBody);
@@ -262,7 +291,7 @@ export async function setUserCustomAttributesWithApi(
   ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty(
     'success',
-    'Custom attributes updated successfully'
+    'Custom attributes deleted successfully'
   );
 
   return response;

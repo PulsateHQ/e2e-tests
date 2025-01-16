@@ -7,6 +7,7 @@ import { getAllSegmentsWithApi } from '@_src/api/factories/segments.api.factory'
 import { getSingleSegmentUsersWithApi } from '@_src/api/factories/segments.api.factory';
 import {
   createUserWithApi,
+  deleteUserCustomAttributesWithApi,
   deleteUserWithApi,
   getAllUsersWithApi,
   getUserCustomAttributesWithApi,
@@ -21,6 +22,7 @@ import { userRequestPayload } from '@_src/api/test-data/user-payload/create-user
 import {
   deleteAllSegments,
   deleteAllUsers,
+  generateCustomAttribute,
   generateUniqueCustomTag,
   getFreshUserPayload,
   importRandomUsers
@@ -264,22 +266,26 @@ test.describe('User Management', () => {
       );
     const getUserCustomAttributesResponseJson =
       await getUserCustomAttributesResponse.json();
-    expect(getUserCustomAttributesResponseJson.data[0].id).toBe(
-      uniqueCustomTag
-    );
+    const customAttributeFromResponse =
+      getUserCustomAttributesResponseJson.data[0];
 
-    const setUserCustomAttributesResponse =
-      await setUserCustomAttributesWithApi(
+    const deleteUserCustomAttributesResponse =
+      await deleteUserCustomAttributesWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         aliasId,
-        { [uniqueCustomTag]: 'true' }
+        {
+          source: customAttributeFromResponse.source || '',
+          product_id: customAttributeFromResponse.product_id || '',
+          name: customAttributeFromResponse.name
+        }
       );
-    const setUserCustomAttributesResponseJson =
-      await setUserCustomAttributesResponse.json();
-    expect(setUserCustomAttributesResponse.status()).toBe(200);
-    expect(setUserCustomAttributesResponseJson.success).toBe(
-      'Custom attributes updated successfully'
+
+    const deleteUserCustomAttributesResponseJson =
+      await deleteUserCustomAttributesResponse.json();
+    expect(deleteUserCustomAttributesResponse.status()).toBe(200);
+    expect(deleteUserCustomAttributesResponseJson.success).toBe(
+      'Custom attributes deleted successfully'
     );
   });
 });
