@@ -3,7 +3,7 @@ import { FeatureFlagsRequest } from '@_src/api//models/feature-flag.api.model';
 export const featureFlagsTestData: FeatureFlagsRequest = {
   feature_flags: [
     {
-      app_id: '673df370a46a6f92b5ebcd18',
+      app_id: '',
       flags: {
         auto_mark_messages_read: true,
         ff_admin_access_restrictions: false,

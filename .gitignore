@@ -12,3 +12,5 @@ node_modules/
 .env.whale
 .env.bear
 .env.local
+.env
+

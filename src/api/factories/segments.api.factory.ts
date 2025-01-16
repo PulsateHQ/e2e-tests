@@ -342,8 +342,15 @@ export async function createSegmentFromFile(
     }
   );
 
+  const responseBody = await response.text();
   const expectedStatusCode = 200;
+  const responseJson = JSON.parse(responseBody);
+
   expect(response.status()).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('segment');
+  expect(responseJson.segment).toBe(
+    "Thank you for your submission. We are currently processing your list to create the segment. Processing large lists may require additional time. You will receive an email notification once the segment is ready. If you don't see the email, please check your spam or junk folder.<br /><br /><i>Please note: Users on the list who do not have online or mobile banking will be excluded from the segment.</i>"
+  );
 
   return response;
 }

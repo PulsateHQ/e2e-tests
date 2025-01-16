@@ -2,6 +2,7 @@ import { Headers } from '@_src/api/models/headers.api.model';
 import { UserRequest, UserResponse } from '@_src/api/models/user.api.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
+import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
 export async function getAllUsersWithApi(
@@ -138,6 +139,135 @@ export async function unsubscribeUserWithApi(
 
   return response;
 }
+
+export async function updateUserNoteWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  userId: string,
+  noteContent: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  const url = `${apiUrls.usersUrlV2}/${userId}/note`;
+
+  const payload = {
+    content: noteContent
+  };
+
+  const response = await request.patch(url, {
+    headers,
+    data: JSON.stringify(payload)
+  });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('success', 'Note updated successfully');
+  expect(responseJson).toHaveProperty('note', noteContent);
+
+  return response;
+}
+
+export async function getUserSegmentsWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  userId: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.usersUrlV2}/${userId}/segments`;
+
+  const response = await request.get(url, { headers });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('data');
+  expect(responseJson).toHaveProperty('metadata');
+
+  return response;
+}
+
+export async function getUserCustomAttributesWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  userAlias: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes`;
+
+  const response = await request.get(url, { headers });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('data');
+  expect(responseJson).toHaveProperty('metadata');
+
+  return response;
+}
+
+export async function setUserCustomAttributesWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  userAlias: string,
+  customAttributes: Record<string, string>
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes`;
+
+  const response = await request.post(url, {
+    headers,
+    data: JSON.stringify({ custom_attributes: customAttributes })
+  });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty(
+    'success',
+    'Custom attributes updated successfully'
+  );
+
+  return response;
+}
+
 export async function createUserWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -190,6 +320,75 @@ export async function upsertUserWithApi(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
+
+  return response;
+}
+
+export async function uploadUsersWithSegmentCreationApi(
+  request: APIRequestContext,
+  authToken: string,
+  {
+    numberOfUsers,
+    segmentName,
+    customTag
+  }: {
+    numberOfUsers: number;
+    segmentName: string;
+    customTag: string;
+  }
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: '*/*',
+    ContentType: 'multipart/form-data'
+  };
+
+  // Generate CSV content
+  const csvRows = [
+    'User_Alias,Email_Address,First_Name,Last_Name,SMS_Phone_Number,Current_City,Age,Gender'
+  ];
+
+  for (let i = 0; i < numberOfUsers; i++) {
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+
+    csvRows.push(
+      `${faker.internet.userName({ firstName: 'Piotr' }).replace(/\./g, '_')},` +
+        `${faker.internet.email()},` +
+        `${firstName},` +
+        `${lastName},` +
+        `${faker.phone.number()},` +
+        `${faker.location.city()},` +
+        `${faker.number.int({ min: 18, max: 100 })},` +
+        `${faker.helpers.arrayElement(['man', 'woman'])}`
+    );
+  }
+
+  const csvContent = Buffer.from(csvRows.join('\n'));
+
+  const response = await request.post(`${apiUrls.usersUrlV2}/upload`, {
+    headers,
+    multipart: {
+      file: {
+        name: 'users_with_segment.csv',
+        mimeType: 'text/csv',
+        buffer: csvContent
+      },
+      create_segment: 'true',
+      segment_name: segmentName,
+      custom_tag: customTag
+    }
+  });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('upload');
 
   return response;
 }

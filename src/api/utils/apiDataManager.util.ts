@@ -109,7 +109,9 @@ export async function deleteAllCampaigns(
 }
 
 function generateRandomUser(): string {
-  const userAlias = faker.internet.username();
+  const userAlias = faker.internet
+    .username({ firstName: 'Piotr' })
+    .replace(/\./g, '_');
   const emailAddress = faker.internet.email();
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
@@ -148,7 +150,7 @@ export async function importRandomUsers(
 export function getFreshUserPayload(): UserRequest {
   return {
     age: faker.number.int({ min: 18, max: 100 }),
-    alias: faker.internet.username({ firstName: 'Piotr' }),
+    alias: faker.internet.username({ firstName: 'Piotr' }).replace(/\./g, '_'),
     current_city: faker.location.city(),
     current_country: faker.location.country(),
     current_location: [faker.location.longitude(), faker.location.latitude()],
@@ -171,4 +173,8 @@ export function generateCsvContentForAliases(aliases: string[]): Buffer {
     csvContent += `\n${alias}`;
   }
   return Buffer.from(csvContent, 'utf-8');
+}
+
+export function generateUniqueCustomTag(): string {
+  return `custom_tag_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 }

@@ -3,16 +3,25 @@ import {
   API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
+import { getAllSegmentsWithApi } from '@_src/api/factories/segments.api.factory';
+import { getSingleSegmentUsersWithApi } from '@_src/api/factories/segments.api.factory';
 import {
   createUserWithApi,
   deleteUserWithApi,
   getAllUsersWithApi,
+  getUserCustomAttributesWithApi,
+  getUserSegmentsWithApi,
   getUserWithApi,
+  setUserCustomAttributesWithApi,
+  updateUserNoteWithApi,
+  uploadUsersWithSegmentCreationApi,
   upsertUserWithApi
 } from '@_src/api/factories/users.api.factory';
 import { userRequestPayload } from '@_src/api/test-data/user-payload/create-users';
 import {
+  deleteAllSegments,
   deleteAllUsers,
+  generateUniqueCustomTag,
   getFreshUserPayload,
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
@@ -152,5 +161,125 @@ test.describe('User Management', () => {
 
     expect(getAllUsersWithApiAfterUnsubscribe.status()).toBe(200);
     expect(getAllUsersWithApiAfterUnsubscribeJson.data.length).toBe(1);
+  });
+
+  test('should import users with segment creation and verify segment content', async ({
+    request
+  }) => {
+    // Arrange
+    await deleteAllSegments(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const numberOfUsers = 2;
+    const uniqueCustomTag = generateUniqueCustomTag();
+
+    // Act
+    const uploadUsersResponse = await uploadUsersWithSegmentCreationApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      {
+        numberOfUsers,
+        segmentName: 'segment_test',
+        customTag: uniqueCustomTag
+      }
+    );
+
+    // Assert
+    expect(uploadUsersResponse.status()).toBe(200);
+
+    // Wait for segments to be created and verify
+    let segmentId: string;
+    await expect(async () => {
+      const getAllSegmentsResponse = await getAllSegmentsWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      );
+      const getAllSegmentsResponseJson = await getAllSegmentsResponse.json();
+
+      segmentId = getAllSegmentsResponseJson.data[0].id;
+      expect(getAllSegmentsResponseJson.data).toHaveLength(1);
+    }).toPass({
+      timeout: 30_000,
+      intervals: [1000]
+    });
+
+    let userId: string;
+    let aliasId: string;
+
+    // Verify segment users
+    await expect(async () => {
+      const segmentUsersResponse = await getSingleSegmentUsersWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        segmentId
+      );
+      const segmentUsersResponseJson = await segmentUsersResponse.json();
+
+      expect(segmentUsersResponse.status()).toBe(200);
+      expect(segmentUsersResponseJson.data).toHaveLength(2);
+      userId = segmentUsersResponseJson.data[0].id;
+      aliasId = segmentUsersResponseJson.data[0].alias;
+    }).toPass({
+      timeout: 30_000,
+      intervals: [1000]
+    });
+
+    // Update user note
+    const updateUserNoteResponse = await updateUserNoteWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      userId,
+      'Updated note'
+    );
+    const updateUserNoteResponseJson = await updateUserNoteResponse.json();
+    expect(updateUserNoteResponse.status()).toBe(200);
+    expect(updateUserNoteResponseJson.note).toBe('Updated note');
+
+    const getUserSegmentsResponse = await getUserSegmentsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      userId
+    );
+    expect(getUserSegmentsResponse.status()).toBe(200);
+    const getUserSegmentsResponseJson = await getUserSegmentsResponse.json();
+    expect(getUserSegmentsResponseJson.data[0].id).toBe(segmentId);
+    expect(getUserSegmentsResponseJson.data[0].name).toBe('segment_test');
+
+    // Get user and verify note
+    const getUserResponse = await getUserWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      userId
+    );
+    const getUserResponseJson = await getUserResponse.json();
+    expect(getUserResponseJson.note).toBe('Updated note');
+    expect(getUserResponseJson.custom_attrs[uniqueCustomTag]).toBe(true);
+
+    const getUserCustomAttributesResponse =
+      await getUserCustomAttributesWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        aliasId
+      );
+    const getUserCustomAttributesResponseJson =
+      await getUserCustomAttributesResponse.json();
+    expect(getUserCustomAttributesResponseJson.data[0].id).toBe(
+      uniqueCustomTag
+    );
+
+    const setUserCustomAttributesResponse =
+      await setUserCustomAttributesWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        aliasId,
+        { [uniqueCustomTag]: 'true' }
+      );
+    const setUserCustomAttributesResponseJson =
+      await setUserCustomAttributesResponse.json();
+    expect(setUserCustomAttributesResponse.status()).toBe(200);
+    expect(setUserCustomAttributesResponseJson.success).toBe(
+      'Custom attributes updated successfully'
+    );
   });
 });
