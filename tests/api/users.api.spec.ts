@@ -266,6 +266,22 @@ test.describe('User Management', () => {
       );
     const getUserCustomAttributesResponseJson =
       await getUserCustomAttributesResponse.json();
+    expect(getUserCustomAttributesResponseJson.data[0].name).toBe(
+      uniqueCustomTag
+    );
+
+    // Generate a single custom attribute with default values
+    const customAttribute = generateCustomAttribute();
+
+    // Set the custom attribute
+    await setUserCustomAttributesWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      aliasId,
+      [customAttribute]
+    );
+
+    // Get the custom attribute we want to delete from the previous GET response
     const customAttributeFromResponse =
       getUserCustomAttributesResponseJson.data[0];
 
@@ -281,11 +297,44 @@ test.describe('User Management', () => {
         }
       );
 
-    const deleteUserCustomAttributesResponseJson =
-      await deleteUserCustomAttributesResponse.json();
     expect(deleteUserCustomAttributesResponse.status()).toBe(200);
-    expect(deleteUserCustomAttributesResponseJson.success).toBe(
-      'Custom attributes deleted successfully'
+
+    const getUserCustomAttributesAfterDeleteResponse =
+      await getUserCustomAttributesWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        aliasId
+      );
+    const getUserCustomAttributesAfterDeleteResponseJson =
+      await getUserCustomAttributesAfterDeleteResponse.json();
+    // Validate that the remaining custom attribute matches what we set
+    expect(getUserCustomAttributesAfterDeleteResponseJson.data[0].name).toBe(
+      customAttribute.name
     );
+    expect(
+      String(getUserCustomAttributesAfterDeleteResponseJson.data[0].value)
+    ).toBe(String(customAttribute.value));
+    expect(getUserCustomAttributesAfterDeleteResponseJson.data[0].source).toBe(
+      customAttribute.source
+    );
+    expect(
+      getUserCustomAttributesAfterDeleteResponseJson.data[0].product_id
+    ).toBe(customAttribute.product_id);
+
+    // Get user and verify custom attributes
+    const getUserAfterDelteAttributeResponse = await getUserWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      userId
+    );
+    const getUserAfterDelteAttributeResponseJson =
+      await getUserAfterDelteAttributeResponse.json();
+    expect(
+      String(
+        getUserAfterDelteAttributeResponseJson.custom_attrs[
+          customAttribute.name
+        ]
+      )
+    ).toBe(String(customAttribute.value));
   });
 });

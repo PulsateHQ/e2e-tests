@@ -62,7 +62,7 @@ export async function getUserWithApi(
   const response = await request.get(url, { headers });
 
   const responseBody = await response.text();
-  const expectedStatusCode = 201;
+  const expectedStatusCode = 200;
 
   const responseJson: UserResponse = JSON.parse(responseBody);
 
@@ -281,18 +281,12 @@ export async function deleteUserCustomAttributesWithApi(
 
   const response = await request.delete(url, { headers });
 
-  const responseBody = await response.text();
   const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
 
   expect(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty(
-    'success',
-    'Custom attributes deleted successfully'
-  );
 
   return response;
 }
