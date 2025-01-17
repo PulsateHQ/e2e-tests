@@ -270,8 +270,7 @@ test.describe('User Management', () => {
           source: customAttributeFromResponse.source || '',
           product_id: customAttributeFromResponse.product_id || '',
           name: customAttributeFromResponse.name
-        },
-        true // flag to use request body instead of query params
+        }
       );
 
     expect(deleteUserCustomAttributesWithBodyResponse.status()).toBe(200);
