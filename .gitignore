@@ -3,6 +3,7 @@ node_modules/
 /test-results/
 /playwright-report/
 /playwright/.cache/
+.vscode/
 
 .env.tiger
 .env.leopard
@@ -13,4 +14,5 @@ node_modules/
 .env.bear
 .env.local
 .env
+
 
