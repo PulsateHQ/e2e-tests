@@ -1,0 +1,205 @@
+import {
+  API_E2E_ACCESS_TOKEN_ADMIN,
+  API_E2E_APP_ID
+} from '@_config/env.config';
+import {
+  addResourcesToGroupWithApi,
+  createGroupForSegmentWithApi,
+  deleteGroupWithApi,
+  getAllGroupsWithApi,
+  getSingleGroupWithApi,
+  removeResourcesFromGroupWithApi,
+  updateGroupWithApi
+} from '@_src/api/factories/groups.api.factory';
+import {
+  createSegmentWithApi,
+  getSingleSegmentWithApi
+} from '@_src/api/factories/segments.api.factory';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
+import {
+  deleteAllGroups,
+  deleteAllSegments,
+  deleteAllUsers,
+  generateGroupPayloadSegments,
+  importRandomUsers
+} from '@_src/api/utils/apiDataManager.util';
+import { expect, test } from '@_src/ui/fixtures/merge.fixture';
+import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
+
+test.describe('Groups Management', () => {
+  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
+    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
+    apiE2EAppId: `${API_E2E_APP_ID}`
+  };
+
+  test.beforeEach(async ({ request }) => {
+    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllSegments(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    await deleteAllGroups(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+  });
+
+  test('CRUD for groups', async ({ request }) => {
+    // Arrange
+    const numberOfUsers = 3;
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload
+    );
+    const createSegmentResponseJson = await createSegmentResponse.json();
+    const firstSegmentId = createSegmentResponseJson.segment.id;
+
+    const getAllGroupsResponse = await getAllGroupsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+
+    expect(getAllGroupsResponse.status()).toBe(200);
+
+    const getAllGroupsResponseJson = await getAllGroupsResponse.json();
+    expect(getAllGroupsResponseJson.data).toHaveLength(0);
+
+    // Store the payload before making the API call
+    const groupPayload = generateGroupPayloadSegments();
+
+    const createGroupResponse = await createGroupForSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      groupPayload
+    );
+
+    const createGroupResponseJson = await createGroupResponse.json();
+    const firstGroupId = createGroupResponseJson.id;
+
+    expect(createGroupResponse.status()).toBe(200);
+    expect(createGroupResponseJson.name).toBe(groupPayload.group.name);
+    expect(createGroupResponseJson.resource_type).toBe('Mobile::App::Segment');
+
+    const getSingleGroupResponse = await getSingleGroupWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstGroupId
+    );
+    const getSingleGroupResponseJson = await getSingleGroupResponse.json();
+
+    expect(getSingleGroupResponse.status()).toBe(200);
+    expect(getSingleGroupResponseJson.name).toBe(groupPayload.group.name);
+    expect(getSingleGroupResponseJson.id).toBe(firstGroupId);
+    expect(getSingleGroupResponseJson.resource_type).toBe(
+      'Mobile::App::Segment'
+    );
+
+    const addResourcesToGroupResponse = await addResourcesToGroupWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      {
+        resource_ids: [firstSegmentId],
+        group_id: firstGroupId
+      }
+    );
+
+    expect(addResourcesToGroupResponse.status()).toBe(200);
+
+    const getSingleGroupAfterAddResourcesResponse = await getSingleGroupWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstGroupId
+    );
+
+    expect(getSingleGroupAfterAddResourcesResponse.status()).toBe(200);
+    const getSingleGroupAfterAddResourcesResponseJson =
+      await getSingleGroupAfterAddResourcesResponse.json();
+    expect(
+      getSingleGroupAfterAddResourcesResponseJson.resource_ids.segment_ids
+    ).toContain(firstSegmentId);
+
+    const getSingleSegmentWithApiResponse = await getSingleSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstSegmentId
+    );
+    const getSingleSegmentWithApiResponseJson =
+      await getSingleSegmentWithApiResponse.json();
+
+    expect(getSingleSegmentWithApiResponse.status()).toBe(200);
+    expect(getSingleSegmentWithApiResponseJson.groups).toHaveLength(1);
+
+    const updateGroupResponse = await updateGroupWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstGroupId,
+      groupPayload
+    );
+
+    expect(updateGroupResponse.status()).toBe(200);
+    const updateGroupResponseJson = await updateGroupResponse.json();
+    expect(updateGroupResponseJson.name).toBe(groupPayload.group.name);
+
+    const getSingleGroupAfterUpdateResponse = await getSingleGroupWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstGroupId
+    );
+
+    expect(getSingleGroupAfterUpdateResponse.status()).toBe(200);
+    const getSingleGroupAfterUpdateResponseJson =
+      await getSingleGroupAfterUpdateResponse.json();
+    expect(getSingleGroupAfterUpdateResponseJson.name).toBe(
+      groupPayload.group.name
+    );
+
+    const removeResourcesFromGroupResponse =
+      await removeResourcesFromGroupWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        {
+          resource_ids: [firstSegmentId],
+          group_id: firstGroupId
+        }
+      );
+
+    expect(removeResourcesFromGroupResponse.status()).toBe(200);
+
+    const getSingleGroupAfterRemoveResourcesResponse =
+      await getSingleGroupWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        firstGroupId
+      );
+
+    expect(getSingleGroupAfterRemoveResourcesResponse.status()).toBe(200);
+    const getSingleGroupAfterRemoveResourcesResponseJson =
+      await getSingleGroupAfterRemoveResourcesResponse.json();
+    expect(
+      getSingleGroupAfterRemoveResourcesResponseJson.resource_ids.segment_ids
+    ).not.toContain(firstSegmentId);
+
+    const deleteGroupResponse = await deleteGroupWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      firstGroupId
+    );
+
+    expect(deleteGroupResponse.status()).toBe(200);
+
+    const getAllGroupsAfterDeleteResponse = await getAllGroupsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+
+    expect(getAllGroupsAfterDeleteResponse.status()).toBe(200);
+    const getAllGroupsAfterDeleteResponseJson =
+      await getAllGroupsAfterDeleteResponse.json();
+    expect(getAllGroupsAfterDeleteResponseJson.data).toHaveLength(0);
+  });
+});

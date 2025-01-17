@@ -1,3 +1,6 @@
+import { deleteGroupWithApi } from '../factories/groups.api.factory';
+import { getAllGroupsWithApi } from '../factories/groups.api.factory';
+import { CreateGroupPayload } from '../models/group.api.model';
 import {
   batchDeleteCampaignsWithApi,
   getCampaignsWithApi
@@ -109,6 +112,34 @@ export async function deleteAllCampaigns(
   });
 }
 
+export async function deleteAllGroups(
+  request: APIRequestContext,
+  token: string
+): Promise<void> {
+  await test.step('Deleting all groups', async () => {
+    const getGroupsResponse = await getAllGroupsWithApi(request, token);
+    const getGroupsResponseJson = await getGroupsResponse.json();
+    const initialGroupCount = getGroupsResponseJson.data.length;
+
+    for (const group of getGroupsResponseJson.data) {
+      await deleteGroupWithApi(request, token, group.id);
+    }
+
+    const getGroupsResponseAfterDeletion = await getAllGroupsWithApi(
+      request,
+      token
+    );
+    const getGroupsResponseJsonAfterDeletion =
+      await getGroupsResponseAfterDeletion.json();
+    const finalGroupCount = getGroupsResponseJsonAfterDeletion.data.length;
+
+    expect(getGroupsResponseAfterDeletion.status()).toBe(200);
+    expect(finalGroupCount).toBe(0);
+
+    await test.step(`Deleted ${initialGroupCount} groups, ${finalGroupCount} remaining.`, async () => {});
+  });
+}
+
 function generateRandomUser(): string {
   const userAlias = faker.internet
     .username({ firstName: 'Piotr' })
@@ -198,5 +229,14 @@ export function generateCustomAttribute(
       `${overrides.source || 'cunexus'}_${overrides.product_id || 'motor_loan'}`,
     value:
       overrides.value || faker.number.int({ min: 5000, max: 50000 }).toString()
+  };
+}
+
+export function generateGroupPayloadSegments(): CreateGroupPayload {
+  return {
+    group: {
+      name: faker.lorem.word(),
+      resource_type: 'segments'
+    }
   };
 }
