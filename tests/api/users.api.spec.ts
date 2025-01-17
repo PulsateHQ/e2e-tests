@@ -156,7 +156,7 @@ test.describe('User Management', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       {
-        numberOfUsers,
+        numberOfUsers: numberOfUsers,
         segmentName: 'segment_test',
         customTag: uniqueCustomTag
       }
