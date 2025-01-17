@@ -266,7 +266,7 @@ export async function deleteUserCustomAttributesWithApi(
   request: APIRequestContext,
   authToken: string,
   userAlias: string,
-  queryParams: {
+  params: {
     source: string;
     product_id: string;
     name: string;
@@ -277,9 +277,12 @@ export async function deleteUserCustomAttributesWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes?source=${queryParams.source}&product_id=${queryParams.product_id}&name=${queryParams.name}`;
+  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes`;
 
-  const response = await request.delete(url, { headers });
+  const response = await request.delete(url, {
+    headers,
+    data: params
+  });
 
   const expectedStatusCode = 200;
 
@@ -376,7 +379,7 @@ export async function uploadUsersWithSegmentCreationApi(
     const lastName = faker.person.lastName();
 
     csvRows.push(
-      `${faker.internet.userName({ firstName: 'Piotr' }).replace(/\./g, '_')},` +
+      `${faker.internet.username({ firstName: 'Piotr' }).replace(/\./g, '_')},` +
         `${faker.internet.email()},` +
         `${firstName},` +
         `${lastName},` +

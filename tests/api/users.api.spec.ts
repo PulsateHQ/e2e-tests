@@ -260,7 +260,8 @@ test.describe('User Management', () => {
     const customAttributeFromResponse =
       getUserCustomAttributesResponseJson.data[0];
 
-    const deleteUserCustomAttributesResponse =
+    // Test with request body
+    const deleteUserCustomAttributesWithBodyResponse =
       await deleteUserCustomAttributesWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -269,10 +270,11 @@ test.describe('User Management', () => {
           source: customAttributeFromResponse.source || '',
           product_id: customAttributeFromResponse.product_id || '',
           name: customAttributeFromResponse.name
-        }
+        },
+        true // flag to use request body instead of query params
       );
 
-    expect(deleteUserCustomAttributesResponse.status()).toBe(200);
+    expect(deleteUserCustomAttributesWithBodyResponse.status()).toBe(200);
 
     const getUserCustomAttributesAfterDeleteResponse =
       await getUserCustomAttributesWithApi(
