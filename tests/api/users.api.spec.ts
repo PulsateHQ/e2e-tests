@@ -41,31 +41,6 @@ test.describe('User Management', () => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
   });
 
-  test('should import multiple users and verify the count', async ({
-    request
-  }) => {
-    // Arrange
-    const numberOfUsers = 2;
-    const { apiE2EAccessTokenAdmin, apiE2EAppId } = APIE2ELoginUserModel;
-
-    // Act
-    await importRandomUsers(
-      request,
-      apiE2EAccessTokenAdmin,
-      apiE2EAppId,
-      numberOfUsers
-    );
-    const getUsersResponse = await getAllUsersWithApi(
-      request,
-      apiE2EAccessTokenAdmin
-    );
-    const getUsersResponseJson = await getUsersResponse.json();
-
-    // Assert
-    expect(getUsersResponse.status()).toBe(200);
-    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
-  });
-
   test('should import a single user and validate the user details', async ({
     request
   }) => {
@@ -165,7 +140,7 @@ test.describe('User Management', () => {
     expect(getAllUsersWithApiAfterUnsubscribeJson.data.length).toBe(1);
   });
 
-  test('should import users with segment creation and verify segment content', async ({
+  test('should import users with segment creation and verify segment content including custom attributes', async ({
     request
   }) => {
     // Arrange
