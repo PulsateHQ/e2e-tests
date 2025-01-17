@@ -96,7 +96,7 @@ export async function getSingleSegmentWithApi(
 export async function getTotalAudienceForSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
-  expectedTotalAudience: number
+  expectedTotalAudience?: number
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -118,10 +118,13 @@ export async function getTotalAudienceForSegmentWithApi(
       response.status(),
       `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
     ).toBe(expectedStatusCode);
-    expect(responseJson).toHaveProperty(
-      'total_audience',
-      expectedTotalAudience
-    );
+
+    if (expectedTotalAudience !== undefined) {
+      expect(responseJson).toHaveProperty(
+        'total_audience',
+        expectedTotalAudience
+      );
+    }
   }).toPass({ timeout: 20_000 });
 
   return response!;

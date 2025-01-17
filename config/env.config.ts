@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
 
-dotenv.config({
-  override: true
-});
+// Configure dotenv to use the environment file specified by DOTENV_CONFIG_PATH
+// or fall back to default .env
+dotenv.config({ path: process.env.DOTENV_CONFIG_PATH });
 
 function requireEnvVariable(envVariableName: string): string {
   const envVariableValue = process.env[envVariableName];
