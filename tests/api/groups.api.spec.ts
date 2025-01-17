@@ -41,7 +41,9 @@ test.describe('Groups Management', () => {
     await deleteAllGroups(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
   });
 
-  test('CRUD for groups', async ({ request }) => {
+  test('should manage group lifecycle with segment resource assignments', async ({
+    request
+  }) => {
     // Arrange
     const numberOfUsers = 3;
     await importRandomUsers(
@@ -132,7 +134,7 @@ test.describe('Groups Management', () => {
       await getSingleSegmentWithApiResponse.json();
 
     expect(getSingleSegmentWithApiResponse.status()).toBe(200);
-    expect(getSingleSegmentWithApiResponseJson.groups).toHaveLength(1);
+    expect(getSingleSegmentWithApiResponseJson.groups_ids).toHaveLength(1);
 
     const updateGroupResponse = await updateGroupWithApi(
       request,
