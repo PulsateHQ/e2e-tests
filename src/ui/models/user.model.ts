@@ -18,6 +18,7 @@ export interface CompanyRegistrationModel {
 
 export interface APIE2ELoginUserModel {
   apiE2EAccessTokenAdmin: string;
+  apiE2EAccessTokenSuperAdmin?: string;
   apiE2EAppId: string;
 }
 

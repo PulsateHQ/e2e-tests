@@ -1,10 +1,9 @@
 import { UserRequest } from '@_src/api/models/user.api.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-// Template payload with static values
 export const userRequestPayload: UserRequest = {
   age: faker.number.int({ min: 18, max: 100 }),
-  alias: faker.internet.username({ firstName: 'Piotr' }),
+  alias: faker.internet.username({ firstName: 'Piotr' }).replace(/\./g, '_'),
   current_city: faker.location.city(),
   current_country: faker.location.country(),
   current_location: [faker.location.longitude(), faker.location.latitude()],

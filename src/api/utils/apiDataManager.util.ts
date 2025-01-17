@@ -5,12 +5,13 @@ import {
 import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
   batchDeleteSegmentsWithApi,
-  getSegmentsWithApi
+  getAllSegmentsWithApi
 } from '@_src/api/factories/segments.api.factory';
 import {
   deleteUserWithApi,
   getAllUsersWithApi
 } from '@_src/api/factories/users.api.factory';
+import { CustomAttribute } from '@_src/api/models/custom-attribute.api.model';
 import { UserRequest } from '@_src/api/models/user.api.model';
 import { userRequestPayload } from '@_src/api/test-data/user-payload/create-users';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
@@ -50,7 +51,7 @@ export async function deleteAllSegments(
   token: string
 ): Promise<void> {
   await test.step('Deleting all segments', async () => {
-    const getSegmentsResponse = await getSegmentsWithApi(request, token);
+    const getSegmentsResponse = await getAllSegmentsWithApi(request, token);
     const getSegmentsResponseJson = await getSegmentsResponse.json();
     const initialSegmentCount = getSegmentsResponseJson.data.length;
 
@@ -60,7 +61,7 @@ export async function deleteAllSegments(
       getSegmentsResponseJson.data.map((segment: { id: string }) => segment.id)
     );
 
-    const getSegmentsResponseAfterDeletion = await getSegmentsWithApi(
+    const getSegmentsResponseAfterDeletion = await getAllSegmentsWithApi(
       request,
       token
     );
@@ -109,7 +110,9 @@ export async function deleteAllCampaigns(
 }
 
 function generateRandomUser(): string {
-  const userAlias = faker.internet.username();
+  const userAlias = faker.internet
+    .username({ firstName: 'Piotr' })
+    .replace(/\./g, '_');
   const emailAddress = faker.internet.email();
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
@@ -121,7 +124,7 @@ function generateRandomUser(): string {
   return `${userAlias},${emailAddress},${firstName},${lastName},${smsPhoneNumber},${currentCity},${age},${gender}`;
 }
 
-function generateCsvContent(numberOfUsers: number): Buffer {
+function generateCsvContentForUsersImport(numberOfUsers: number): Buffer {
   let csvContent =
     'userAlias,emailAddress,firstName,lastName,smsPhoneNumber,currentCity,age,gender';
 
@@ -140,7 +143,7 @@ export async function importRandomUsers(
   numberOfUsers: number
 ): Promise<void> {
   await test.step(`Appending ${numberOfUsers} random users to CSV content`, async () => {
-    const csvContent = generateCsvContent(numberOfUsers);
+    const csvContent = generateCsvContentForUsersImport(numberOfUsers);
     await importUsersWithApi(request, authToken, { csvContent, app_id: appId });
   });
 }
@@ -148,7 +151,7 @@ export async function importRandomUsers(
 export function getFreshUserPayload(): UserRequest {
   return {
     age: faker.number.int({ min: 18, max: 100 }),
-    alias: faker.internet.username({ firstName: 'Piotr' }),
+    alias: faker.internet.username({ firstName: 'Piotr' }).replace(/\./g, '_'),
     current_city: faker.location.city(),
     current_country: faker.location.country(),
     current_location: [faker.location.longitude(), faker.location.latitude()],
@@ -162,5 +165,38 @@ export function getFreshUserPayload(): UserRequest {
       guid: faker.string.uuid()
     },
     custom_tags: userRequestPayload.custom_tags
+  };
+}
+
+export function generateCsvContentForAliases(aliases: string[]): Buffer {
+  let csvContent = 'User_Alias';
+  for (const alias of aliases) {
+    csvContent += `\n${alias}`;
+  }
+  return Buffer.from(csvContent, 'utf-8');
+}
+
+export function generateUniqueCustomTag(): string {
+  return `custom_tag_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+}
+
+export function generateCustomAttribute(
+  overrides: Partial<CustomAttribute> = {}
+): CustomAttribute {
+  return {
+    source:
+      overrides.source ||
+      faker.helpers.arrayElement(['cunexus', 'other_source']),
+    product_id:
+      overrides.product_id ||
+      faker.helpers.arrayElement(['motor_loan', 'personal_loan', 'mortgage']),
+    category:
+      overrides.category ||
+      faker.helpers.arrayElement(['loans', 'cards', 'investments']),
+    name:
+      overrides.name ||
+      `${overrides.source || 'cunexus'}_${overrides.product_id || 'motor_loan'}`,
+    value:
+      overrides.value || faker.number.int({ min: 5000, max: 50000 }).toString()
   };
 }

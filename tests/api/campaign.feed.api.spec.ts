@@ -1,7 +1,8 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   API_E2E_ACCESS_TOKEN_SDK,
-  API_E2E_APP_ID
+  API_E2E_APP_ID,
+  SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import {
   createCampaignWithApi,
@@ -14,12 +15,12 @@ import {
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
-import { createCampaignPayloadFeedPost } from '@_src/api/test-data/create-feed-campaign-payload';
-import { createSegmentAllUsersPayload } from '@_src/api/test-data/create-segment-all-users-payload';
-import { startMobileSessionPayload } from '@_src/api/test-data/start-mobile-session-payload';
-import { updateMobileUserPayload } from '@_src/api/test-data/update-mobile-user-payload';
-import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/user-actions/feed-post-button-click-payload';
-import { feedPostFrontImpressionAction } from '@_src/api/test-data/user-actions/feed-post-impression-payload';
+import { createCampaignPayloadFeedPost } from '@_src/api/test-data/campaign/create-feed-campaign-payload';
+import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-button-click-payload';
+import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-impression-payload';
+import { startMobileSessionPayload } from '@_src/api/test-data/mobile-user-actions/start-mobile-session-payload';
+import { updateMobileUserPayload } from '@_src/api/test-data/mobile-user-actions/update-mobile-user-payload';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -35,6 +36,7 @@ import {
 test.describe('Feed Post Campaign Tests', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
+    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
 

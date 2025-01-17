@@ -26,10 +26,9 @@ export const createCampaignPayloadFeedPost: CreateCampaignPayload = {
         message: '',
         admin: {
           job_title: null,
-          name: 'e2e_tiger_api',
-          avatar_url:
-            'https://pulsate-media-bucket-production.s3.eu-west-1.amazonaws.com/default-user-avatar.png',
-          s_id: '672cc369b58b2cc1937b68cd'
+          name: null,
+          avatar_url: null,
+          s_id: null
         }
       },
       image: {
