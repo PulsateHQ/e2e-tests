@@ -30,7 +30,7 @@ export default defineConfig({
   projects: [
     {
       name: 'firefox',
-      testDir: './tests/api',
+      testDir: './tests',
       use: {
         ...devices['Desktop Firefox']
       }

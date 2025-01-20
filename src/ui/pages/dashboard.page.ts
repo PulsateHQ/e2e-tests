@@ -4,11 +4,10 @@ import { BasePage } from '@_src/ui/pages/base.page';
 import { Page } from '@playwright/test';
 
 export class DashboardPage extends BasePage {
-  url = `/mobile/apps/${UI_INTEGRATION_APP_ID}/dashboard_beta`;
   sideBar: SideBarComponent;
 
-  constructor(page: Page) {
-    super(page);
+  constructor(page: Page, appId: string = UI_INTEGRATION_APP_ID) {
+    super(page, appId);
     this.sideBar = new SideBarComponent(page);
   }
 
