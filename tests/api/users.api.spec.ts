@@ -20,12 +20,14 @@ import {
   upsertUserWithApi
 } from '@_src/api/factories/users.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { userRequestPayload } from '@_src/api/test-data/user-payload/create-users';
+import {
+  createCustomAttributePayload,
+  generateUniqueCustomTag
+} from '@_src/api/test-data/custom-attributes/custom-attribute-payload';
+import { userRequestPayload } from '@_src/api/test-data/users/create-users';
 import {
   deleteAllSegments,
   deleteAllUsers,
-  generateCustomAttribute,
-  generateUniqueCustomTag,
   getFreshUserPayload,
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
@@ -246,7 +248,7 @@ test.describe('User Management', () => {
     );
 
     // Generate a single custom attribute with default values
-    const customAttribute = generateCustomAttribute();
+    const customAttribute = createCustomAttributePayload();
 
     // Set the custom attribute
     await setUserCustomAttributesWithApi(

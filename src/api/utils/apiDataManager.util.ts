@@ -1,6 +1,5 @@
 import { deleteGroupWithApi } from '../factories/groups.api.factory';
 import { getAllGroupsWithApi } from '../factories/groups.api.factory';
-import { CreateGroupPayload } from '../models/group.api.model';
 import {
   batchDeleteCampaignsWithApi,
   getCampaignsWithApi
@@ -14,9 +13,8 @@ import {
   deleteUserWithApi,
   getAllUsersWithApi
 } from '@_src/api/factories/users.api.factory';
-import { CustomAttribute } from '@_src/api/models/custom-attribute.api.model';
 import { UserRequest } from '@_src/api/models/user.api.model';
-import { userRequestPayload } from '@_src/api/test-data/user-payload/create-users';
+import { userRequestPayload } from '@_src/api/test-data/users/create-users';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, test } from '@playwright/test';
@@ -205,38 +203,4 @@ export function generateCsvContentForAliases(aliases: string[]): Buffer {
     csvContent += `\n${alias}`;
   }
   return Buffer.from(csvContent, 'utf-8');
-}
-
-export function generateUniqueCustomTag(): string {
-  return `custom_tag_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-}
-
-export function generateCustomAttribute(
-  overrides: Partial<CustomAttribute> = {}
-): CustomAttribute {
-  return {
-    source:
-      overrides.source ||
-      faker.helpers.arrayElement(['cunexus', 'other_source']),
-    product_id:
-      overrides.product_id ||
-      faker.helpers.arrayElement(['motor_loan', 'personal_loan', 'mortgage']),
-    category:
-      overrides.category ||
-      faker.helpers.arrayElement(['loans', 'cards', 'investments']),
-    name:
-      overrides.name ||
-      `${overrides.source || 'cunexus'}_${overrides.product_id || 'motor_loan'}`,
-    value:
-      overrides.value || faker.number.int({ min: 5000, max: 50000 }).toString()
-  };
-}
-
-export function generateGroupPayloadSegments(): CreateGroupPayload {
-  return {
-    group: {
-      name: faker.lorem.word(),
-      resource_type: 'segments'
-    }
-  };
 }

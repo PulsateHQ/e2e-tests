@@ -19,12 +19,12 @@ import {
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
+import { generateUniqueCustomTag } from '@_src/api/test-data/custom-attributes/custom-attribute-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
 import { createSegmentSingleAliasPayload } from '@_src/api/test-data/segment/create-segment-single-alias-payload';
 import {
   deleteAllSegments,
   deleteAllUsers,
-  generateUniqueCustomTag,
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';

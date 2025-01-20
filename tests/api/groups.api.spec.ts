@@ -16,12 +16,12 @@ import {
   getSingleSegmentWithApi
 } from '@_src/api/factories/segments.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
+import { createGroupSegmentsPayload } from '@_src/api/test-data/group/create-group-segments-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
 import {
   deleteAllGroups,
   deleteAllSegments,
   deleteAllUsers,
-  generateGroupPayloadSegments,
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
@@ -72,7 +72,7 @@ test.describe('Groups Management', () => {
     expect(getAllGroupsResponseJson.data).toHaveLength(0);
 
     // Store the payload before making the API call
-    const groupPayload = generateGroupPayloadSegments();
+    const groupPayload = createGroupSegmentsPayload;
 
     const createGroupResponse = await createGroupForSegmentWithApi(
       request,
