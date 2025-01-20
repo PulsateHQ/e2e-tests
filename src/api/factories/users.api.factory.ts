@@ -1,4 +1,3 @@
-import { CustomAttribute } from '../models/custom-attribute.api.model';
 import { Headers } from '@_src/api/models/headers.api.model';
 import { UserRequest, UserResponse } from '@_src/api/models/user.api.model';
 import { apiUrls } from '@_src/api/utils/api.util';
@@ -28,7 +27,7 @@ export async function getAllUsersWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
+  const url = `${apiUrls.users.v2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
 
   const response = await request.get(url, { headers });
 
@@ -57,7 +56,7 @@ export async function getUserWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}/${userId}`;
+  const url = `${apiUrls.users.v2}/${userId}`;
 
   const response = await request.get(url, { headers });
 
@@ -85,7 +84,7 @@ export async function deleteUserWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}/${userId}`;
+  const url = `${apiUrls.users.v2}/${userId}`;
 
   const response = await request.delete(url, { headers });
 
@@ -117,7 +116,7 @@ export async function unsubscribeUserWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}/${userId}/unsubscribe`;
+  const url = `${apiUrls.users.v2}/${userId}/unsubscribe`;
 
   const response = await request.patch(url, {
     headers,
@@ -153,7 +152,7 @@ export async function updateUserNoteWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}/${userId}/note`;
+  const url = `${apiUrls.users.v2}/${userId}/note`;
 
   const payload = {
     content: noteContent
@@ -188,7 +187,7 @@ export async function getUserSegmentsWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV2}/${userId}/segments`;
+  const url = `${apiUrls.users.v2}/${userId}/segments`;
 
   const response = await request.get(url, { headers });
 
@@ -206,94 +205,6 @@ export async function getUserSegmentsWithApi(
   return response;
 }
 
-export async function getUserCustomAttributesWithApi(
-  request: APIRequestContext,
-  authToken: string,
-  userAlias: string
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
-
-  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes`;
-
-  const response = await request.get(url, { headers });
-
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
-  expect(responseJson).toHaveProperty('data');
-
-  return response;
-}
-
-export async function setUserCustomAttributesWithApi(
-  request: APIRequestContext,
-  authToken: string,
-  userAlias: string,
-  customAttributes: CustomAttribute[]
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
-
-  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes`;
-
-  const response = await request.post(url, {
-    headers,
-    data: JSON.stringify({ custom_attributes: customAttributes })
-  });
-
-  const expectedStatusCode = 201;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
-
-  return response;
-}
-
-export async function deleteUserCustomAttributesWithApi(
-  request: APIRequestContext,
-  authToken: string,
-  userAlias: string,
-  params: {
-    source: string;
-    product_id: string;
-    name: string;
-  }
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
-
-  const url = `${apiUrls.usersUrlV2}/${userAlias}/custom_attributes`;
-
-  const response = await request.delete(url, {
-    headers,
-    data: params
-  });
-
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
-
-  return response;
-}
-
 export async function createUserWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -305,7 +216,7 @@ export async function createUserWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV1}`;
+  const url = `${apiUrls.users.v1}`;
 
   const response = await request.post(url, {
     headers,
@@ -333,7 +244,7 @@ export async function upsertUserWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.usersUrlV1}/upsert`;
+  const url = `${apiUrls.users.v1}/upsert`;
 
   const response = await request.put(url, {
     headers,
@@ -392,7 +303,7 @@ export async function uploadUsersWithSegmentCreationApi(
 
   const csvContent = Buffer.from(csvRows.join('\n'));
 
-  const response = await request.post(`${apiUrls.usersUrlV2}/upload`, {
+  const response = await request.post(`${apiUrls.users.v2}/upload`, {
     headers,
     multipart: {
       file: {

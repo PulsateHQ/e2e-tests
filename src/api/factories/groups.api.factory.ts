@@ -24,7 +24,7 @@ export async function getAllGroupsWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.groupsUrlV2}?resource_type=${resourceType}&page=${page}&per_page=${perPage}`;
+  const url = `${apiUrls.groups.v2}?resource_type=${resourceType}&page=${page}&per_page=${perPage}`;
 
   const response = await request.get(url, { headers });
 
@@ -58,7 +58,7 @@ export async function getSingleGroupWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.groupsUrlV2}/${groupId}`;
+  const url = `${apiUrls.groups.v2}/${groupId}`;
 
   const response = await request.get(url, { headers });
 
@@ -90,7 +90,7 @@ export async function createGroupForSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.groupsUrlV2, {
+  const response = await request.post(apiUrls.groups.v2, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -122,7 +122,7 @@ export async function addResourcesToGroupWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.groupsUrlV2}/add_resources`;
+  const url = `${apiUrls.groups.v2}/add_resources`;
 
   const response = await request.post(url, {
     headers,
@@ -151,7 +151,7 @@ export async function updateGroupWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.groupsUrlV2}/${groupId}`;
+  const url = `${apiUrls.groups.v2}/${groupId}`;
 
   const response = await request.put(url, {
     headers,
@@ -188,7 +188,7 @@ export async function removeResourcesFromGroupWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.groupsUrlV2}/remove_resources`;
+  const url = `${apiUrls.groups.v2}/remove_resources`;
 
   const response = await request.delete(url, {
     headers,
@@ -215,7 +215,7 @@ export async function deleteGroupWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.groupsUrlV2}/${groupId}`;
+  const url = `${apiUrls.groups.v2}/${groupId}`;
 
   const response = await request.delete(url, { headers });
 

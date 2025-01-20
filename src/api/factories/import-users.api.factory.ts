@@ -14,7 +14,7 @@ export async function importUsersWithApi(
     ContentType: 'multipart/form-data'
   };
 
-  const response = await request.post(apiUrls.importUsersUrl, {
+  const response = await request.post(apiUrls.users.import, {
     headers,
     multipart: {
       file: {

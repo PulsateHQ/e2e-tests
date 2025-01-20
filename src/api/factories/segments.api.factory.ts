@@ -14,7 +14,7 @@ export async function getAllSegmentsWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV2}?show=all`;
+  const url = `${apiUrls.segments.v2}?show=all`;
 
   const response = await request.get(url, { headers });
 
@@ -44,7 +44,7 @@ export async function getSingleSegmentUsersWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV2}/${segmentId}/users`;
+  const url = `${apiUrls.segments.v2}/${segmentId}/users`;
 
   const response = await request.get(url, { headers });
 
@@ -73,7 +73,7 @@ export async function getSingleSegmentWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV2}/${segmentId}`;
+  const url = `${apiUrls.segments.v2}/${segmentId}`;
 
   const response = await request.get(url, { headers });
 
@@ -103,7 +103,7 @@ export async function getTotalAudienceForSegmentWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV2}/total_audience`;
+  const url = `${apiUrls.segments.v2}/total_audience`;
 
   let response: APIResponse;
 
@@ -141,7 +141,7 @@ export async function getUserCountForAlias(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV2}/users_count`;
+  const url = `${apiUrls.segments.v2}/users_count`;
 
   const payload = {
     segment: {
@@ -189,7 +189,7 @@ export async function estimateSegmentsWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV2}/estimate?segment_ids=${segmentsIds}`;
+  const url = `${apiUrls.segments.v2}/estimate?segment_ids=${segmentsIds}`;
 
   const response = await request.get(url, { headers });
 
@@ -219,7 +219,7 @@ export async function createSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.segmentsUrlV1, {
+  const response = await request.post(apiUrls.segments.v1, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -252,7 +252,7 @@ export async function updateSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV1}/${segmentsIds}`;
+  const url = `${apiUrls.segments.v1}/${segmentsIds}`;
 
   const response = await request.put(url, {
     headers,
@@ -289,7 +289,7 @@ export async function duplicateSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.segmentsUrlV1}/${segmentsIds}/duplicate`;
+  const url = `${apiUrls.segments.v1}/${segmentsIds}/duplicate`;
 
   const response = await request.post(url, {
     headers
@@ -330,7 +330,7 @@ export async function createSegmentFromFile(
   };
 
   const response = await request.post(
-    `${apiUrls.segmentsUrlV2}/create_from_file`,
+    `${apiUrls.segments.v2}/create_from_file`,
     {
       headers,
       multipart: {
@@ -374,7 +374,7 @@ export async function batchDeleteSegmentsWithApi(
   };
 
   const response = await request.delete(
-    `${apiUrls.segmentsUrlV2}/batch_destroy`,
+    `${apiUrls.segments.v2}/batch_destroy`,
     {
       headers,
       data: JSON.stringify(payload)

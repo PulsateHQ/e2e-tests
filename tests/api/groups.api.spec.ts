@@ -15,6 +15,7 @@ import {
   createSegmentWithApi,
   getSingleSegmentWithApi
 } from '@_src/api/factories/segments.api.factory';
+import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
 import {
   deleteAllGroups,
@@ -24,7 +25,6 @@ import {
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('Groups Management', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
