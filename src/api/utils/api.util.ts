@@ -1,17 +1,72 @@
 import { API_E2E_APP_ID, BASE_URL, SDK_API_URL } from '@_config/env.config';
 
 export const apiUrls = {
-  importUsersUrl: `${BASE_URL}/api/v2/import_users_for_single_app`,
-  segmentsUrlV1: `${BASE_URL}/api/v1/apps/${API_E2E_APP_ID}/segments`,
-  segmentsUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/segments`,
-  groupsUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/groups`,
-  superAdminsFeatureFlagUrlV2: `${BASE_URL}/api/v2/super_admins/feature_flags`,
-  campaignsUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/campaigns`,
-  usersUrlV1: `${BASE_URL}/api/v1/apps/${API_E2E_APP_ID}/users`,
-  usersUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/users`,
-  combinedStatsUrlV2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/campaigns/combined_stats`,
-  startSessionUrlV4: `${SDK_API_URL}/api/mobile/v4/sessions/start`,
-  updateUserUrlV4: `${SDK_API_URL}/api/mobile/v4/users/update`,
-  getInboxMessageUrlV2: `${SDK_API_URL}/api/mobile/v2/messages/get_inbox`,
-  getMessagesUrlV2: `${SDK_API_URL}/api/mobile/v2/messages/messages`
+  // App related endpoints
+  apps: {
+    v2: {
+      base: `${BASE_URL}/api/v2/apps`
+    }
+  },
+
+  // Admin related endpoints
+  admins: {
+    v2: {
+      register: `${BASE_URL}/admins/api/v2/register`,
+      whoami: `${BASE_URL}/sessions/api/v2/whoami`,
+      currentAdmin: `${BASE_URL}/admins/current_admin`
+    }
+  },
+
+  // SuperAdmin related endpoints
+  superAdmins: {
+    v2: {
+      base: `${BASE_URL}/api/v2/super_admins`
+    }
+  },
+
+  // User related endpoints
+  users: {
+    v1: `${BASE_URL}/api/v1/apps/${API_E2E_APP_ID}/users`,
+    v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/users`,
+    import: `${BASE_URL}/api/v2/import_users_for_single_app`
+  },
+
+  // Segment related endpoints
+  segments: {
+    v1: `${BASE_URL}/api/v1/apps/${API_E2E_APP_ID}/segments`,
+    v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/segments`
+  },
+
+  // Group related endpoints
+  groups: {
+    v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/groups`
+  },
+
+  // Campaign related endpoints
+  campaigns: {
+    v2: {
+      base: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/campaigns`,
+      combinedStats: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/campaigns`
+    }
+  },
+
+  // SDK related endpoints
+  sdk: {
+    sessions: {
+      v4: {
+        start: `${SDK_API_URL}/api/mobile/v4/sessions/start`
+      }
+    },
+    users: {
+      v4: {
+        update: `${SDK_API_URL}/api/mobile/v4/users/update`
+      }
+    },
+    messages: {
+      v2: {
+        inbox: `${SDK_API_URL}/api/mobile/v2/messages/get_inbox`,
+        messages: `${SDK_API_URL}/api/mobile/v2/messages/messages`
+      }
+    }
+  }
 };

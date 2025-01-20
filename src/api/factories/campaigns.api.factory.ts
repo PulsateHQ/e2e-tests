@@ -26,7 +26,7 @@ export async function getCampaignsWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaignsUrlV2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
+  const url = `${apiUrls.campaigns.v2.base}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
 
   const response = await request.get(url, { headers });
 
@@ -57,7 +57,7 @@ export async function createCampaignWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.campaignsUrlV2, {
+  const response = await request.post(apiUrls.campaigns.v2.base, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -87,7 +87,7 @@ export async function deleteCampaignWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaignsUrlV2}/${campaignId}`;
+  const url = `${apiUrls.campaigns.v2.base}/${campaignId}`;
 
   const response = await request.delete(url, { headers });
 
@@ -117,7 +117,7 @@ export async function batchDeleteCampaignsWithApi(
   };
 
   const response = await request.delete(
-    `${apiUrls.campaignsUrlV2}/batch_destroy`,
+    `${apiUrls.campaigns.v2.base}/batch_destroy`,
     {
       headers,
       data: JSON.stringify(payload)
@@ -132,38 +132,4 @@ export async function batchDeleteCampaignsWithApi(
   ).toBe(expectedStatusCode);
 
   return response;
-}
-
-export async function getCampaignCombinedStatsWithApi(
-  request: APIRequestContext,
-  authToken: string,
-  campaignId: string,
-  expectedSend: number
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
-
-  const url = `${apiUrls.campaignsUrlV2}/${campaignId}/stats`;
-
-  let response: APIResponse;
-
-  await expect(async () => {
-    response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
-    expect(responseJson).toHaveProperty('export_url');
-    expect(responseJson).toHaveProperty('type');
-    expect(responseJson).toHaveProperty('send', expectedSend);
-  }).toPass({ timeout: 20_000 });
-
-  return response!;
 }

@@ -84,7 +84,7 @@ jobs:
           echo ENVIRONMENT=${{ github.event.client_payload.environment }} >> .env
       - name: Run Playwright tests
         id: run-tests
-        run: npx dotenv -e .env -- npx playwright test --project=firefox
+        run: npx dotenv -e .env -- npx playwright test --project=api
       - name: Set Test Outcome
         id: set-outcome
         run: echo "test_outcome=${{ steps.run-tests.outcome }}" >> "$GITHUB_OUTPUT"

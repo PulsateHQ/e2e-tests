@@ -1,6 +1,7 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID
+  API_E2E_APP_ID,
+  SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import {
   batchDeleteSegmentsWithApi,
@@ -15,31 +16,33 @@ import {
   getUserCountForAlias,
   updateSegmentWithApi
 } from '@_src/api/factories/segments.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
+import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
+import { generateUniqueCustomTag } from '@_src/api/test-data/custom-attributes/custom-attribute-payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
 import { createSegmentSingleAliasPayload } from '@_src/api/test-data/segment/create-segment-single-alias-payload';
 import {
   deleteAllSegments,
   deleteAllUsers,
-  generateUniqueCustomTag,
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('Segment Management', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
+    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
 
-  // test.beforeAll(async ({ request }) => {
-  //   await superAdminsFeatureFLagDefaultBatchUpdate(
-  //     request,
-  //     APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-  //     [API_E2E_APP_ID]
-  //   );
-  // });
+  test.beforeAll(async ({ request }) => {
+    await superAdminsFeatureFLagDefaultBatchUpdate(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
+      [API_E2E_APP_ID]
+    );
+  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);

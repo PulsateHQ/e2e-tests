@@ -19,7 +19,7 @@ export async function superAdminsFeatureFLagDefaultBatchUpdate(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.superAdminsFeatureFlagUrlV2}/batch_update`;
+  const url = `${apiUrls.superAdmins.v2.base}/feature_flags/batch_update`;
 
   const featureFlags: FeatureFlag[] = appIds.map((app_id) => ({
     app_id,
@@ -39,6 +39,37 @@ export async function superAdminsFeatureFLagDefaultBatchUpdate(
     response.status(),
     `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
   ).toBe(expectedStatusCode);
+
+  return response;
+}
+
+export async function superAdminsActivationCodesCreate(
+  request: APIRequestContext,
+  authToken: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Cookie: `super_admin_token=${authToken}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  const url = `${apiUrls.superAdmins.v2.base}/activation_codes`;
+
+  const response = await request.post(url, {
+    headers,
+    data: JSON.stringify({})
+  });
+
+  const expectedStatusCode = 201;
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+
+  const responseBody = await response.json();
+  expect(responseBody).toHaveProperty('activation_code');
+  expect(typeof responseBody.activation_code).toBe('string');
 
   return response;
 }

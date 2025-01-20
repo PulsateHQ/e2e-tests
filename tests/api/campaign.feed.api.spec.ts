@@ -4,17 +4,19 @@ import {
   API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
-import {
-  createCampaignWithApi,
-  getCampaignCombinedStatsWithApi
-} from '@_src/api/factories/campaigns.api.factory';
+import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
 import {
   getInboxMessagesWithApi,
   startMobileSessionWithApi,
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
+import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
+import {
+  APIE2ELoginUserModel,
+  APIE2ETokenSDKModel
+} from '@_src/api/models/admin.model';
 import { createCampaignPayloadFeedPost } from '@_src/api/test-data/campaign/create-feed-campaign-payload';
 import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-button-click-payload';
 import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-impression-payload';
@@ -28,10 +30,6 @@ import {
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import {
-  APIE2ELoginUserModel,
-  APIE2ETokenSDKModel
-} from '@_src/ui/models/user.model';
 
 test.describe('Feed Post Campaign Tests', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
@@ -141,34 +139,35 @@ test.describe('Feed Post Campaign Tests', () => {
       0
     );
 
-    const getCampaignCombinedStatsWithWaitResponse =
-      await getCampaignCombinedStatsWithApi(
-        request,
-        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        createCampaignResponseJson.id,
-        1
-      );
+    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      1
+    );
 
-    const getCampaignCombinedStatsWithWaitResponseJson =
-      await getCampaignCombinedStatsWithWaitResponse.json();
+    const getCampaignStatsWithWaitResponseJson =
+      await getCampaignStatsWithWaitResponse.json();
 
     // Assert Validate Response Body
-    expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty('card');
+    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('card');
+    expect(getCampaignStatsWithWaitResponseJson.card.send).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.delivery).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
+      'total_uniq',
+      1
+    );
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.card.send
+      getCampaignStatsWithWaitResponseJson.card.front.front_impression
     ).toHaveProperty('total_uniq', 1);
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.card.delivery
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignCombinedStatsWithWaitResponseJson.card.clicks
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignCombinedStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignCombinedStatsWithWaitResponseJson.card.front
-        .front_button_click_one
+      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
     ).toHaveProperty('total_uniq', 1);
   });
 });

@@ -16,7 +16,7 @@ export async function startMobileSessionWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.startSessionUrlV4, {
+  const response = await request.post(apiUrls.sdk.sessions.v4.start, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -42,7 +42,7 @@ export async function updateMobileUserWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.updateUserUrlV4, {
+  const response = await request.post(apiUrls.sdk.users.v4.update, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -68,7 +68,7 @@ export async function getInboxMessagesWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.getInboxMessageUrlV2}?alias=${alias}`;
+  const url = `${apiUrls.sdk.messages.v2.inbox}?alias=${alias}`;
 
   let response: APIResponse;
 
@@ -103,7 +103,7 @@ export async function getMessagesWithApi(
   };
 
   const response = await request.get(
-    `${apiUrls.getMessagesUrlV2}?alias=${alias}&campaign_guid=${campaignGuid}`,
+    `${apiUrls.sdk.messages.v2}?alias=${alias}&campaign_guid=${campaignGuid}`,
     {
       headers
     }

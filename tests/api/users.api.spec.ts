@@ -5,29 +5,33 @@ import {
 import { getAllSegmentsWithApi } from '@_src/api/factories/segments.api.factory';
 import { getSingleSegmentUsersWithApi } from '@_src/api/factories/segments.api.factory';
 import {
-  createUserWithApi,
   deleteUserCustomAttributesWithApi,
+  getUserCustomAttributesWithApi,
+  setUserCustomAttributesWithApi
+} from '@_src/api/factories/user-custom-attributes.api.factory';
+import {
+  createUserWithApi,
   deleteUserWithApi,
   getAllUsersWithApi,
-  getUserCustomAttributesWithApi,
   getUserSegmentsWithApi,
   getUserWithApi,
-  setUserCustomAttributesWithApi,
   updateUserNoteWithApi,
   uploadUsersWithSegmentCreationApi,
   upsertUserWithApi
 } from '@_src/api/factories/users.api.factory';
-import { userRequestPayload } from '@_src/api/test-data/user-payload/create-users';
+import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
+import {
+  createCustomAttributePayload,
+  generateUniqueCustomTag
+} from '@_src/api/test-data/custom-attributes/custom-attribute-payload';
+import { userRequestPayload } from '@_src/api/test-data/users/create-users';
 import {
   deleteAllSegments,
   deleteAllUsers,
-  generateCustomAttribute,
-  generateUniqueCustomTag,
   getFreshUserPayload,
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { APIE2ELoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('User Management', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
@@ -244,7 +248,7 @@ test.describe('User Management', () => {
     );
 
     // Generate a single custom attribute with default values
-    const customAttribute = generateCustomAttribute();
+    const customAttribute = createCustomAttributePayload();
 
     // Set the custom attribute
     await setUserCustomAttributesWithApi(

@@ -2,7 +2,10 @@ import { Locator, Page, expect } from '@playwright/test';
 
 export class BasePage {
   url = '';
-  constructor(protected page: Page) {}
+  constructor(
+    protected page: Page,
+    protected appId?: string
+  ) {}
 
   async goto(parameters = ''): Promise<void> {
     await this.page.goto(`${this.url}${parameters}`);

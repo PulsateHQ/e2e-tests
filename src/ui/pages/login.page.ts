@@ -51,4 +51,24 @@ export class LoginPage extends BasePage {
 
     return new DashboardPage(this.page);
   }
+
+  async loginWithToken(token: string, appId: string): Promise<DashboardPage> {
+    const baseUrl = process.env.BASE_URL;
+    const domain = new URL(baseUrl).hostname;
+
+    // Set the user_token cookie
+    await this.page.context().addCookies([
+      {
+        name: 'user_token',
+        value: token,
+        domain: domain,
+        path: '/'
+      }
+    ]);
+
+    // Navigate to dashboard directly and wait for load
+    await this.page.goto(`${baseUrl}/mobile/apps/${appId}/dashboard_beta`);
+
+    return new DashboardPage(this.page, appId);
+  }
 }

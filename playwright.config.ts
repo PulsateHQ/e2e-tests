@@ -29,7 +29,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'firefox',
+      name: 'api',
       testDir: './tests/api',
       use: {
         ...devices['Desktop Firefox']

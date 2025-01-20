@@ -7,7 +7,6 @@ import {
 import {
   createCampaignWithApi,
   deleteCampaignWithApi,
-  getCampaignCombinedStatsWithApi,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
 import {
@@ -15,7 +14,12 @@ import {
   updateMobileUserWithApi
 } from '@_src/api/factories/mobile.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
+import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
+import {
+  APIE2ELoginUserModel,
+  APIE2ETokenSDKModel
+} from '@_src/api/models/admin.model';
 import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/campaign/create-inapp-large-campaign-payload';
 import { inAppDeliveryAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-delivery-payload';
 import { inAppDismissAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-dismiss-payload';
@@ -30,10 +34,6 @@ import {
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import {
-  APIE2ELoginUserModel,
-  APIE2ETokenSDKModel
-} from '@_src/ui/models/user.model';
 
 test.describe('In-App Campaign Tests', () => {
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
@@ -198,32 +198,32 @@ test.describe('In-App Campaign Tests', () => {
       { ...updateMobileUserPayload, user_actions: userActions }
     );
 
-    const getCampaignCombinedStatsWithWaitResponse =
-      await getCampaignCombinedStatsWithApi(
-        request,
-        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        createCampaignResponseJson.id,
-        1
-      );
+    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      1
+    );
 
-    const getCampaignCombinedStatsWithWaitResponseJson =
-      await getCampaignCombinedStatsWithWaitResponse.json();
+    const getCampaignStatsWithWaitResponseJson =
+      await getCampaignStatsWithWaitResponse.json();
 
     // Assert Validate Response Body
-    expect(getCampaignCombinedStatsWithWaitResponseJson).toHaveProperty(
-      'in_app'
+    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('in_app');
+    expect(getCampaignStatsWithWaitResponseJson.in_app.send).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.dismiss).toHaveProperty(
+      'total_uniq',
+      1
     );
     expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.send
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.delivery
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.dismiss
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignCombinedStatsWithWaitResponseJson.in_app.impression
+      getCampaignStatsWithWaitResponseJson.in_app.impression
     ).toHaveProperty('total_uniq', 1);
   });
 });
