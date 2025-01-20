@@ -1,11 +1,19 @@
 import { API_E2E_APP_ID, BASE_URL, SDK_API_URL } from '@_config/env.config';
 
 export const apiUrls = {
+  // App related endpoints
+  apps: {
+    v2: {
+      base: `${BASE_URL}/api/v2/apps`
+    }
+  },
+
   // Admin related endpoints
   admins: {
     v2: {
-      base: `${BASE_URL}/api/v2/admins`,
-      register: `${BASE_URL}/api/v2/admins/register`
+      register: `${BASE_URL}/admins/api/v2/register`,
+      whoami: `${BASE_URL}/sessions/api/v2/whoami`,
+      currentAdmin: `${BASE_URL}/admins/current_admin`
     }
   },
 

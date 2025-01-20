@@ -53,7 +53,7 @@ export async function superAdminsActivationCodesCreate(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.superAdmins.v2}/activation_codes`;
+  const url = `${apiUrls.superAdmins.v2.base}/activation_codes`;
 
   const response = await request.post(url, {
     headers,
