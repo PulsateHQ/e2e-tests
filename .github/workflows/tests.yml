@@ -129,14 +129,22 @@ jobs:
       - name: Upload report to S3
         if: always()
         run: |
+          # Trim any whitespace from environment variables
+          AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
+          AWS_CLOUDFRONT_CLEAN=$(echo "$AWS_CLOUDFRONT_DISTRIBUTION" | xargs)
+
           # Create unique folder name using environment and run ID
           REPORT_DIR="${{ github.event.client_payload.environment }}/run-${{ github.run_id }}"
 
-          # Upload to S3 (ensure no spaces in the S3 URI)
-          aws s3 sync allure-report "s3://${AWS_S3_BUCKET}${REPORT_DIR}"
+          # Debug information
+          echo "Uploading to bucket: $AWS_S3_BUCKET_CLEAN"
+          echo "Report directory: $REPORT_DIR"
+
+          # Upload to S3 (using cleaned bucket name and proper path joining)
+          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/$REPORT_DIR"
 
           # Get CloudFront URL
-          REPORT_URL="https://${AWS_CLOUDFRONT_DISTRIBUTION}/${REPORT_DIR}"
+          REPORT_URL="https://$AWS_CLOUDFRONT_CLEAN/$REPORT_DIR"
           echo "REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
       - name: Publish test report
         if: success() || failure()
