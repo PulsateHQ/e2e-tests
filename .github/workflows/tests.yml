@@ -132,8 +132,8 @@ jobs:
           # Create unique folder name using environment and run ID
           REPORT_DIR="${{ github.event.client_payload.environment }}/run-${{ github.run_id }}"
 
-          # Upload to S3
-          aws s3 sync allure-report s3://${{ env.AWS_S3_BUCKET }}/$REPORT_DIR
+          # Upload to S3 (removed space after $AWS_S3_BUCKET)
+          aws s3 sync allure-report "s3://${{ env.AWS_S3_BUCKET }}/$REPORT_DIR"
 
           # Get CloudFront URL
           REPORT_URL="https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/$REPORT_DIR"
