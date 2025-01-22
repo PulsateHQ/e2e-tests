@@ -133,31 +133,15 @@ jobs:
           AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
           AWS_CLOUDFRONT_CLEAN=$(echo "$AWS_CLOUDFRONT_DISTRIBUTION" | xargs)
 
-          # Set up directory structure
-          ENV="${{ github.event.client_payload.environment }}"
-          RUN_ID="${{ github.run_id }}"
-          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+          # Upload report to staging
+          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging"
 
-          # Define paths (all under staging)
-          LATEST_DIR="staging/$ENV"
-          HISTORY_DIR="staging/history/run-${RUN_ID}_${ENV}_${TIMESTAMP}"
-
-          # Debug information
-          echo "Uploading to bucket: $AWS_S3_BUCKET_CLEAN"
-          echo "Latest directory: $LATEST_DIR"
-          echo "History directory: $HISTORY_DIR"
-
-          # Upload to both latest and history folders
-          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/$HISTORY_DIR"
-          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/$LATEST_DIR"
-
-          # Set the report URL to the latest report
-          REPORT_URL="https://$AWS_CLOUDFRONT_CLEAN/$LATEST_DIR/index.html"
+          # Set the report URL
+          REPORT_URL="https://$AWS_CLOUDFRONT_CLEAN/staging/index.html"
           echo "REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
 
-          # Debug the URLs
-          echo "Latest Report URL: $REPORT_URL"
-          echo "Historical Report URL: https://$AWS_CLOUDFRONT_CLEAN/$HISTORY_DIR/index.html"
+          # Debug the URL
+          echo "Report URL: $REPORT_URL"
       - name: Publish test report
         if: success() || failure()
         uses: mikepenz/action-junit-report@v4
