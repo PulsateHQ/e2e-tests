@@ -8,7 +8,7 @@ env:
   ALLURE_RESULTS_DIR: allure-results
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
-  REPORT_URL: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/latest/index.html
+  REPORT_URL: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html
 
 permissions:
   contents: read
@@ -129,30 +129,30 @@ jobs:
         run: |
           npm install -g allure-commandline
 
-          # Download history before generating the report
-          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/staging/history" "${{ env.ALLURE_RESULTS_DIR }}/history" --recursive || true
+          # 1. First, download the previous report (if exists)
+          aws s3 sync "s3://$AWS_S3_BUCKET_CLEAN/staging" "previous-report" || true
 
-          # Generate report with history
+          # 2. Ensure allure-results directory exists with our current test results
+          mkdir -p ${{ env.ALLURE_RESULTS_DIR }}
+
+          # 3. Copy history from previous report to current results
+          if [ -d "previous-report/history" ]; then
+            echo "Copying history from previous report..."
+            cp -r previous-report/history ${{ env.ALLURE_RESULTS_DIR }}/
+          fi
+
+          # 4. Generate new report
           allure generate ${{ env.ALLURE_RESULTS_DIR }} --clean -o allure-report
+
       - name: Upload report to S3
         id: upload-report
         if: always()
         run: |
           # Trim any whitespace from environment variables
           AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
-          AWS_CLOUDFRONT_CLEAN=$(echo "$AWS_CLOUDFRONT_DISTRIBUTION" | xargs)
 
-          # Download existing history
-          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/staging/history" "allure-report/history" --recursive || true
-
-          # Generate history if directory doesn't exist
-          mkdir -p allure-report/history
-
-          # Upload current report to latest (this can overwrite)
-          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging/latest"
-
-          # Upload history data (append only, don't delete existing files)
-          aws s3 cp allure-report/history "s3://$AWS_S3_BUCKET_CLEAN/staging/history" --recursive
+          # Upload the entire new report
+          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging"
 
           # Use the environment variable for the report URL
           echo "report_url=$REPORT_URL" >> "$GITHUB_OUTPUT"
@@ -175,7 +175,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <https://${{ env.REPORT_URL }}|Click here to view>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ env.REPORT_URL }}|Click here to view>"
                   }
                 }
               ]
