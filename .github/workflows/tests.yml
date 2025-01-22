@@ -154,24 +154,7 @@ jobs:
             "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "reportUrl": "https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html",
             "buildName": "Run #${{ github.run_number }}",
-            "environment": "${{ github.event.client_payload.environment }}",
-            "categories": [
-              {
-                "name": "Retries",
-                "messageRegex": ".*",
-                "matchedStatuses": ["skipped"]
-              },
-              {
-                "name": "API Errors",
-                "messageRegex": ".*API.*failed.*",
-                "matchedStatuses": ["failed"]
-              },
-              {
-                "name": "Test Timeouts",
-                "messageRegex": ".*timeout.*",
-                "matchedStatuses": ["broken"]
-              }
-            ]
+            "environment": "${{ github.event.client_payload.environment }}"
           }' > allure-results/executor.json
 
           # 4. Create environment.properties

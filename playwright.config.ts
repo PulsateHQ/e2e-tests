@@ -30,6 +30,16 @@ export default defineConfig({
             name: 'Retries',
             messageRegex: '.*',
             matchedStatuses: ['skipped']
+          },
+          {
+            name: 'API Errors',
+            messageRegex: '.*API.*failed.*',
+            matchedStatuses: ['failed']
+          },
+          {
+            name: 'Test Timeouts',
+            messageRegex: '.*timeout.*',
+            matchedStatuses: ['broken']
           }
         ]
       }
