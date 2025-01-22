@@ -8,6 +8,7 @@ env:
   ALLURE_RESULTS_DIR: allure-results
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
+  REPORT_URL: https://${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/latest/index.html
 
 permissions:
   contents: read
@@ -127,6 +128,11 @@ jobs:
         if: always()
         run: |
           npm install -g allure-commandline
+
+          # Download history before generating the report
+          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/staging/history" "${{ env.ALLURE_RESULTS_DIR }}/history" --recursive || true
+
+          # Generate report with history
           allure generate ${{ env.ALLURE_RESULTS_DIR }} --clean -o allure-report
       - name: Upload report to S3
         id: upload-report
@@ -136,12 +142,20 @@ jobs:
           AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
           AWS_CLOUDFRONT_CLEAN=$(echo "$AWS_CLOUDFRONT_DISTRIBUTION" | xargs)
 
-          # Upload report to staging
-          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging"
+          # Download existing history
+          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/staging/history" "allure-report/history" --recursive || true
 
-          # Set the report URL
-          REPORT_URL="https://$AWS_CLOUDFRONT_CLEAN/staging/index.html"
-          echo "report_url=$REPORT_URL" >> $GITHUB_OUTPUT
+          # Generate history if directory doesn't exist
+          mkdir -p allure-report/history
+
+          # Upload current report to latest (this can overwrite)
+          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging/latest"
+
+          # Upload history data (append only, don't delete existing files)
+          aws s3 cp allure-report/history "s3://$AWS_S3_BUCKET_CLEAN/staging/history" --recursive
+
+          # Use the environment variable for the report URL
+          echo "report_url=$REPORT_URL" >> "$GITHUB_OUTPUT"
 
   notify-and-update-pr-status:
     needs: [test, reports]
@@ -161,7 +175,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Report: <${{ needs.reports.outputs.report_url }}|View Allure Report>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ env.REPORT_URL }}|Click here to view>"
                   }
                 }
               ]
