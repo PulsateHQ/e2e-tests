@@ -8,7 +8,7 @@ env:
   ALLURE_RESULTS_DIR: allure-results
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
-  REPORT_URL: https://${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/latest/index.html
+  REPORT_URL: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/latest/index.html
 
 permissions:
   contents: read
@@ -128,6 +128,11 @@ jobs:
         if: always()
         run: |
           npm install -g allure-commandline
+
+          # Download history before generating the report
+          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/staging/history" "${{ env.ALLURE_RESULTS_DIR }}/history" --recursive || true
+
+          # Generate report with history
           allure generate ${{ env.ALLURE_RESULTS_DIR }} --clean -o allure-report
       - name: Upload report to S3
         id: upload-report
@@ -170,7 +175,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ env.REPORT_URL }}|Click here to view>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <https://${{ env.REPORT_URL }}|Click here to view>"
                   }
                 }
               ]
