@@ -108,6 +108,8 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     if: always()
+    outputs:
+      report_url: ${{ steps.upload-report.outputs.report_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Download test results
@@ -127,6 +129,7 @@ jobs:
           npm install -g allure-commandline
           allure generate ${{ env.ALLURE_RESULTS_DIR }} --clean -o allure-report
       - name: Upload report to S3
+        id: upload-report
         if: always()
         run: |
           # Trim any whitespace from environment variables
@@ -138,15 +141,7 @@ jobs:
 
           # Set the report URL
           REPORT_URL="https://$AWS_CLOUDFRONT_CLEAN/staging/index.html"
-          echo "REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
-
-          # Debug the URL
-          echo "Report URL: $REPORT_URL"
-      - name: Publish test report
-        if: success() || failure()
-        uses: mikepenz/action-junit-report@v4
-        with:
-          report_paths: './playwright-report/results.xml'
+          echo "report_url=$REPORT_URL" >> $GITHUB_OUTPUT
 
   notify-and-update-pr-status:
     needs: [test, reports]
@@ -166,7 +161,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Report: <${{ env.REPORT_URL }}|View Allure Report>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Report: <${{ needs.reports.outputs.report_url }}|View Allure Report>"
                   }
                 }
               ]
