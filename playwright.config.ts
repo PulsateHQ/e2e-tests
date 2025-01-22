@@ -19,7 +19,31 @@ export default defineConfig({
     ['github'],
     ['json', { outputFile: './playwright-report/results.json' }],
     ['junit', { outputFile: './playwright-report/results.xml' }],
-    ['allure-playwright']
+    [
+      'allure-playwright',
+      {
+        detail: true,
+        outputFolder: 'allure-results',
+        suiteTitle: false,
+        categories: [
+          {
+            name: 'Retries',
+            messageRegex: '.*',
+            matchedStatuses: ['skipped']
+          },
+          {
+            name: 'API Errors',
+            messageRegex: '.*API.*failed.*',
+            matchedStatuses: ['failed']
+          },
+          {
+            name: 'Test Timeouts',
+            messageRegex: '.*timeout.*',
+            matchedStatuses: ['broken']
+          }
+        ]
+      }
+    ]
   ],
   use: {
     baseURL: BASE_URL,
