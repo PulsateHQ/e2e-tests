@@ -128,11 +128,6 @@ jobs:
         if: always()
         run: |
           npm install -g allure-commandline
-
-          # Download history before generating the report
-          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/staging/history" "${{ env.ALLURE_RESULTS_DIR }}/history" --recursive || true
-
-          # Generate report with history
           allure generate ${{ env.ALLURE_RESULTS_DIR }} --clean -o allure-report
       - name: Upload report to S3
         id: upload-report
