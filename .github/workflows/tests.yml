@@ -8,7 +8,7 @@ env:
   ALLURE_RESULTS_DIR: allure-results
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
-  REPORT_URL: https://${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/latest/index.html
+  REPORT_URL: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/latest/index.html
 
 permissions:
   contents: read
@@ -170,7 +170,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ env.REPORT_URL }}|Click here to view>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <https://${{ env.REPORT_URL }}|Click here to view>"
                   }
                 }
               ]
