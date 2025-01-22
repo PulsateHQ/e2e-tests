@@ -154,14 +154,35 @@ jobs:
             "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "reportUrl": "https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html",
             "buildName": "Run #${{ github.run_number }}",
-            "environment": "${{ github.event.client_payload.environment }}"
+            "environment": "${{ github.event.client_payload.environment }}",
+            "categories": [
+              {
+                "name": "Retries",
+                "messageRegex": ".*",
+                "matchedStatuses": ["skipped"]
+              },
+              {
+                "name": "API Errors",
+                "messageRegex": ".*API.*failed.*",
+                "matchedStatuses": ["failed"]
+              },
+              {
+                "name": "Test Timeouts",
+                "messageRegex": ".*timeout.*",
+                "matchedStatuses": ["broken"]
+              }
+            ]
           }' > allure-results/executor.json
 
           # 4. Create environment.properties
           echo "Environment=${{ github.event.client_payload.environment }}
           Browser=Playwright
           Branch=${{ github.ref }}
-          Run_ID=${{ github.run_id }}" > allure-results/environment.properties
+          Run_ID=${{ github.run_id }}
+          Commit_SHA=${{ github.event.client_payload.commit_sha }}
+          PR_Number=${{ github.event.client_payload.pr_number }}
+          Node_Version=$(node -v)
+          Playwright_Version=$PLAYWRIGHT_VERSION" > allure-results/environment.properties
 
           # 5. Generate new report
           allure generate allure-results --clean -o allure-report
