@@ -4,6 +4,11 @@ on:
   repository_dispatch:
     types: [run-e2e-tests]
 
+env:
+  ALLURE_RESULTS_DIR: allure-results
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
+
 permissions:
   contents: read
   checks: write
@@ -97,6 +102,7 @@ jobs:
           path: |
             playwright-report/**/*.*
             test-results/**/*.*
+            allure-results/**/*.*
 
   reports:
     needs: [test]
@@ -109,13 +115,36 @@ jobs:
         with:
           name: test-results
           path: .
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          npm install -g allure-commandline
+          allure generate ${{ env.ALLURE_RESULTS_DIR }} --clean -o allure-report
+      - name: Upload report to S3
+        if: always()
+        run: |
+          # Create unique folder name using environment and run ID
+          REPORT_DIR="${{ github.event.client_payload.environment }}/run-${{ github.run_id }}"
+
+          # Upload to S3
+          aws s3 sync allure-report s3://${{ env.AWS_S3_BUCKET }}/$REPORT_DIR
+
+          # Get CloudFront URL
+          REPORT_URL="https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/$REPORT_DIR"
+          echo "REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
       - name: Publish test report
         if: success() || failure()
         uses: mikepenz/action-junit-report@v4
         with:
           report_paths: './playwright-report/results.xml'
 
-  notify-and-update-pr-statu:
+  notify-and-update-pr-status:
     needs: [test, reports]
     runs-on: ubuntu-latest
     if: always()
@@ -133,7 +162,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Report: <${{ env.REPORT_URL }}|View Allure Report>"
                   }
                 }
               ]
