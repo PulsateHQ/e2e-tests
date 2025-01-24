@@ -17,4 +17,6 @@ node_modules/
 .env.local
 .env
 
+test-event.json
+
 

@@ -116,48 +116,69 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     if: always()
-    outputs:
-      report_url: ${{ steps.upload-report.outputs.report_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
       - name: Download test results
         uses: actions/download-artifact@v4
         with:
           name: test-results
-          path: .
+          path: downloaded-artifacts
+
+      - name: Prepare directories and restore artifacts
+        run: |
+          # Create required directories
+          mkdir -p allure-results allure-report playwright-report test-results
+
+          # Move files to their correct locations
+          if [ -d "downloaded-artifacts/allure-results" ]; then
+            cp -r downloaded-artifacts/allure-results/* allure-results/
+          fi
+          if [ -d "downloaded-artifacts/playwright-report" ]; then
+            cp -r downloaded-artifacts/playwright-report/* playwright-report/
+          fi
+          if [ -d "downloaded-artifacts/test-results" ]; then
+            cp -r downloaded-artifacts/test-results/* test-results/
+          fi
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Generate Allure Report
-        if: always()
+
+      - name: Download previous history
         run: |
-          npm install -g allure-commandline
-
-          # Trim any whitespace from environment variables
           AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
-
-          # 1. Ensure directories exist
-          mkdir -p allure-results
-          mkdir -p allure-report
-
-          # 2. Download previous history
           aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/staging/history" "allure-results/history" --recursive || true
 
-          # 3. Create executor.json with build information
+      - name: Create Allure executor configuration
+        run: |
           echo '{
             "name": "GitHub Actions",
             "type": "github",
             "buildOrder": ${{ github.run_number }},
             "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "reportUrl": "https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html",
-            "buildName": "Run #${{ github.run_number }}",
-            "environment": "${{ github.event.client_payload.environment }}"
+            "reportName": "E2E Tests - ${{ github.event.client_payload.environment }}",
+            "buildName": "Run #${{ github.run_number }} - ${{ github.event.client_payload.environment }}"
           }' > allure-results/executor.json
 
-          # 4. Create environment.properties
+      - name: Create Allure environment properties
+        run: |
           echo "Environment=${{ github.event.client_payload.environment }}
           Browser=Playwright
           Branch=${{ github.ref }}
@@ -167,24 +188,16 @@ jobs:
           Node_Version=$(node -v)
           Playwright_Version=$PLAYWRIGHT_VERSION" > allure-results/environment.properties
 
-          # 5. Generate new report
-          allure generate allure-results --clean -o allure-report
+      - name: Generate Allure report
+        run: npx allure generate allure-results --clean -o allure-report
 
-          # 6. Upload the complete report to staging
+      - name: Upload report to S3 bucket
+        run: |
+          AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
           aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging" --delete
 
-          # 7. Preserve history separately (for next run)
-          aws s3 cp allure-report/history "s3://$AWS_S3_BUCKET_CLEAN/staging/history" --recursive
-
-      - name: Upload report to S3
-        id: upload-report
-        if: always()
-        run: |
-          # Use the environment variable for the report URL
-          echo "report_url=$REPORT_URL" >> "$GITHUB_OUTPUT"
-
   notify-and-update-pr-status:
-    needs: [test, reports]
+    needs: [test]
     runs-on: ubuntu-latest
     if: always()
     steps:
