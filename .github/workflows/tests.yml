@@ -197,7 +197,7 @@ jobs:
           aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging" --delete
 
   notify-and-update-pr-status:
-    needs: [reports]
+    needs: [test, reports]
     runs-on: ubuntu-latest
     if: always()
     steps:
