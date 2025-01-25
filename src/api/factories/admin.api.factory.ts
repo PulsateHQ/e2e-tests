@@ -1,13 +1,11 @@
 import {
   AdminDetailResponse,
   AdminListResponse,
-  AppResponse,
   CompanyRegistrationRequest,
   CurrentAdminResponse,
-  DeleteAppRequest,
   WhoAmIResponse
 } from '../models/admin.model';
-import { Headers } from '@_src/api/models/headers.api.model';
+import { Headers } from '@_src/api/models/header.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -221,62 +219,5 @@ export async function getCurrentAdmin(
   expect(new Date(admin.updated_at).toISOString()).toBe(admin.updated_at);
   expect(new Date(admin.created_at).toISOString()).toBe(admin.created_at);
 
-  return response;
-}
-
-export async function createApp(
-  request: APIRequestContext,
-  authToken: string,
-  name: string
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
-
-  const formData = {
-    'app[name]': name,
-    'app[setting_attributes][mode]': 'production'
-  } as const;
-
-  const response = await request.post(apiUrls.apps.v2.base, {
-    headers,
-    multipart: formData
-  });
-
-  expect(response.status()).toBe(200);
-
-  const responseJson = (await response.json()) as AppResponse;
-  expect(responseJson).toHaveProperty('id');
-  expect(responseJson).toHaveProperty('name');
-  expect(responseJson.name).toBe(name);
-
-  return response;
-}
-
-export async function deleteApp(
-  request: APIRequestContext,
-  authToken: string,
-  appId: string,
-  name: string,
-  password: string
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
-
-  const deleteData: DeleteAppRequest = {
-    name,
-    password
-  };
-
-  const response = await request.delete(`${apiUrls.apps.v2.base}/${appId}`, {
-    headers,
-    data: JSON.stringify(deleteData)
-  });
-
-  expect(response.status()).toBe(200);
   return response;
 }
