@@ -164,3 +164,34 @@ export interface AppResponse {
   id: string;
   name: string;
 }
+
+export interface UpdateAdminPrivilegesRequest {
+  email: string;
+  allowed_actions: string;
+  role: string;
+  managed_app_id?: string;
+}
+
+export interface UpdateAdminPrivilegesResponse {
+  message: string;
+  admin: {
+    id: string;
+    access: string;
+    actions: {
+      edit: boolean;
+      delete: boolean;
+    };
+    avatar_url: string;
+    email: string;
+    job_title: string | null;
+    managed_app: {
+      name: string | null;
+      id: string;
+    };
+    name: string;
+    role: string;
+    username: string;
+    updated_at: string;
+    created_at: string;
+  };
+}

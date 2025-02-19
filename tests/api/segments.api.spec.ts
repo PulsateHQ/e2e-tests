@@ -179,7 +179,8 @@ test.describe('Segment Management', () => {
     const getTotalAudienceForSegmentWithApiBeforeUserCreationResponse =
       await getTotalAudienceForSegmentWithApi(
         request,
-        APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        0
       );
     const getTotalAudienceForSegmentWithApiBeforeUserCreationResponseJson =
       await getTotalAudienceForSegmentWithApiBeforeUserCreationResponse.json();
@@ -191,10 +192,10 @@ test.describe('Segment Management', () => {
     expect(
       getTotalAudienceForSegmentWithApiBeforeUserCreationResponse.status()
     ).toBe(200);
-    // TODO: wait for the api to be ready
-    // expect(
-    //   getTotalAudienceForSegmentWithApiBeforeUserCreationResponseJson.total_audience
-    // ).toBe(0);
+
+    expect(
+      getTotalAudienceForSegmentWithApiBeforeUserCreationResponseJson.total_audience
+    ).toBe(0);
 
     // Arrange
     const numberOfUsers = 3;

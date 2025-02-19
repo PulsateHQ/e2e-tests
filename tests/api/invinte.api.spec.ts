@@ -4,8 +4,11 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import {
+  deleteAdmin,
   getAdminById,
-  registerAdmin
+  registerAdmin,
+  updateAdminPrivileges,
+  updateAdminPrivilegesUnauthorized
 } from '@_src/api/factories/admin.api.factory';
 import { inviteAdmin } from '@_src/api/factories/admin.invite.api.factory';
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
@@ -41,14 +44,16 @@ test.describe('Admin Invite', () => {
     );
   });
 
-  test('should invinte new admin flow', async ({ request }) => {
+  test('should invinte new admin, edit privilages and delete admin', async ({
+    request
+  }) => {
     const inviteAdminResponse = await inviteAdmin(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       APIE2ELoginUserModel.apiE2EAppId,
       faker.internet.email().toLowerCase(),
       APIE2ELoginUserModel.apiE2EAppId,
-      'app_admin'
+      'account_admin'
     );
 
     const inviteAdminResponseJson = await inviteAdminResponse.json();
@@ -70,7 +75,7 @@ test.describe('Admin Invite', () => {
     const getAdminByIdResponse = await getAdminById(
       request,
       adminData.admin_access_token,
-      adminData.app_permissions[0].app_id.$oid,
+      adminData.recent_mobile_app_id,
       adminData._id.$oid
     );
 
@@ -78,6 +83,99 @@ test.describe('Admin Invite', () => {
 
     expect(getAdminByIdResponseJson.email).toBe(
       inviteAdminResponseJson.admin.email
+    );
+
+    const updateAdminPrivilegesToAccountAdminResponse =
+      await updateAdminPrivileges(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        APIE2ELoginUserModel.apiE2EAppId,
+        adminData._id.$oid,
+        {
+          email: adminData.email,
+          allowed_actions: 'all',
+          role: 'account_admin'
+        }
+      );
+
+    const updateAdminPrivilegesToAccountAdminResponseJson =
+      await updateAdminPrivilegesToAccountAdminResponse.json();
+
+    expect(updateAdminPrivilegesToAccountAdminResponseJson.admin.role).toBe(
+      'account_admin'
+    );
+
+    const updateAdminPrivilegesToAppAdminResponse = await updateAdminPrivileges(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      adminData._id.$oid,
+      {
+        email: adminData.email,
+        allowed_actions: 'all',
+        role: 'app_admin',
+        managed_app_id: adminData.recent_mobile_app_id
+      }
+    );
+
+    const updateAdminPrivilegesToAppAdminResponseJson =
+      await updateAdminPrivilegesToAppAdminResponse.json();
+
+    expect(updateAdminPrivilegesToAppAdminResponseJson.admin.role).toBe(
+      'app_admin'
+    );
+
+    const updateAdminPrivilegesToMaterAdminResponse =
+      await updateAdminPrivileges(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        APIE2ELoginUserModel.apiE2EAppId,
+        adminData._id.$oid,
+        {
+          email: adminData.email,
+          allowed_actions: 'all',
+          role: 'master_admin'
+        }
+      );
+
+    const updateAdminPrivilegesToMaterAdminResponseJson =
+      await updateAdminPrivilegesToMaterAdminResponse.json();
+
+    expect(updateAdminPrivilegesToMaterAdminResponseJson.admin.role).toBe(
+      'master_admin'
+    );
+
+    const updateAdminPrivilegesToUnauthorizedResponse =
+      await updateAdminPrivilegesUnauthorized(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        APIE2ELoginUserModel.apiE2EAppId,
+        adminData._id.$oid,
+        {
+          email: adminData.email,
+          allowed_actions: 'all',
+          role: 'account_admin'
+        }
+      );
+
+    const updateAdminPrivilegesToUnauthorizedResponseJson =
+      await updateAdminPrivilegesToUnauthorizedResponse.json();
+
+    expect(
+      updateAdminPrivilegesToUnauthorizedResponseJson.errors[0].unauthorized
+    ).toBe('You cannot perform this action');
+
+    const deleteAdminResponse = await deleteAdmin(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      adminData._id.$oid
+    );
+
+    const deleteAdminResponseJson = await deleteAdminResponse.json();
+
+    expect(deleteAdminResponseJson.message).toBe(
+      'Request performed successfully'
     );
   });
 });

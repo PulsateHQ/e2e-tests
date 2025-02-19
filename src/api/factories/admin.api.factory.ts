@@ -3,6 +3,8 @@ import {
   AdminListResponse,
   CompanyAdminRegistrationRequest,
   CurrentAdminResponse,
+  UpdateAdminPrivilegesRequest,
+  UpdateAdminPrivilegesResponse,
   WhoAmIResponse
 } from '../models/admin.model';
 import { Headers } from '@_src/api/models/headers.model';
@@ -257,6 +259,127 @@ export async function getCurrentAdmin(
   // Validate date formats
   expect(new Date(admin.updated_at)).toBeInstanceOf(Date);
   expect(new Date(admin.created_at)).toBeInstanceOf(Date);
+
+  return response;
+}
+
+export async function updateAdminPrivileges(
+  request: APIRequestContext,
+  authToken: string,
+  appId: string,
+  adminId: string,
+  updateData: UpdateAdminPrivilegesRequest
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
+    Authorization: `Token token=${authToken}`,
+    'Content-Type': 'application/json'
+  };
+
+  const response = await request.put(
+    `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}/update_privileges`,
+    {
+      headers,
+      data: updateData
+    }
+  );
+
+  const responseJson = (await response.json()) as UpdateAdminPrivilegesResponse;
+
+  // Validate response status and message
+  expect(response.status()).toBe(200);
+  expect(responseJson.message).toBe('Admin was successfully updated');
+
+  // Validate admin object structure
+  const admin = responseJson.admin;
+  expect(admin).toHaveProperty('id');
+  expect(admin).toHaveProperty('access');
+  expect(admin).toHaveProperty('actions');
+  expect(admin.actions).toHaveProperty('edit');
+  expect(admin.actions).toHaveProperty('delete');
+  expect(typeof admin.actions.edit).toBe('boolean');
+  expect(typeof admin.actions.delete).toBe('boolean');
+
+  // Validate admin details
+  expect(admin).toHaveProperty('avatar_url');
+  expect(admin).toHaveProperty('email');
+  expect(admin).toHaveProperty('job_title');
+  expect(admin).toHaveProperty('managed_app');
+  expect(admin).toHaveProperty('name');
+  expect(admin).toHaveProperty('role');
+  expect(admin).toHaveProperty('username');
+
+  // Validate dates
+  expect(new Date(admin.updated_at)).toBeInstanceOf(Date);
+  expect(new Date(admin.created_at)).toBeInstanceOf(Date);
+
+  // Validate the updated data matches request
+  expect(admin.email).toBe(updateData.email);
+  expect(admin.role).toBe(updateData.role);
+
+  return response;
+}
+
+export async function updateAdminPrivilegesUnauthorized(
+  request: APIRequestContext,
+  invalidAuthToken: string,
+  appId: string,
+  adminId: string,
+  updateData: UpdateAdminPrivilegesRequest
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
+    Authorization: `Token token=${invalidAuthToken}`,
+    'Content-Type': 'application/json'
+  };
+
+  const response = await request.put(
+    `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}/update_privileges`,
+    {
+      headers,
+      data: updateData
+    }
+  );
+
+  const responseJson = await response.json();
+
+  // Validate unauthorized response
+  expect(response.status()).toBe(401);
+  expect(responseJson).toHaveProperty('errors');
+  expect(Array.isArray(responseJson.errors)).toBe(true);
+  expect(responseJson.errors.length).toBeGreaterThan(0);
+  expect(responseJson.errors[0]).toHaveProperty('unauthorized');
+  expect(responseJson.errors[0].unauthorized).toBe(
+    'You cannot perform this action'
+  );
+
+  return response;
+}
+
+export async function deleteAdmin(
+  request: APIRequestContext,
+  authToken: string,
+  appId: string,
+  adminId: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
+    Authorization: `Token token=${authToken}`
+  };
+
+  const response = await request.delete(
+    `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}`,
+    {
+      headers
+    }
+  );
+
+  const responseJson = await response.json();
+
+  // Validate response status and message
+  expect(response.status()).toBe(200);
+  expect(responseJson).toHaveProperty('message');
+  expect(responseJson.message).toBe('Request performed successfully');
 
   return response;
 }
