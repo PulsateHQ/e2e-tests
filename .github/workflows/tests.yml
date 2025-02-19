@@ -179,14 +179,22 @@ jobs:
 
       - name: Create Allure environment properties
         run: |
+          # Get browser from Playwright project configuration
+          BROWSER=$(node -e "
+            const config = require('./playwright.config.ts');
+            const apiProject = config.default.projects.find(p => p.name === 'api');
+            const browser = apiProject.use['...devices']['Desktop Firefox'] ? 'Firefox' : 'Unknown';
+            console.log(browser);
+          ")
+
+          # Create PR URL
+          PR_URL="${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.client_payload.pr_number }}"
+
           echo "Environment=${{ github.event.client_payload.environment }}
-          Browser=Playwright
-          Branch=${{ github.ref }}
-          Run_ID=${{ github.run_id }}
-          Commit_SHA=${{ github.event.client_payload.commit_sha }}
-          PR_Number=${{ github.event.client_payload.pr_number }}
+          Browser=$BROWSER
+          PR_URL=$PR_URL
           Node_Version=$(node -v)
-          Playwright_Version=$PLAYWRIGHT_VERSION" > allure-results/environment.properties
+          Playwright_Version=$(npx playwright --version)
 
       - name: Generate Allure report
         run: npx allure generate allure-results --clean -o allure-report

@@ -2,7 +2,7 @@ import {
   FeatureFlag,
   FeatureFlagsRequest
 } from '@_src/api/models/feature-flag.api.model';
-import { Headers } from '@_src/api/models/headers.api.model';
+import { Headers } from '@_src/api/models/headers.model';
 import { featureFlagsTestData } from '@_src/api/test-data/feature-flags/feature-flag-default';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';

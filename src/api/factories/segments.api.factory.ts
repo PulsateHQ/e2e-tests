@@ -1,5 +1,5 @@
-import { CreateSegmentPayload } from '@_src/api/models/create-segment.api.model';
-import { Headers } from '@_src/api/models/headers.api.model';
+import { Headers } from '@_src/api/models/headers.model';
+import { CreateSegmentPayload } from '@_src/api/models/segment.model';
 import { generateCsvContentForAliases } from '@_src/api/test-data/users/generate-aliases-payload';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
@@ -219,7 +219,7 @@ export async function createSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.segments.v1, {
+  const response = await request.post(apiUrls.segments.v2, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -252,7 +252,7 @@ export async function updateSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.segments.v1}/${segmentsIds}`;
+  const url = `${apiUrls.segments.v2}/${segmentsIds}`;
 
   const response = await request.put(url, {
     headers,
@@ -289,7 +289,7 @@ export async function duplicateSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.segments.v1}/${segmentsIds}/duplicate`;
+  const url = `${apiUrls.segments.v2}/${segmentsIds}/duplicate`;
 
   const response = await request.post(url, {
     headers

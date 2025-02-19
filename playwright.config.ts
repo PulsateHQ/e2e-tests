@@ -24,24 +24,7 @@ export default defineConfig({
       {
         detail: true,
         outputFolder: 'allure-results',
-        suiteTitle: false,
-        categories: [
-          {
-            name: 'Retries',
-            messageRegex: '.*',
-            matchedStatuses: ['skipped']
-          },
-          {
-            name: 'API Errors',
-            messageRegex: '.*API.*failed.*',
-            matchedStatuses: ['failed']
-          },
-          {
-            name: 'Test Timeouts',
-            messageRegex: '.*timeout.*',
-            matchedStatuses: ['broken']
-          }
-        ]
+        suiteTitle: false
       }
     ]
   ],

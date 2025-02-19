@@ -13,7 +13,7 @@ import {
   deleteUserWithApi,
   getAllUsersWithApi
 } from '@_src/api/factories/users.api.factory';
-import { UserRequest } from '@_src/api/models/user.api.model';
+import { UserRequest } from '@_src/api/models/user.model';
 import { userRequestPayload } from '@_src/api/test-data/users/create-users';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';

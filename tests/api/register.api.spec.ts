@@ -4,17 +4,20 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import {
-  createApp,
-  deleteApp,
   getAdminById,
   getAllAdmins,
   getWhoAmI,
   registerCompany
-} from '@_src/api/factories/admins.api.factory';
+} from '@_src/api/factories/admin.api.factory';
+import {
+  createApp,
+  deleteApp,
+  getAllApps
+} from '@_src/api/factories/app.api.factory';
 import {
   superAdminsActivationCodesCreate,
   superAdminsFeatureFLagDefaultBatchUpdate
-} from '@_src/api/factories/super-admins.api.factory';
+} from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/admins/company-registration';
 import {
@@ -97,6 +100,12 @@ test.describe('Company registration and admin management', () => {
       'test-app'
     );
     const createAppResponseJson = await createAppResponse.json();
+
+    // Get apps count before deletion
+    const beforeDeleteAppResponse = await getAllApps(request, adminAccessToken);
+    const beforeDeleteAppJson = await beforeDeleteAppResponse.json();
+    const beforeDeleteCount = beforeDeleteAppJson.data.length;
+
     const deleteAppResponse = await deleteApp(
       request,
       adminAccessToken,
@@ -104,6 +113,11 @@ test.describe('Company registration and admin management', () => {
       'test-app',
       registrationData.password
     );
+
+    // Verify apps count after deletion
+    const afterDeleteAppResponse = await getAllApps(request, adminAccessToken);
+    const afterDeleteAppJson = await afterDeleteAppResponse.json();
+    expect(afterDeleteAppJson.data.length).toBe(beforeDeleteCount - 1);
 
     // Assert
     // 1. Activation Code Creation

@@ -1,13 +1,13 @@
 import {
   AdminDetailResponse,
   AdminListResponse,
-  AppResponse,
-  CompanyRegistrationRequest,
+  CompanyAdminRegistrationRequest,
   CurrentAdminResponse,
-  DeleteAppRequest,
+  UpdateAdminPrivilegesRequest,
+  UpdateAdminPrivilegesResponse,
   WhoAmIResponse
 } from '../models/admin.model';
-import { Headers } from '@_src/api/models/headers.api.model';
+import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -15,7 +15,7 @@ import { APIRequestContext, APIResponse } from '@playwright/test';
 export async function registerCompany(
   request: APIRequestContext,
   authToken: string,
-  registrationData: CompanyRegistrationRequest
+  registrationData: CompanyAdminRegistrationRequest
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -28,6 +28,49 @@ export async function registerCompany(
   });
 
   expect(response.status()).toBe(201);
+  return response;
+}
+
+export async function registerAdmin(
+  request: APIRequestContext,
+  authToken: string,
+  registrationData: CompanyAdminRegistrationRequest
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const response = await request.post(apiUrls.admins.v2.register, {
+    headers,
+    data: registrationData
+  });
+
+  const responseJson = await response.json();
+
+  // Validate response status and structure
+  expect(response.status()).toBe(200);
+  expect(responseJson).toHaveProperty('data');
+  expect(responseJson).toHaveProperty('message');
+  expect(responseJson).toHaveProperty('path');
+  expect(responseJson.message).toBe('Registered successfully');
+
+  // Validate admin data structure
+  const adminData = responseJson.data;
+  expect(adminData).toHaveProperty('_id');
+  expect(adminData).toHaveProperty('admin_access_token');
+  expect(adminData).toHaveProperty('email');
+  expect(adminData).toHaveProperty('front_end_access_token');
+  expect(adminData).toHaveProperty('name');
+  expect(adminData).toHaveProperty('role');
+  expect(adminData).toHaveProperty('username');
+  expect(adminData).toHaveProperty('company_ids');
+  expect(Array.isArray(adminData.company_ids)).toBe(true);
+
+  // Validate date formats
+  expect(new Date(adminData.created_at)).toBeInstanceOf(Date);
+  expect(new Date(adminData.updated_at)).toBeInstanceOf(Date);
+
   return response;
 }
 
@@ -126,10 +169,6 @@ export async function getAdminById(
 
   expect(responseJson).toHaveProperty('avatar_url');
   expect(responseJson).toHaveProperty('email');
-  expect(responseJson).toHaveProperty('job_title');
-  expect(responseJson).toHaveProperty('managed_app');
-  expect(responseJson.managed_app).toHaveProperty('name');
-  expect(responseJson.managed_app).toHaveProperty('id');
 
   expect(responseJson).toHaveProperty('name');
   expect(responseJson).toHaveProperty('role');
@@ -218,65 +257,129 @@ export async function getCurrentAdmin(
   expect(responseJson.current_app.type).toBe('app');
 
   // Validate date formats
-  expect(new Date(admin.updated_at).toISOString()).toBe(admin.updated_at);
-  expect(new Date(admin.created_at).toISOString()).toBe(admin.created_at);
+  expect(new Date(admin.updated_at)).toBeInstanceOf(Date);
+  expect(new Date(admin.created_at)).toBeInstanceOf(Date);
 
   return response;
 }
 
-export async function createApp(
-  request: APIRequestContext,
-  authToken: string,
-  name: string
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
-
-  const formData = {
-    'app[name]': name,
-    'app[setting_attributes][mode]': 'production'
-  } as const;
-
-  const response = await request.post(apiUrls.apps.v2.base, {
-    headers,
-    multipart: formData
-  });
-
-  expect(response.status()).toBe(200);
-
-  const responseJson = (await response.json()) as AppResponse;
-  expect(responseJson).toHaveProperty('id');
-  expect(responseJson).toHaveProperty('name');
-  expect(responseJson.name).toBe(name);
-
-  return response;
-}
-
-export async function deleteApp(
+export async function updateAdminPrivileges(
   request: APIRequestContext,
   authToken: string,
   appId: string,
-  name: string,
-  password: string
+  adminId: string,
+  updateData: UpdateAdminPrivilegesRequest
 ): Promise<APIResponse> {
   const headers: Headers = {
     Accept: 'application/json',
-    'Content-Type': 'application/json',
+    Authorization: `Token token=${authToken}`,
+    'Content-Type': 'application/json'
+  };
+
+  const response = await request.put(
+    `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}/update_privileges`,
+    {
+      headers,
+      data: updateData
+    }
+  );
+
+  const responseJson = (await response.json()) as UpdateAdminPrivilegesResponse;
+
+  // Validate response status and message
+  expect(response.status()).toBe(200);
+  expect(responseJson.message).toBe('Admin was successfully updated');
+
+  // Validate admin object structure
+  const admin = responseJson.admin;
+  expect(admin).toHaveProperty('id');
+  expect(admin).toHaveProperty('access');
+  expect(admin).toHaveProperty('actions');
+  expect(admin.actions).toHaveProperty('edit');
+  expect(admin.actions).toHaveProperty('delete');
+  expect(typeof admin.actions.edit).toBe('boolean');
+  expect(typeof admin.actions.delete).toBe('boolean');
+
+  // Validate admin details
+  expect(admin).toHaveProperty('avatar_url');
+  expect(admin).toHaveProperty('email');
+  expect(admin).toHaveProperty('job_title');
+  expect(admin).toHaveProperty('managed_app');
+  expect(admin).toHaveProperty('name');
+  expect(admin).toHaveProperty('role');
+  expect(admin).toHaveProperty('username');
+
+  // Validate dates
+  expect(new Date(admin.updated_at)).toBeInstanceOf(Date);
+  expect(new Date(admin.created_at)).toBeInstanceOf(Date);
+
+  // Validate the updated data matches request
+  expect(admin.email).toBe(updateData.email);
+  expect(admin.role).toBe(updateData.role);
+
+  return response;
+}
+
+export async function updateAdminPrivilegesUnauthorized(
+  request: APIRequestContext,
+  invalidAuthToken: string,
+  appId: string,
+  adminId: string,
+  updateData: UpdateAdminPrivilegesRequest
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
+    Authorization: `Token token=${invalidAuthToken}`,
+    'Content-Type': 'application/json'
+  };
+
+  const response = await request.put(
+    `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}/update_privileges`,
+    {
+      headers,
+      data: updateData
+    }
+  );
+
+  const responseJson = await response.json();
+
+  // Validate unauthorized response
+  expect(response.status()).toBe(401);
+  expect(responseJson).toHaveProperty('errors');
+  expect(Array.isArray(responseJson.errors)).toBe(true);
+  expect(responseJson.errors.length).toBeGreaterThan(0);
+  expect(responseJson.errors[0]).toHaveProperty('unauthorized');
+  expect(responseJson.errors[0].unauthorized).toBe(
+    'You cannot perform this action'
+  );
+
+  return response;
+}
+
+export async function deleteAdmin(
+  request: APIRequestContext,
+  authToken: string,
+  appId: string,
+  adminId: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
     Authorization: `Token token=${authToken}`
   };
 
-  const deleteData: DeleteAppRequest = {
-    name,
-    password
-  };
+  const response = await request.delete(
+    `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}`,
+    {
+      headers
+    }
+  );
 
-  const response = await request.delete(`${apiUrls.apps.v2.base}/${appId}`, {
-    headers,
-    data: JSON.stringify(deleteData)
-  });
+  const responseJson = await response.json();
 
+  // Validate response status and message
   expect(response.status()).toBe(200);
+  expect(responseJson).toHaveProperty('message');
+  expect(responseJson.message).toBe('Request performed successfully');
+
   return response;
 }

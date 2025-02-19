@@ -8,20 +8,21 @@ export interface APIE2ETokenSDKModel {
   apiE2EAccessTokenSdk: string;
 }
 
-export interface CompanyRegistrationRequest {
+export interface CompanyAdminRegistrationRequest {
   name: string;
-  email: string;
+  email?: string;
   username: string;
   password: string;
   password_confirmation: string;
-  activation_code: string;
-  company_name: string;
-  app_name: string;
-  role: 'master_admin';
+  activation_code?: string;
+  company_name?: string;
+  app_name?: string;
+  role?: 'master_admin';
   generate_admin_token?: boolean;
+  invite_token?: string;
 }
 
-export interface CompanyRegistrationResponse {
+export interface CompanyAdminRegistrationResponse {
   data: {
     _id: {
       $oid: string;
@@ -162,4 +163,35 @@ export interface DeleteAppRequest {
 export interface AppResponse {
   id: string;
   name: string;
+}
+
+export interface UpdateAdminPrivilegesRequest {
+  email: string;
+  allowed_actions: string;
+  role: string;
+  managed_app_id?: string;
+}
+
+export interface UpdateAdminPrivilegesResponse {
+  message: string;
+  admin: {
+    id: string;
+    access: string;
+    actions: {
+      edit: boolean;
+      delete: boolean;
+    };
+    avatar_url: string;
+    email: string;
+    job_title: string | null;
+    managed_app: {
+      name: string | null;
+      id: string;
+    };
+    name: string;
+    role: string;
+    username: string;
+    updated_at: string;
+    created_at: string;
+  };
 }

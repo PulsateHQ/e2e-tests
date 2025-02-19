@@ -1,5 +1,5 @@
-import { Headers } from '@_src/api/models/headers.api.model';
-import { UserRequest, UserResponse } from '@_src/api/models/user.api.model';
+import { Headers } from '@_src/api/models/headers.model';
+import { UserRequest, UserResponse } from '@_src/api/models/user.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
