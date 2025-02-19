@@ -1,5 +1,5 @@
 import { userRequestPayload } from './create-users';
-import { UserRequest } from '@_src/api/models/user.api.model';
+import { UserRequest } from '@_src/api/models/user.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 export const createFreshUserPayload = (): UserRequest => {

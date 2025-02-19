@@ -5,7 +5,7 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { registerCompany } from '@_src/api/factories/admins.api.factory';
-import { superAdminsActivationCodesCreate } from '@_src/api/factories/super-admins.api.factory';
+import { superAdminsActivationCodesCreate } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/admins/company-registration';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';

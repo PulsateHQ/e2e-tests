@@ -1,4 +1,4 @@
-import { Headers } from '@_src/api/models/headers.api.model';
+import { Headers } from '@_src/api/models/headers.model';
 import { StartMobileSessionPayload } from '@_src/api/models/start-mobile-session.api.model';
 import { UpdateMobileUserPayload } from '@_src/api/models/update-mobile-user.api.model';
 import { apiUrls } from '@_src/api/utils/api.util';

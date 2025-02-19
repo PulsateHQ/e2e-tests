@@ -1,4 +1,4 @@
-import { CreateSegmentPayload } from '@_src/api/models/create-segment.api.model';
+import { CreateSegmentPayload } from '@_src/api/models/segment.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 export const createSegmentSingleAliasPayload: CreateSegmentPayload = {

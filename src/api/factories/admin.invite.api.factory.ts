@@ -1,8 +1,8 @@
+import { Headers } from '@_src/api/models/headers.model';
 import {
   InviteAdminRequest,
   InviteAdminResponse
-} from '@_src/api/models/admin-invite.model';
-import { Headers } from '@_src/api/models/header.model';
+} from '@_src/api/models/invite.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -12,7 +12,8 @@ export async function inviteAdmin(
   authToken: string,
   appId: string,
   email: string,
-  managedAppId: string
+  managedAppId: string,
+  roleAdmin: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Accept: 'application/json',
@@ -22,7 +23,7 @@ export async function inviteAdmin(
 
   const inviteData: InviteAdminRequest = {
     email,
-    role: 'app_admin',
+    role: roleAdmin,
     managed_app_id: managedAppId,
     allowed_actions: 'all',
     skip_invinte_mail: true
@@ -36,20 +37,22 @@ export async function inviteAdmin(
     }
   );
 
-  expect(response.status()).toBe(201);
+  expect(response.status()).toBe(200);
 
   const responseJson = (await response.json()) as InviteAdminResponse;
 
   // Validate response structure
-  expect(responseJson).toHaveProperty('id');
-  expect(responseJson).toHaveProperty('email');
-  expect(responseJson.email).toBe(email);
-  expect(responseJson).toHaveProperty('role', 'app_admin');
-  expect(responseJson).toHaveProperty('managed_app_id', managedAppId);
-  expect(responseJson).toHaveProperty('allowed_actions', 'all');
-  expect(responseJson).toHaveProperty('invite_token');
-  expect(responseJson).toHaveProperty('created_at');
-  expect(responseJson).toHaveProperty('updated_at');
+  expect(responseJson).toHaveProperty('admin');
+  expect(responseJson.admin).toHaveProperty('id');
+  expect(responseJson.admin).toHaveProperty('email');
+  expect(responseJson.admin.email).toBe(email);
+  expect(responseJson.admin).toHaveProperty('role', roleAdmin);
+  expect(responseJson.admin).toHaveProperty('managed_app');
+  expect(responseJson.admin).toHaveProperty('actions');
+  expect(responseJson.admin).toHaveProperty('invite_token');
+  expect(responseJson.admin).toHaveProperty('created_at');
+  expect(responseJson.admin).toHaveProperty('updated_at');
+  expect(responseJson).toHaveProperty('message', 'Admin created successfully');
 
   return response;
 }

@@ -16,7 +16,7 @@ import {
   getUserCountForAlias,
   updateSegmentWithApi
 } from '@_src/api/factories/segments.api.factory';
-import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super-admins.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateUniqueCustomTag } from '@_src/api/test-data/custom-attributes/custom-attribute-payload';

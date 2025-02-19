@@ -5,11 +5,6 @@ import {
 import { getAllSegmentsWithApi } from '@_src/api/factories/segments.api.factory';
 import { getSingleSegmentUsersWithApi } from '@_src/api/factories/segments.api.factory';
 import {
-  deleteUserCustomAttributesWithApi,
-  getUserCustomAttributesWithApi,
-  setUserCustomAttributesWithApi
-} from '@_src/api/factories/user-custom-attributes.api.factory';
-import {
   createUserWithApi,
   deleteUserWithApi,
   getAllUsersWithApi,
@@ -19,6 +14,11 @@ import {
   uploadUsersWithSegmentCreationApi,
   upsertUserWithApi
 } from '@_src/api/factories/users.api.factory';
+import {
+  deleteUserCustomAttributesWithApi,
+  getUserCustomAttributesWithApi,
+  setUserCustomAttributesWithApi
+} from '@_src/api/factories/users.custom.attributes.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import {
   createCustomAttributePayload,

@@ -2,10 +2,10 @@ import {
   AppResponse,
   CreateAppRequest,
   DeleteAppRequest,
-  GetAllAppsParams,
-  GetAllAppsResponse
+  GetAllAppsParams
 } from '../models/app.model';
-import { Headers } from '@_src/api/models/headers.api.model';
+import { GetAllAppsResponse } from '../models/app.model';
+import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';

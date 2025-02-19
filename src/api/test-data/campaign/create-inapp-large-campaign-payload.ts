@@ -1,4 +1,4 @@
-import { CreateCampaignPayload } from '@_src/api/models/create-campaigns.api.model';
+import { CreateCampaignPayload } from '@_src/api/models/campaign.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 export const createCampaignPayloadInAppLarge: CreateCampaignPayload = {

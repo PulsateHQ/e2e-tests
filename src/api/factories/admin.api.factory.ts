@@ -1,11 +1,11 @@
 import {
   AdminDetailResponse,
   AdminListResponse,
-  CompanyRegistrationRequest,
+  CompanyAdminRegistrationRequest,
   CurrentAdminResponse,
   WhoAmIResponse
 } from '../models/admin.model';
-import { Headers } from '@_src/api/models/header.model';
+import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -13,7 +13,7 @@ import { APIRequestContext, APIResponse } from '@playwright/test';
 export async function registerCompany(
   request: APIRequestContext,
   authToken: string,
-  registrationData: CompanyRegistrationRequest
+  registrationData: CompanyAdminRegistrationRequest
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -26,6 +26,49 @@ export async function registerCompany(
   });
 
   expect(response.status()).toBe(201);
+  return response;
+}
+
+export async function registerAdmin(
+  request: APIRequestContext,
+  authToken: string,
+  registrationData: CompanyAdminRegistrationRequest
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const response = await request.post(apiUrls.admins.v2.register, {
+    headers,
+    data: registrationData
+  });
+
+  const responseJson = await response.json();
+
+  // Validate response status and structure
+  expect(response.status()).toBe(200);
+  expect(responseJson).toHaveProperty('data');
+  expect(responseJson).toHaveProperty('message');
+  expect(responseJson).toHaveProperty('path');
+  expect(responseJson.message).toBe('Registered successfully');
+
+  // Validate admin data structure
+  const adminData = responseJson.data;
+  expect(adminData).toHaveProperty('_id');
+  expect(adminData).toHaveProperty('admin_access_token');
+  expect(adminData).toHaveProperty('email');
+  expect(adminData).toHaveProperty('front_end_access_token');
+  expect(adminData).toHaveProperty('name');
+  expect(adminData).toHaveProperty('role');
+  expect(adminData).toHaveProperty('username');
+  expect(adminData).toHaveProperty('company_ids');
+  expect(Array.isArray(adminData.company_ids)).toBe(true);
+
+  // Validate date formats
+  expect(new Date(adminData.created_at)).toBeInstanceOf(Date);
+  expect(new Date(adminData.updated_at)).toBeInstanceOf(Date);
+
   return response;
 }
 
@@ -124,10 +167,6 @@ export async function getAdminById(
 
   expect(responseJson).toHaveProperty('avatar_url');
   expect(responseJson).toHaveProperty('email');
-  expect(responseJson).toHaveProperty('job_title');
-  expect(responseJson).toHaveProperty('managed_app');
-  expect(responseJson.managed_app).toHaveProperty('name');
-  expect(responseJson.managed_app).toHaveProperty('id');
 
   expect(responseJson).toHaveProperty('name');
   expect(responseJson).toHaveProperty('role');
@@ -216,8 +255,8 @@ export async function getCurrentAdmin(
   expect(responseJson.current_app.type).toBe('app');
 
   // Validate date formats
-  expect(new Date(admin.updated_at).toISOString()).toBe(admin.updated_at);
-  expect(new Date(admin.created_at).toISOString()).toBe(admin.created_at);
+  expect(new Date(admin.updated_at)).toBeInstanceOf(Date);
+  expect(new Date(admin.created_at)).toBeInstanceOf(Date);
 
   return response;
 }

@@ -8,20 +8,21 @@ export interface APIE2ETokenSDKModel {
   apiE2EAccessTokenSdk: string;
 }
 
-export interface CompanyRegistrationRequest {
+export interface CompanyAdminRegistrationRequest {
   name: string;
-  email: string;
+  email?: string;
   username: string;
   password: string;
   password_confirmation: string;
-  activation_code: string;
-  company_name: string;
-  app_name: string;
-  role: 'master_admin';
+  activation_code?: string;
+  company_name?: string;
+  app_name?: string;
+  role?: 'master_admin';
   generate_admin_token?: boolean;
+  invite_token?: string;
 }
 
-export interface CompanyRegistrationResponse {
+export interface CompanyAdminRegistrationResponse {
   data: {
     _id: {
       $oid: string;
