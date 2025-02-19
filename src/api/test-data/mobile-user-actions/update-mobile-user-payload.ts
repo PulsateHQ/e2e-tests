@@ -1,4 +1,4 @@
-import { UpdateMobileUserPayload } from '@_src/api/models/update-mobile-user.api.model';
+import { UpdateMobileUserPayload } from '@_src/api/models/mobile.users.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 export const updateMobileUserPayload: UpdateMobileUserPayload = {

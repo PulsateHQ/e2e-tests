@@ -1,5 +1,5 @@
 // src/api/test-data/user-actions/in-app-dismiss.ts
-import { UserAction } from '@_src/api/models/update-mobile-user.api.model';
+import { UserAction } from '@_src/api/models/mobile.users.model';
 
 export const inAppDismissAction: UserAction = {
   guid: '',

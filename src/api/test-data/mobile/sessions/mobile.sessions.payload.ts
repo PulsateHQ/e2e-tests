@@ -1,4 +1,4 @@
-import { StartMobileSessionPayload } from '@_src/api/models/start-mobile-session.api.model';
+import { StartMobileSessionPayload } from '@_src/api/models/mobile.sessions.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 export const startMobileSessionPayload: StartMobileSessionPayload = {

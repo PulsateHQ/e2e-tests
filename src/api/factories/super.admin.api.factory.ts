@@ -1,9 +1,9 @@
 import {
   FeatureFlag,
   FeatureFlagsRequest
-} from '@_src/api/models/feature-flag.api.model';
+} from '@_src/api/models/feature-flag.model';
 import { Headers } from '@_src/api/models/headers.model';
-import { featureFlagsTestData } from '@_src/api/test-data/feature-flags/feature-flag-default';
+import { featureFlagsTestData } from '@_src/api/test-data/cms/feature-flags/default.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';

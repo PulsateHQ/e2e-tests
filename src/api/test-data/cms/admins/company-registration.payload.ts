@@ -1,4 +1,4 @@
-import { CompanyAdminRegistrationRequest } from '../../models/admin.model';
+import { CompanyAdminRegistrationRequest } from '../../../models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 export const generateCompanyPayload = (

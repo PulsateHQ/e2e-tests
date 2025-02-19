@@ -1,4 +1,4 @@
-import { FeatureFlagsRequest } from '@_src/api//models/feature-flag.api.model';
+import { FeatureFlagsRequest } from '@_src/api/models/feature-flag.model';
 
 export const featureFlagsTestData: FeatureFlagsRequest = {
   feature_flags: [

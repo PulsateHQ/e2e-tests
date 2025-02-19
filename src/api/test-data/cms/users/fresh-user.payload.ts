@@ -1,4 +1,4 @@
-import { userRequestPayload } from './create-users';
+import { userRequestPayload } from './create-users.payload';
 import { UserRequest } from '@_src/api/models/user.model';
 import { faker } from '@faker-js/faker/locale/en';
 

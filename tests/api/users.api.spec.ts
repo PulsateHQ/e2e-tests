@@ -23,8 +23,8 @@ import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import {
   createCustomAttributePayload,
   generateUniqueCustomTag
-} from '@_src/api/test-data/custom-attributes/custom-attribute-payload';
-import { userRequestPayload } from '@_src/api/test-data/users/create-users';
+} from '@_src/api/test-data/cms/custom-attributes/custom-attribute.payload';
+import { userRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
 import {
   deleteAllSegments,
   deleteAllUsers,

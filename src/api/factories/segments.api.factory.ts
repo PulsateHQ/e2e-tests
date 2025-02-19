@@ -1,6 +1,6 @@
 import { Headers } from '@_src/api/models/headers.model';
 import { CreateSegmentPayload } from '@_src/api/models/segment.model';
-import { generateCsvContentForAliases } from '@_src/api/test-data/users/generate-aliases-payload';
+import { generateCsvContentForAliases } from '@_src/api/test-data/cms/users/generate-aliases.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';

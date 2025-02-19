@@ -1,11 +1,11 @@
 import { Headers } from '@_src/api/models/headers.model';
-import { StartMobileSessionPayload } from '@_src/api/models/start-mobile-session.api.model';
-import { UpdateMobileUserPayload } from '@_src/api/models/update-mobile-user.api.model';
+import { StartMobileSessionPayload } from '@_src/api/models/mobile.sessions.model';
+import { UpdateMobileUserPayload } from '@_src/api/models/mobile.users.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
-export async function startMobileSessionWithApi(
+export async function startMobileSessionsWithApi(
   request: APIRequestContext,
   authToken: string,
   payload: StartMobileSessionPayload

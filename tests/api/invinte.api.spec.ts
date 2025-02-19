@@ -13,7 +13,7 @@ import {
 import { inviteAdmin } from '@_src/api/factories/admin.invite.api.factory';
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { generateAdminPayload } from '@_src/api/test-data/admins/company-registration';
+import { generateAdminPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import {
   deleteAllSegments,
   deleteAllUsers

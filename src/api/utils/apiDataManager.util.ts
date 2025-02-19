@@ -14,7 +14,7 @@ import {
   getAllUsersWithApi
 } from '@_src/api/factories/users.api.factory';
 import { UserRequest } from '@_src/api/models/user.model';
-import { userRequestPayload } from '@_src/api/test-data/users/create-users';
+import { userRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, test } from '@playwright/test';

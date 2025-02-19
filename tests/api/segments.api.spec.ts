@@ -19,9 +19,9 @@ import {
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { generateUniqueCustomTag } from '@_src/api/test-data/custom-attributes/custom-attribute-payload';
-import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
-import { createSegmentSingleAliasPayload } from '@_src/api/test-data/segment/create-segment-single-alias-payload';
+import { generateUniqueCustomTag } from '@_src/api/test-data/cms/custom-attributes/custom-attribute.payload';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
+import { createSegmentSingleAliasPayload } from '@_src/api/test-data/cms/segment/create-segment-single-alias.payload';
 import {
   deleteAllSegments,
   deleteAllUsers,

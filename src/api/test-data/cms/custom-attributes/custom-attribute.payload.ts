@@ -1,4 +1,4 @@
-import { CustomAttribute } from '@_src/api/models/custom-attribute.api.model';
+import { CustomAttribute } from '@_src/api/models/custom-attribute.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 export function generateUniqueCustomTag(): string {

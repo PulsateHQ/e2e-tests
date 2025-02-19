@@ -19,7 +19,7 @@ import {
   superAdminsFeatureFLagDefaultBatchUpdate
 } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { generateCompanyPayload } from '@_src/api/test-data/admins/company-registration';
+import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import {
   deleteAllSegments,
   deleteAllUsers

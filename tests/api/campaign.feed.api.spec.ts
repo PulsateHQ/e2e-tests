@@ -5,11 +5,9 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
-import {
-  getInboxMessagesWithApi,
-  startMobileSessionWithApi,
-  updateMobileUserWithApi
-} from '@_src/api/factories/mobile.api.factory';
+import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
+import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
+import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
 import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
@@ -17,12 +15,12 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
-import { createCampaignPayloadFeedPost } from '@_src/api/test-data/campaign/create-feed-campaign-payload';
+import { createCampaignPayloadFeedPost } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-button-click-payload';
 import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-impression-payload';
-import { startMobileSessionPayload } from '@_src/api/test-data/mobile-user-actions/start-mobile-session-payload';
 import { updateMobileUserPayload } from '@_src/api/test-data/mobile-user-actions/update-mobile-user-payload';
-import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
+import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -103,7 +101,7 @@ test.describe('Feed Post Campaign Tests', () => {
     updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
-    await startMobileSessionWithApi(
+    await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       startMobileSessionPayload
