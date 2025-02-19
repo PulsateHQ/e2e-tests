@@ -1,5 +1,3 @@
-// src/api/models/user.api.model.ts
-
 export interface UserResponse {
   id: string;
   age: number | null;

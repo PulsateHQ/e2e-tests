@@ -20,11 +20,11 @@ import {
 } from '@_src/api/models/admin.model';
 import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/cms/campaign/create-inapp-large-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
-import { inAppDeliveryAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-delivery-payload';
-import { inAppDismissAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-dismiss-payload';
-import { inAppImpressionAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-impression-payload';
-import { updateMobileUserPayload } from '@_src/api/test-data/mobile-user-actions/update-mobile-user-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
+import { inAppDeliveryAction } from '@_src/api/test-data/mobile/users/inapp/in-app-delivery.payload';
+import { inAppDismissAction } from '@_src/api/test-data/mobile/users/inapp/in-app-dismiss.payload';
+import { inAppImpressionAction } from '@_src/api/test-data/mobile/users/inapp/in-app-impression.payload';
+import { updateMobileUserPayload } from '@_src/api/test-data/mobile/users/update/mobile.users.update.payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,

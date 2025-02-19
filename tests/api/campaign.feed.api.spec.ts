@@ -17,10 +17,10 @@ import {
 } from '@_src/api/models/admin.model';
 import { createCampaignPayloadFeedPost } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
-import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-button-click-payload';
-import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile-user-actions/feed-post/feed-post-impression-payload';
-import { updateMobileUserPayload } from '@_src/api/test-data/mobile-user-actions/update-mobile-user-payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
+import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile/users/card/feed-post-front-button-click.payload';
+import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile/users/card/feed-post-impression.payload';
+import { updateMobileUserPayload } from '@_src/api/test-data/mobile/users/update/mobile.users.update.payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
