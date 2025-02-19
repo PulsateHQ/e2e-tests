@@ -219,7 +219,7 @@ export async function createSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.segments.v1, {
+  const response = await request.post(apiUrls.segments.v2, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -252,7 +252,7 @@ export async function updateSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.segments.v1}/${segmentsIds}`;
+  const url = `${apiUrls.segments.v2}/${segmentsIds}`;
 
   const response = await request.put(url, {
     headers,
@@ -289,7 +289,7 @@ export async function duplicateSegmentWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.segments.v1}/${segmentsIds}/duplicate`;
+  const url = `${apiUrls.segments.v2}/${segmentsIds}/duplicate`;
 
   const response = await request.post(url, {
     headers
