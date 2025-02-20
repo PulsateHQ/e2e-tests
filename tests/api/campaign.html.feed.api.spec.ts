@@ -2,6 +2,8 @@ import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   API_E2E_ACCESS_TOKEN_SDK,
   API_E2E_APP_ID,
+  API_E2E_APP_ID_SDK,
+  API_E2E_APP_KEY_SDK,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
@@ -15,10 +17,10 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
-import { createCampaignFeedButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
+import { createFeedCampaignFrontBackButtonToDeepLink } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
-import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
-import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile/users/card/feed-post-front-button-click.payload';
+import { startMobileSessionFeedPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
+import { feedPostBackButtonClickOneAction } from '@_src/api/test-data/mobile/users/card/feed-post-back-button-click.payload';
 import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile/users/card/feed-post-impression.payload';
 import { updateMobileUserPayload } from '@_src/api/test-data/mobile/users/update/mobile.users.update.payload';
 import {
@@ -55,7 +57,8 @@ test.describe('Feed Post Campaign Tests', () => {
   });
 
   test('should create an Feed Post campaign with a URL button and update mobile session user to click it', async ({
-    request
+    request,
+    page
   }) => {
     const numberOfUsers = 1;
 
@@ -75,19 +78,19 @@ test.describe('Feed Post Campaign Tests', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignFeedButtonToUrl.segment_ids = [
+    createFeedCampaignFrontBackButtonToDeepLink.segment_ids = [
       createSegmentResponseJson.segment.id
     ];
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedButtonToUrl
+      createFeedCampaignFrontBackButtonToDeepLink
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignFeedButtonToUrl.name
+      createFeedCampaignFrontBackButtonToDeepLink.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -96,7 +99,7 @@ test.describe('Feed Post Campaign Tests', () => {
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionPayload.alias = getUsersResponseJson.data[0].alias;
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
     updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
@@ -104,7 +107,7 @@ test.describe('Feed Post Campaign Tests', () => {
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionPayload
+      startMobileSessionFeedPayload
     );
 
     await getInboxMessagesWithApi(
@@ -113,22 +116,20 @@ test.describe('Feed Post Campaign Tests', () => {
       alias,
       1
     );
+    // Visit the feed page in mobile view
+    await page.setViewportSize({ width: 375, height: 812 }); // iPhone X dimensions
+    const feedUrl = `https://sdk.furiousapi.com/feed?sdkAppId=${API_E2E_APP_ID_SDK}&sdkAppKey=${API_E2E_APP_KEY_SDK}&alias=${alias}&deviceGuid=${startMobileSessionFeedPayload.device.token}`;
+    await page.goto(feedUrl);
 
-    // Update Mobile User
-    const userActions = [
-      feedPostFrontImpressionAction,
-      feedPostFrontButtonClickOneAction
-    ];
+    // Wait for the feed to load and take a screenshot
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000); // Give extra time for dynamic content to load
+    await page.screenshot({ path: 'feed-page.png' });
 
-    userActions.forEach((action) => {
-      action.guid = createCampaignResponseJson.guid;
-    });
-
-    await updateMobileUserWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      { ...updateMobileUserPayload, user_actions: userActions }
-    );
+    // Click the back button
+    const buttonSelector = 'a.text-center:has-text("Button_Card_Back")';
+    await page.waitForSelector(buttonSelector);
+    await page.click(buttonSelector);
 
     await getInboxMessagesWithApi(
       request,

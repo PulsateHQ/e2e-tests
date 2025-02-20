@@ -64,8 +64,14 @@ export const apiUrls = {
     },
     messages: {
       v2: {
-        inbox: `${SDK_API_URL}/api/mobile/v2/messages/get_inbox`,
-        messages: `${SDK_API_URL}/api/mobile/v2/messages/messages`
+        getInbox: `${SDK_API_URL}/api/mobile/v2/messages/get_inbox`,
+        getMessages: `${SDK_API_URL}/api/mobile/v2/messages/get_messages`,
+        getInboxItem: `${SDK_API_URL}/api/mobile/v2/messages/get_inbox_item`
+      }
+    },
+    notifications: {
+      v4: {
+        card: `${SDK_API_URL}/api/mobile/v4/notifications/card`
       }
     }
   }
