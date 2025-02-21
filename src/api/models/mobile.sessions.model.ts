@@ -6,10 +6,10 @@ export interface Device {
   sdk_version: string;
   app_version: string;
   language: string;
-  location_permission: string;
-  push_permission: string;
-  background_location_permission: string;
-  in_app_permission: string;
+  push_permission: boolean;
+  location_permission: boolean;
+  background_location_permission: boolean;
+  in_app_permission: boolean;
   timezone: string;
 }
 

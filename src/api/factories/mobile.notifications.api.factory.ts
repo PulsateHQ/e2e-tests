@@ -29,8 +29,16 @@ export async function getCardWithApi(
       response.status(),
       `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
     ).toBe(expectedStatusCode);
-    expect(responseJson).toHaveProperty('categories');
-    expect(responseJson).toHaveProperty('inbox_items');
+    expect(responseJson).toHaveProperty('guid');
+    expect(responseJson).toHaveProperty('is_campaign_unread');
+    expect(responseJson).toHaveProperty('type');
+    expect(responseJson).toHaveProperty('campaign_guid');
+    expect(responseJson).toHaveProperty('allow_reply');
+    expect(responseJson).toHaveProperty('front');
+    expect(responseJson).toHaveProperty('back');
+    expect(responseJson).toHaveProperty('inbox_item_guid');
+    expect(responseJson).toHaveProperty('last_interaction_at');
+    expect(responseJson).toHaveProperty('expiry_at');
   }).toPass({ timeout: 20_000 });
 
   return response;

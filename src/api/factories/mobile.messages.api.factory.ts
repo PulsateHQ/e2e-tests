@@ -41,7 +41,7 @@ export async function getMessagesWithApi(
   request: APIRequestContext,
   authToken: string,
   alias: string,
-  campaignGuid: string
+  campaignGuid?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -72,14 +72,15 @@ export async function getMessagesWithApi(
 
 export async function getInboxItemWithApi(
   request: APIRequestContext,
-  authToken: string
+  authToken: string,
+  campaignGuid: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.sdk.messages.v2.getInboxItem}`;
+  const url = `${apiUrls.sdk.messages.v2.getInboxItem}?campaign_guid=${campaignGuid}`;
 
   let response: APIResponse;
 

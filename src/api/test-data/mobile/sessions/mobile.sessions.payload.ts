@@ -11,10 +11,10 @@ export const startMobileSessionPayload: StartMobileSessionPayload = {
     sdk_version: '2.13.8',
     app_version: '2.13.8-prod',
     language: 'en',
-    location_permission: 'true',
-    push_permission: 'true',
-    background_location_permission: 'true',
-    in_app_permission: 'true',
+    location_permission: true,
+    push_permission: true,
+    background_location_permission: true,
+    in_app_permission: true,
     timezone: 'GMT+00:00'
   }
 };
@@ -30,10 +30,10 @@ export const startMobileSessionFeedPayload: StartMobileSessionPayload = {
     sdk_version: '4.7.0',
     app_version: '4.7.0.9',
     language: 'en',
-    location_permission: 'true',
-    push_permission: 'true',
-    background_location_permission: 'true',
-    in_app_permission: 'true',
+    location_permission: true,
+    push_permission: true,
+    background_location_permission: true,
+    in_app_permission: true,
     timezone: 'GMT+01:00'
   },
   guid: '69147c4b-dea7-463f-af54-0ea90131771f',
