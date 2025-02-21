@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker/locale/en';
 export const createFreshUserPayload = (): UserRequest => {
   return {
     age: faker.number.int({ min: 18, max: 100 }),
-    alias: faker.internet.userName({ firstName: 'Piotr' }).replace(/\./g, '_'),
+    alias: `${faker.internet.username({ firstName: 'playwright' }).replace(/\./g, '_')},`,
     current_city: faker.location.city(),
     current_country: faker.location.country(),
     current_location: [faker.location.longitude(), faker.location.latitude()],

@@ -1,30 +1,28 @@
 import { faker } from '@faker-js/faker/locale/en';
 
 export function generateRandomUser(): string {
-  const userAlias = faker.internet
-    .username({ firstName: 'Piotr' })
-    .replace(/\./g, '_');
-  const emailAddress = faker.internet.email();
-  const firstName = faker.person.firstName();
-  const lastName = faker.person.lastName();
-  const smsPhoneNumber = faker.phone.number();
-  const currentCity = faker.location.city();
-  const age = faker.number.int({ min: 18, max: 80 });
-  const gender = faker.person.sex();
-
-  return `${userAlias},${emailAddress},${firstName},${lastName},${smsPhoneNumber},${currentCity},${age},${gender}`;
+  return [
+    `Lake ${faker.person.lastName()}field`,
+    `playwright_${faker.person.firstName().toLowerCase()}${faker.number.int({ min: 100, max: 999 })}`,
+    faker.person.firstName(),
+    faker.person.lastName(),
+    `${faker.person.firstName().toLowerCase()}.${faker.person.lastName().toLowerCase()}@example.com`,
+    faker.phone.number({ style: 'national' })
+  ]
+    .map((field, index) => (index === 5 ? `"${field}"` : String(field)))
+    .join(',');
 }
 
 export function generateCsvContentForUsersImport(
   numberOfUsers: number
 ): Buffer {
-  let csvContent =
-    'userAlias,emailAddress,firstName,lastName,smsPhoneNumber,currentCity,age,gender';
+  const csvContent = [
+    'Random,User Alias,First Name,Last Name,Email Address,SMS Phone Number'
+  ];
 
   for (let i = 0; i < numberOfUsers; i++) {
-    const randomUser = generateRandomUser();
-    csvContent += `\n${randomUser}`;
+    csvContent.push(generateRandomUser());
   }
 
-  return Buffer.from(csvContent, 'utf-8');
+  return Buffer.from(csvContent.join('\n'), 'utf-8');
 }
