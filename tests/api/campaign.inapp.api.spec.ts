@@ -1,9 +1,9 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_ACCESS_TOKEN_SDK,
   API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
+import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import {
   createCampaignWithApi,
   deleteCampaignWithApi,
@@ -34,15 +34,26 @@ import {
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('In-App Campaign Tests', () => {
+  let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
+
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
     apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
 
-  const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
-    apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
-  };
+  test.beforeAll(async ({ request }) => {
+    const sdkCredentialsResponse = await getSdkCredentials(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
+    const sdkCredentials = await sdkCredentialsResponse.json();
+
+    APIE2ETokenSDKModel = {
+      apiE2EAccessTokenSdk: sdkCredentials.access_token
+    };
+  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
