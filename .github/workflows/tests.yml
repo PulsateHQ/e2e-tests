@@ -179,13 +179,8 @@ jobs:
 
       - name: Create Allure environment properties
         run: |
-          # Get browser from Playwright project configuration
-          BROWSER=$(node -e "
-            const config = require('./playwright.config.ts');
-            const apiProject = config.default.projects.find(p => p.name === 'api');
-            const browser = apiProject.use['...devices']['Desktop Firefox'] ? 'Firefox' : 'Unknown';
-            console.log(browser);
-          ")
+          # Set browser directly since we know it's Firefox from the Playwright installation step
+          BROWSER="Firefox"
 
           # Create PR URL
           PR_URL="${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.client_payload.pr_number }}"
