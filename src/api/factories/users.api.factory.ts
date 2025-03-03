@@ -290,7 +290,7 @@ export async function uploadUsersWithSegmentCreationApi(
     const lastName = faker.person.lastName();
 
     csvRows.push(
-      `${faker.internet.username({ firstName: 'Piotr' }).replace(/\./g, '_')},` +
+      `${faker.internet.username({ firstName: 'playwright' }).replace(/\./g, '_')},` +
         `${faker.internet.email()},` +
         `${firstName},` +
         `${lastName},` +

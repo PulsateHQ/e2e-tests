@@ -87,7 +87,6 @@ jobs:
           echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env
           echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env
           echo SUPER_ADMIN_ACCESS_TOKEN=${{ secrets.SUPER_ADMIN_ACCESS_TOKEN }} >> .env
-          echo API_E2E_ACCESS_TOKEN_SDK=${{ secrets.API_E2E_ACCESS_TOKEN_SDK }} >> .env
           echo ENVIRONMENT=${{ github.event.client_payload.environment }} >> .env
       - name: Run Playwright tests
         id: run-tests
@@ -154,7 +153,7 @@ jobs:
           fi
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -194,7 +193,7 @@ jobs:
           Browser=$BROWSER
           PR_URL=$PR_URL
           Node_Version=$(node -v)
-          Playwright_Version=$(npx playwright --version)
+          Playwright_Version=$(npx playwright --version)" > allure-results/environment.properties
 
       - name: Generate Allure report
         run: npx allure generate allure-results --clean -o allure-report
@@ -234,9 +233,10 @@ jobs:
           github-token: ${{ secrets.E2E_PAT }}
           script: |
             try {
+              const [owner, repo] = context.repo.fullName ? context.repo.fullName.split('/') : ['${{ github.repository_owner }}', '${{ github.event.repository.name }}'];
               await github.rest.repos.createCommitStatus({
-                owner: 'PulsateHQ',
-                repo: 'smokesignals',
+                owner: owner,
+                repo: repo,
                 sha: '${{ github.event.client_payload.commit_sha }}',
                 state: '${{ needs.test.outputs.test_outcome }}' === 'success' ? 'success' : 'failure',
                 description: 'E2E tests completed with status: ${{ needs.test.outputs.test_outcome }}',

@@ -1,4 +1,3 @@
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -8,21 +7,18 @@ export async function importUsersWithApi(
   authToken: string,
   { csvContent, app_id }: { csvContent: Buffer; app_id: string }
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: '*/*',
-    ContentType: 'multipart/form-data'
-  };
-
   const response = await request.post(apiUrls.users.import, {
-    headers,
+    headers: {
+      Authorization: `Token token=${authToken}`,
+      Accept: '*/*'
+    },
     multipart: {
       file: {
         name: 'import.data.users.csv',
         mimeType: 'text/csv',
         buffer: csvContent
       },
-      app_id: app_id
+      app_id
     }
   });
 

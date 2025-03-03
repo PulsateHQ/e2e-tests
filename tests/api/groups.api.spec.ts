@@ -16,8 +16,8 @@ import {
   getSingleSegmentWithApi
 } from '@_src/api/factories/segments.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { createGroupSegmentsPayload } from '@_src/api/test-data/group/create-group-segments-payload';
-import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
+import { createGroupSegmentsPayload } from '@_src/api/test-data/cms/group/create-group-segments.payload';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import {
   deleteAllGroups,
   deleteAllSegments,

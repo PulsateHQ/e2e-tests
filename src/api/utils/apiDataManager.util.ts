@@ -14,7 +14,8 @@ import {
   getAllUsersWithApi
 } from '@_src/api/factories/users.api.factory';
 import { UserRequest } from '@_src/api/models/user.model';
-import { userRequestPayload } from '@_src/api/test-data/users/create-users';
+import { userRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
+import { generateCsvContentForUsersImport } from '@_src/api/test-data/cms/users/generate-user.payload';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, test } from '@playwright/test';
@@ -138,33 +139,6 @@ export async function deleteAllGroups(
   });
 }
 
-function generateRandomUser(): string {
-  const userAlias = faker.internet
-    .username({ firstName: 'Piotr' })
-    .replace(/\./g, '_');
-  const emailAddress = faker.internet.email();
-  const firstName = faker.person.firstName();
-  const lastName = faker.person.lastName();
-  const smsPhoneNumber = faker.phone.number();
-  const currentCity = faker.location.city();
-  const age = faker.number.int({ min: 18, max: 80 });
-  const gender = faker.person.sex();
-
-  return `${userAlias},${emailAddress},${firstName},${lastName},${smsPhoneNumber},${currentCity},${age},${gender}`;
-}
-
-function generateCsvContentForUsersImport(numberOfUsers: number): Buffer {
-  let csvContent =
-    'userAlias,emailAddress,firstName,lastName,smsPhoneNumber,currentCity,age,gender';
-
-  for (let i = 0; i < numberOfUsers; i++) {
-    const randomUser = generateRandomUser();
-    csvContent += `\n${randomUser}`;
-  }
-
-  return Buffer.from(csvContent, 'utf-8');
-}
-
 export async function importRandomUsers(
   request: APIRequestContext,
   authToken: string,
@@ -180,7 +154,7 @@ export async function importRandomUsers(
 export function getFreshUserPayload(): UserRequest {
   return {
     age: faker.number.int({ min: 18, max: 100 }),
-    alias: faker.internet.username({ firstName: 'Piotr' }).replace(/\./g, '_'),
+    alias: `${faker.internet.username({ firstName: 'playwright' }).replace(/\./g, '_')},`,
     current_city: faker.location.city(),
     current_country: faker.location.country(),
     current_location: [faker.location.longitude(), faker.location.latitude()],

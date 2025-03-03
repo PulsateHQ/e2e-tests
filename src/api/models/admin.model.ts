@@ -6,6 +6,8 @@ export interface APIE2ELoginUserModel {
 
 export interface APIE2ETokenSDKModel {
   apiE2EAccessTokenSdk: string;
+  apiE2EAppIdSdk?: string;
+  apiE2EAppKeySdk?: string;
 }
 
 export interface CompanyAdminRegistrationRequest {

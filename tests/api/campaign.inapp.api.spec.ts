@@ -1,18 +1,16 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_ACCESS_TOKEN_SDK,
   API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
+import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import {
   createCampaignWithApi,
   deleteCampaignWithApi,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
-import {
-  startMobileSessionWithApi,
-  updateMobileUserWithApi
-} from '@_src/api/factories/mobile.api.factory';
+import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
+import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
 import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
@@ -20,13 +18,13 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
-import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/campaign/create-inapp-large-campaign-payload';
-import { inAppDeliveryAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-delivery-payload';
-import { inAppDismissAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-dismiss-payload';
-import { inAppImpressionAction } from '@_src/api/test-data/mobile-user-actions/in-app/in-app-impression-payload';
-import { startMobileSessionPayload } from '@_src/api/test-data/mobile-user-actions/start-mobile-session-payload';
-import { updateMobileUserPayload } from '@_src/api/test-data/mobile-user-actions/update-mobile-user-payload';
-import { createSegmentAllUsersPayload } from '@_src/api/test-data/segment/create-segment-all-users-payload';
+import { createCampaignPayloadInAppLarge } from '@_src/api/test-data/cms/campaign/create-inapp-large-campaign.payload';
+import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
+import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
+import { inAppDeliveryAction } from '@_src/api/test-data/mobile/users/inapp/in-app-delivery.payload';
+import { inAppDismissAction } from '@_src/api/test-data/mobile/users/inapp/in-app-dismiss.payload';
+import { inAppImpressionAction } from '@_src/api/test-data/mobile/users/inapp/in-app-impression.payload';
+import { updateMobileUserPayload } from '@_src/api/test-data/mobile/users/update/mobile.users.update.payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -36,15 +34,26 @@ import {
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('In-App Campaign Tests', () => {
+  let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
+
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
     apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
 
-  const APIE2ETokenSDKModel: APIE2ETokenSDKModel = {
-    apiE2EAccessTokenSdk: `${API_E2E_ACCESS_TOKEN_SDK}`
-  };
+  test.beforeAll(async ({ request }) => {
+    const sdkCredentialsResponse = await getSdkCredentials(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
+    const sdkCredentials = await sdkCredentialsResponse.json();
+
+    APIE2ETokenSDKModel = {
+      apiE2EAccessTokenSdk: sdkCredentials.access_token
+    };
+  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
@@ -175,7 +184,7 @@ test.describe('In-App Campaign Tests', () => {
     updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
-    await startMobileSessionWithApi(
+    await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       startMobileSessionPayload

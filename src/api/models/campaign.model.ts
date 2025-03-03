@@ -2,13 +2,13 @@ export interface CampaignGoal {
   primary: boolean;
   event_kind: string;
   event_identifier: string | null;
-  expiry_time_unit: string;
+  expiry_time_unit: 'hours' | 'days' | 'weeks';
   expiry_time_value: number;
 }
 
 export interface CampaignButton {
   label: string;
-  destination_type: string;
+  destination_type: 'card_back' | 'deeplink' | 'dismiss' | 'url';
   destination?: string;
   txt_color: string;
   btn_color: string;
@@ -16,41 +16,47 @@ export interface CampaignButton {
 
 export interface CampaignCallToAction {
   buttons: CampaignButton[];
-  side: string;
+  side: 'front' | 'back';
+  active?: boolean;
 }
 
-export interface CampaignText {
-  side: string;
+export interface CampaignBasePart {
   active: boolean;
+  position: number;
+  side: 'front' | 'back';
+}
+
+export interface CampaignText extends CampaignBasePart {
   text: string;
-  position: number;
 }
 
-export interface CampaignImage {
-  side: string;
+export interface CampaignImage extends CampaignBasePart {
   name: string;
-  active: boolean;
-  position: number;
   url: string;
 }
 
-export interface CampaignHeadline {
-  side: string;
-  active: boolean;
+export interface CampaignHeadline extends CampaignBasePart {
   text: string;
-  position: number;
+}
+
+export interface CampaignTable extends CampaignBasePart {
+  heading: string;
+  rows: Array<{
+    value: string;
+    label: string;
+  }>;
 }
 
 export interface CampaignAdminHeaderWithMessage {
-  side: string;
+  side: 'front';
   position: number;
   active: boolean;
   message: string;
   admin: {
     job_title: string | null;
-    name: string | null;
-    avatar_url: string | null;
-    s_id: string | null;
+    name: string;
+    avatar_url: string;
+    s_id: string;
   };
 }
 
@@ -74,14 +80,21 @@ export interface CardNotification {
     text: CampaignText;
     call_to_action: CampaignCallToAction;
   };
-  type: string;
+  back_parts?: {
+    image: CampaignImage;
+    headline: CampaignHeadline;
+    text: CampaignText;
+    table: CampaignTable;
+    call_to_action: CampaignCallToAction;
+  };
+  type: 'card';
   goals: CampaignGoal[];
 }
 
 export interface CreateCampaignPayload {
-  state_machine_notifications_state: string;
+  state_machine_notifications_state: 'initial' | string;
   duplication_source_id: string;
-  type: string;
+  type: 'CardInboxCampaign' | string;
   last_builder_page: string;
   name: string;
   control_group: null;
@@ -98,11 +111,13 @@ export interface CreateCampaignPayload {
   start_now: boolean;
   start_at: string;
   end_at: string;
-  time_frame: string;
+  time_frame: 'hours' | 'days' | 'weeks';
   time_value: string;
   time_zone_name: string;
   time_zone_offset: string;
-  delivery: string;
+  delivery: 'current' | string;
   campaign_limits: boolean;
   campaign_expiry: boolean;
+  expiry_time_frame?: 'hours' | 'days' | 'weeks';
+  expiry_time_value?: number;
 }

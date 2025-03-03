@@ -2,7 +2,8 @@ import {
   AppResponse,
   CreateAppRequest,
   DeleteAppRequest,
-  GetAllAppsParams
+  GetAllAppsParams,
+  SdkCredentialsResponse
 } from '../models/app.model';
 import { GetAllAppsResponse } from '../models/app.model';
 import { Headers } from '@_src/api/models/headers.model';
@@ -122,5 +123,36 @@ export async function deleteApp(
   });
 
   expect(response.status()).toBe(200);
+  return response;
+}
+
+export async function getSdkCredentials(
+  request: APIRequestContext,
+  authToken: string,
+  appId: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
+    Authorization: `Token token=${authToken}`
+  };
+
+  const url = `${apiUrls.apps.v2.base}/${appId}/sdk_credentials`;
+
+  const response = await request.get(url, {
+    headers
+  });
+
+  expect(response.status()).toBe(200);
+
+  const responseJson = (await response.json()) as SdkCredentialsResponse;
+
+  // Validate response structure
+  expect(responseJson).toHaveProperty('app_id');
+  expect(responseJson).toHaveProperty('app_key');
+  expect(responseJson).toHaveProperty('access_token');
+  expect(typeof responseJson.app_id).toBe('string');
+  expect(typeof responseJson.app_key).toBe('string');
+  expect(typeof responseJson.access_token).toBe('string');
+
   return response;
 }

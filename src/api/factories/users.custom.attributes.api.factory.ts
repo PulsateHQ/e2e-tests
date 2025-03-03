@@ -1,4 +1,4 @@
-import { CustomAttribute } from '../models/custom-attribute.api.model';
+import { CustomAttribute } from '../models/custom-attribute.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';

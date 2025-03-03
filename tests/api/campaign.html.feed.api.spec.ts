@@ -6,20 +6,20 @@ import {
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
+import { getCardWithApi } from '@_src/api/factories/mobile.notifications.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
-import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
 import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
+import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
+import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.model';
 import { createCampaignFeedButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
-import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
-import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile/users/card/feed-post-front-button-click.payload';
-import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile/users/card/feed-post-impression.payload';
+import { startMobileSessionFeedPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
 import { updateMobileUserPayload } from '@_src/api/test-data/mobile/users/update/mobile.users.update.payload';
 import {
   deleteAllCampaigns,
@@ -27,15 +27,28 @@ import {
   deleteAllUsers,
   importRandomUsers
 } from '@_src/api/utils/apiDataManager.util';
+import { isRunningInEnvironment } from '@_src/api/utils/environmentSkip.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Feed Post Campaign Tests', () => {
-  let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
+// Define the environments where this test should run
+const SUPPORTED_ENVIRONMENTS = ['tiger'];
 
+// Use condition() to skip tests on unsupported environments
+test.describe('Feed HTML Post Campaign Tests', () => {
+  // This will skip all tests in this suite if not running in a supported environment
+  test.beforeEach(() => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
+  });
+
+  let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
+    apiE2EAccessTokenAdmin: API_E2E_ACCESS_TOKEN_ADMIN,
+    apiE2EAccessTokenSuperAdmin: SUPER_ADMIN_ACCESS_TOKEN,
+    apiE2EAppId: API_E2E_APP_ID
   };
 
   test.beforeAll(async ({ request }) => {
@@ -47,25 +60,25 @@ test.describe('Feed Post Campaign Tests', () => {
     const sdkCredentials = await sdkCredentialsResponse.json();
 
     APIE2ETokenSDKModel = {
-      apiE2EAccessTokenSdk: sdkCredentials.access_token
+      apiE2EAccessTokenSdk: sdkCredentials.access_token,
+      apiE2EAppIdSdk: sdkCredentials.app_id,
+      apiE2EAppKeySdk: sdkCredentials.app_key
     };
   });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
-
     await deleteAllSegments(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
-
     await deleteAllCampaigns(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
   });
 
-  test('should create an Feed Post campaign with a URL button and update mobile session user to click it', async ({
+  test('should create an HTML Feed campaign with a URL button and click it', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -107,7 +120,7 @@ test.describe('Feed Post Campaign Tests', () => {
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionPayload.alias = getUsersResponseJson.data[0].alias;
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
     updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
 
@@ -115,7 +128,7 @@ test.describe('Feed Post Campaign Tests', () => {
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionPayload
+      startMobileSessionFeedPayload
     );
 
     await getInboxMessagesWithApi(
@@ -125,20 +138,68 @@ test.describe('Feed Post Campaign Tests', () => {
       1
     );
 
-    // Update Mobile User
-    const userActions = [
-      feedPostFrontImpressionAction,
-      feedPostFrontButtonClickOneAction
-    ];
-
-    userActions.forEach((action) => {
-      action.guid = createCampaignResponseJson.guid;
-    });
-
-    await updateMobileUserWithApi(
+    const getCardWithApiResponse = await getCardWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      { ...updateMobileUserPayload, user_actions: userActions }
+      alias,
+      createCampaignResponseJson.guid
+    );
+
+    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+
+    // Validate card matches campaign configuration
+    expect(getCardWithApiResponseJson.campaign_guid).toBe(
+      createCampaignResponseJson.guid
+    );
+
+    // Find parts in card response
+    const callToActionPart = getCardWithApiResponseJson.front.find(
+      (part) => part.type === 'call_to_action'
+    );
+    const textPart = getCardWithApiResponseJson.front.find(
+      (part) => part.type === 'text'
+    );
+
+    // Validate call to action part matches campaign configuration
+    const campaignCallToAction =
+      createCampaignResponseJson.card_notification.front_parts.call_to_action;
+    expect(callToActionPart.active).toBe(campaignCallToAction.active);
+    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+
+    // Validate button attributes match exactly
+    const buttonAttrs = callToActionPart.attrs[0];
+    const campaignButton = campaignCallToAction.buttons[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+
+    // Validate text part matches campaign configuration
+    const campaignText =
+      createCampaignResponseJson.card_notification.front_parts.text;
+    expect(textPart.active).toBe(campaignText.active);
+    expect(textPart.position).toBe(campaignText.position);
+    expect(textPart.attrs[0].text).toBe(campaignText.text);
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_IMPRESSION
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_ONE
     );
 
     await getInboxMessagesWithApi(

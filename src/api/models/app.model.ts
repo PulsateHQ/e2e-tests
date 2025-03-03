@@ -30,3 +30,9 @@ export interface DeleteAppRequest {
   name: string;
   password: string;
 }
+
+export interface SdkCredentialsResponse {
+  app_id: string;
+  app_key: string;
+  access_token: string;
+}
