@@ -37,6 +37,7 @@ const SUPPORTED_ENVIRONMENTS = ['tiger'];
 test.describe('Feed HTML Post Campaign Tests', () => {
   // This will skip all tests in this suite if not running in a supported environment
   test.beforeEach(() => {
+    // eslint-disable-next-line playwright/no-skipped-test
     test.skip(
       !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
       `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
