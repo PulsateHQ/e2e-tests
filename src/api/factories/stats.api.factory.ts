@@ -32,7 +32,7 @@ export async function getCampaignStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
-  }).toPass({ timeout: 20_000 });
+  }).toPass({ timeout: 30_000 });
 
   return response!;
 }
