@@ -1,3 +1,7 @@
+import {
+  deleteDeeplinksWithApi,
+  getAllDeeplinksWithApi
+} from '../factories/deeplinks.api.factory';
 import { deleteGroupWithApi } from '../factories/groups.api.factory';
 import { getAllGroupsWithApi } from '../factories/groups.api.factory';
 import {
@@ -136,6 +140,35 @@ export async function deleteAllGroups(
     expect(finalGroupCount).toBe(0);
 
     await test.step(`Deleted ${initialGroupCount} groups, ${finalGroupCount} remaining.`, async () => {});
+  });
+}
+
+export async function deleteAllDeeplinks(
+  request: APIRequestContext,
+  token: string
+): Promise<void> {
+  await test.step('Deleting all deeplinks', async () => {
+    const getDeeplinksResponse = await getAllDeeplinksWithApi(request, token);
+    const getDeeplinksResponseJson = await getDeeplinksResponse.json();
+    const initialDeeplinkCount = getDeeplinksResponseJson.data.length;
+
+    for (const deeplink of getDeeplinksResponseJson.data) {
+      await deleteDeeplinksWithApi(request, token, [deeplink.id]);
+    }
+
+    const getDeeplinksResponseAfterDeletion = await getAllDeeplinksWithApi(
+      request,
+      token
+    );
+    const getDeeplinksResponseJsonAfterDeletion =
+      await getDeeplinksResponseAfterDeletion.json();
+    const finalDeeplinkCount =
+      getDeeplinksResponseJsonAfterDeletion.data.length;
+
+    expect(getDeeplinksResponseAfterDeletion.status()).toBe(200);
+    expect(finalDeeplinkCount).toBe(0);
+
+    await test.step(`Deleted ${initialDeeplinkCount} deeplinks, ${finalDeeplinkCount} remaining.`, async () => {});
   });
 }
 

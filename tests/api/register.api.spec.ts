@@ -23,7 +23,7 @@ import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-r
 import {
   deleteAllSegments,
   deleteAllUsers
-} from '@_src/api/utils/apiDataManager.util';
+} from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Company registration and admin management', () => {

@@ -29,6 +29,11 @@ export const apiUrls = {
     }
   },
 
+  // Deeplinks related endpoints
+  deeplinks: {
+    v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/deeplinks`
+  },
+
   // User related endpoints
   users: {
     v1: `${BASE_URL}/api/v1/apps/${API_E2E_APP_ID}/users`,

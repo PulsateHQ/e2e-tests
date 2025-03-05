@@ -30,7 +30,7 @@ import {
   deleteAllSegments,
   deleteAllUsers,
   importRandomUsers
-} from '@_src/api/utils/apiDataManager.util';
+} from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('In-App Campaign Tests', () => {
