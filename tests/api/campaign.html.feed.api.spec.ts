@@ -627,6 +627,89 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     expect(imagePart.active).toBe(campaignImage.active);
     expect(imagePart.position).toBe(campaignImage.position);
 
+    // Find parts in back card response
+    const callToActionPartBack = getCardWithApiResponseJson.back.find(
+      (part) => part.type === 'call_to_action'
+    );
+    const textPartBack = getCardWithApiResponseJson.back.find(
+      (part) => part.type === 'text'
+    );
+
+    const headlinePartBack = getCardWithApiResponseJson.back.find(
+      (part) => part.type === 'headline'
+    );
+
+    const imagePartBack = getCardWithApiResponseJson.back.find(
+      (part) => part.type === 'image'
+    );
+
+    const headingPartBack = getCardWithApiResponseJson.back.find(
+      (part) => part.type === 'heading'
+    );
+
+    const tablePartBack = getCardWithApiResponseJson.back.find(
+      (part) => part.type === 'table'
+    );
+
+    // Validate call to action part matches campaign configuration
+    const campaignCallToActionBack =
+      createCampaignResponseJson.card_notification.back_parts.call_to_action;
+    expect(callToActionPartBack.active).toBe(campaignCallToActionBack.active);
+    expect(callToActionPartBack.position).toBe(
+      campaignCallToActionBack.position
+    );
+
+    // Validate button attributes match exactly
+    const buttonAttrsBack = callToActionPartBack.attrs[0];
+    const campaignButtonBack = campaignCallToActionBack.buttons[0];
+    expect(buttonAttrsBack.btn_color).toBe(campaignButtonBack.btn_color);
+    expect(buttonAttrsBack.destination_type).toBe(
+      campaignButtonBack.destination_type
+    );
+    expect(buttonAttrsBack.destination).toBe(campaignButtonBack.destination);
+    expect(buttonAttrsBack.in_app_events).toBe(
+      campaignButtonBack.in_app_events
+    );
+    expect(buttonAttrsBack.label).toBe(campaignButtonBack.label);
+    expect(buttonAttrsBack.txt_color).toBe(campaignButtonBack.txt_color);
+    expect(buttonAttrsBack.order_number).toBe(campaignButtonBack.order_number);
+
+    // Validate text part matches campaign configuration
+    const campaignTextBack =
+      createCampaignResponseJson.card_notification.back_parts.text;
+    expect(textPartBack.active).toBe(campaignTextBack.active);
+    expect(textPartBack.position).toBe(campaignTextBack.position);
+    expect(textPartBack.attrs[0].text).toBe(campaignTextBack.text);
+
+    // Validate headline part matches campaign configuration
+    const campaignHeadlineBack =
+      createCampaignResponseJson.card_notification.back_parts.headline;
+    expect(headlinePartBack.active).toBe(campaignHeadlineBack.active);
+    expect(headlinePartBack.position).toBe(campaignHeadlineBack.position);
+    expect(headlinePartBack.attrs[0].text).toBe(campaignHeadlineBack.text);
+
+    // Validate image part matches campaign configuration
+    const campaignImageBack =
+      createCampaignResponseJson.card_notification.back_parts.image;
+    expect(imagePartBack.active).toBe(campaignImageBack.active);
+    expect(imagePartBack.position).toBe(campaignImageBack.position);
+
+    // Validate table part matches campaign configuration
+    const campaignTableBack =
+      createCampaignResponseJson.card_notification.back_parts.table;
+    expect(tablePartBack.active).toBe(campaignTableBack.active);
+    expect(tablePartBack.position).toBe(campaignTableBack.position);
+    expect(tablePartBack.attrs[0].rows[0].value).toBe(
+      campaignTableBack.rows[0].value
+    );
+    expect(tablePartBack.attrs[0].rows[0].label).toBe(
+      campaignTableBack.rows[0].label
+    );
+
+    expect(headingPartBack.active).toBe(campaignTableBack.active);
+    expect(headingPartBack.position).toBe(campaignTableBack.position);
+    expect(headingPartBack.attrs[0].text).toBe(campaignTableBack.heading);
+
     await createWebSdkStatistics(
       request,
       APIE2ETokenSDKModel.apiE2EAppIdSdk,
@@ -704,15 +787,27 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       'total_uniq',
       1
     );
+    expect(getCampaignStatsWithWaitResponseJson.card.delete).toHaveProperty(
+      'total_uniq',
+      0
+    );
     expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
       'total_uniq',
       1
     );
+
     expect(
       getCampaignStatsWithWaitResponseJson.card.front.front_impression
     ).toHaveProperty('total_uniq', 1);
     expect(
       getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
+    ).toHaveProperty('total_uniq', 1);
+
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.back.back_impression
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_one
     ).toHaveProperty('total_uniq', 1);
   });
 });

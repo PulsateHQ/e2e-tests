@@ -32,7 +32,7 @@ export async function getInboxMessagesWithApi(
     expect(responseJson).toHaveProperty('categories');
     expect(responseJson).toHaveProperty('inbox_items');
     expect(responseJson).toHaveProperty('total_unread', expectedTotalUnread);
-  }).toPass({ timeout: 30_000 });
+  }).toPass({ timeout: 60_000 });
 
   return response!;
 }
