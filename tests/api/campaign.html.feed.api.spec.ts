@@ -771,6 +771,8 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
+      1,
+      1,
       1
     );
 

@@ -7,7 +7,9 @@ export async function getCampaignStatsWithApi(
   request: APIRequestContext,
   authToken: string,
   campaignId: string,
-  expectedSend: number
+  expectedSend: number,
+  expectedBackImpressions?: number,
+  expectedBackButtonClicks?: number
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -32,6 +34,14 @@ export async function getCampaignStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
+    expect(responseJson.card.back.back_impression).toHaveProperty(
+      'total_uniq',
+      expectedBackImpressions
+    );
+    expect(responseJson.card.back.back_button_click_one).toHaveProperty(
+      'total_uniq',
+      expectedBackButtonClicks
+    );
   }).toPass({ timeout: 30_000 });
 
   return response!;
