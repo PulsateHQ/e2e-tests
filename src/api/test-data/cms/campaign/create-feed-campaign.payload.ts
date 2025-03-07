@@ -302,13 +302,13 @@ export const createCampaignFeedOneButtonBackWithDismiss: CreateCampaignPayload =
     expiry_time_value: 1
   };
 
-export const createFeedCampaignFrontBackButtonToDeepLink: CreateCampaignPayload =
+export const createCampaignFeedTwoButtonsWithBackAndDeeplink: CreateCampaignPayload =
   {
     state_machine_notifications_state: 'initial',
     duplication_source_id: '',
     type: 'CardInboxCampaign',
     last_builder_page: '1',
-    name: `Feed_Post_Campaign_Back_Deeplink_${faker.lorem.word()}`,
+    name: `Feed_Post_Campaign_Two_Buttons_${faker.lorem.word()}`,
     control_group: null,
     goals: [
       {
@@ -324,14 +324,13 @@ export const createFeedCampaignFrontBackButtonToDeepLink: CreateCampaignPayload 
         admin_header_with_message: {
           side: 'front',
           position: -1,
-          active: true,
-          message: `Personal_Message_${faker.lorem.word()}`,
+          active: false,
+          message: '',
           admin: {
             job_title: null,
-            name: 'Piotr',
-            avatar_url:
-              'https://pulsate-media-bucket-production.s3.eu-west-1.amazonaws.com/default-user-avatar.png',
-            s_id: '667d59fe1d3766548f29ea63'
+            name: null,
+            avatar_url: null,
+            s_id: null
           }
         },
         image: {
@@ -339,32 +338,32 @@ export const createFeedCampaignFrontBackButtonToDeepLink: CreateCampaignPayload 
           name: '1.jpeg',
           active: true,
           position: 0,
-          url: 'https://pulsate-campaign-attachments-production.s3.eu-west-1.amazonaws.com/5fa13b64636f6e4be81b0000/2025-02-19/1739983889_1.jpeg'
+          url: 'https://pulsate-campaign-attachments.s3.eu-west-1.amazonaws.com/643e3df7b58b2c3a5e6bd605/2025-03-07/1741340304_1.jpeg'
         },
         headline: {
           side: 'front',
           active: true,
-          text: `Headline_Front_${faker.lorem.word()}`,
+          text: `Headline_Feed_Post_Campaigns_${faker.lorem.word()}`,
           position: 1
         },
         text: {
           side: 'front',
           active: true,
-          text: `Text_Front_${faker.lorem.word()}`,
+          text: `Text_Feed_Post_Campaigns_${faker.lorem.word()}`,
           position: 2
         },
         call_to_action: {
           buttons: [
             {
-              label: `Button_Card_Back_${faker.lorem.word()}`,
-              destination_type: 'card_back',
+              label: `Button_URL_${faker.lorem.word()}`,
+              destination_type: 'url',
+              destination: 'https://google.com',
               txt_color: '',
               btn_color: ''
             },
             {
-              label: `Button_Deeplink_${faker.lorem.word()}`,
-              destination_type: 'deeplink',
-              destination: 'http://www.pulsatehq.com',
+              label: `Button_Card_Back_${faker.lorem.word()}`,
+              destination_type: 'card_back',
               txt_color: '',
               btn_color: ''
             }
@@ -374,10 +373,10 @@ export const createFeedCampaignFrontBackButtonToDeepLink: CreateCampaignPayload 
       },
       back_parts: {
         image: {
-          name: '1.jpeg',
+          name: '2.jpeg',
           active: true,
           position: 0,
-          url: 'https://pulsate-campaign-attachments-production.s3.eu-west-1.amazonaws.com/5fa13b64636f6e4be81b0000/2025-02-19/1739983945_1.jpeg',
+          url: 'https://pulsate-campaign-attachments.s3.eu-west-1.amazonaws.com/643e3df7b58b2c3a5e6bd605/2025-03-07/1741340342_2.jpeg',
           side: 'back'
         },
         headline: {
@@ -393,23 +392,19 @@ export const createFeedCampaignFrontBackButtonToDeepLink: CreateCampaignPayload 
           side: 'back'
         },
         table: {
-          active: true,
+          active: false,
           position: 3,
-          heading: `Table_Heading_${faker.lorem.word()}`,
-          rows: [
-            {
-              value: `Value_${faker.lorem.word()}`,
-              label: `Label_${faker.lorem.word()}`
-            }
-          ],
+          heading: '',
+          rows: [],
           side: 'back'
         },
         call_to_action: {
           active: true,
           buttons: [
             {
-              label: `Button_Dismiss_${faker.lorem.word()}`,
-              destination_type: 'dismiss',
+              label: `Button_Deeplink_${faker.lorem.word()}`,
+              destination_type: 'deeplink',
+              destination: '',
               txt_color: '',
               btn_color: ''
             },
