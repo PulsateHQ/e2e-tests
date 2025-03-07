@@ -81,7 +81,6 @@ export async function getCampaignBackCardStatsWithApi(
       'total_uniq',
       expectedBackButtonClicksOne
     );
-    
     if (expectedBackButtonClicksTwo !== undefined) {
       expect(responseJson.card.back.back_button_click_two).toHaveProperty(
         'total_uniq', 
