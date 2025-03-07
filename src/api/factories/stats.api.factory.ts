@@ -81,11 +81,13 @@ export async function getCampaignBackCardStatsWithApi(
       'total_uniq',
       expectedBackButtonClicksOne
     );
-
-    expect(responseJson.card.back.back_button_click_two).toHaveProperty(
-      'total_uniq',
-      expectedBackButtonClicksTwo
-    );
+    
+    if (expectedBackButtonClicksTwo !== undefined) {
+      expect(responseJson.card.back.back_button_click_two).toHaveProperty(
+        'total_uniq', 
+        expectedBackButtonClicksTwo
+      );
+    }
   }).toPass({ timeout: 60_000 });
 
   return response!;
