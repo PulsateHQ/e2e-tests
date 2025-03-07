@@ -17,7 +17,7 @@ import { generateAdminPayload } from '@_src/api/test-data/cms/admins/company-reg
 import {
   deleteAllSegments,
   deleteAllUsers
-} from '@_src/api/utils/apiDataManager.util';
+} from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker';
 

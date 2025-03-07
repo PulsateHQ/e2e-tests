@@ -15,7 +15,7 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
-import { createCampaignFeedButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
+import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
 import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile/users/card/feed-post-front-button-click.payload';
@@ -26,7 +26,7 @@ import {
   deleteAllSegments,
   deleteAllUsers,
   importRandomUsers
-} from '@_src/api/utils/apiDataManager.util';
+} from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Feed Post Campaign Tests', () => {
@@ -86,19 +86,19 @@ test.describe('Feed Post Campaign Tests', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignFeedButtonToUrl.segment_ids = [
+    createCampaignFeedOneButtonToUrl.segment_ids = [
       createSegmentResponseJson.segment.id
     ];
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedButtonToUrl
+      createCampaignFeedOneButtonToUrl
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignFeedButtonToUrl.name
+      createCampaignFeedOneButtonToUrl.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
