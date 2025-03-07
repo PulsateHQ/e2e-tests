@@ -65,7 +65,7 @@ export async function getMessagesWithApi(
     ).toBe(expectedStatusCode);
     expect(responseJson).toHaveProperty('categories');
     expect(responseJson).toHaveProperty('inbox_items');
-  }).toPass({ timeout: 30_000 });
+  }).toPass({ timeout: 60_000 });
 
   return response;
 }

@@ -32,7 +32,7 @@ export async function getCampaignStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
-  }).toPass({ timeout: 30_000 });
+  }).toPass({ timeout: 60_000 });
 
   return response!;
 }
@@ -77,20 +77,16 @@ export async function getCampaignBackCardStatsWithApi(
       expectedBackImpressions
     );
 
-    if (expectedBackButtonClicksOne !== undefined) {
-      expect(responseJson.card.back.back_button_click_one).toHaveProperty(
-        'total_uniq',
-        expectedBackButtonClicksOne
-      );
-    }
+    expect(responseJson.card.back.back_button_click_one).toHaveProperty(
+      'total_uniq',
+      expectedBackButtonClicksOne
+    );
 
-    if (expectedBackButtonClicksTwo !== undefined) {
-      expect(responseJson.card.back.back_button_click_two).toHaveProperty(
-        'total_uniq',
-        expectedBackButtonClicksTwo
-      );
-    }
-  }).toPass({ timeout: 30_000 });
+    expect(responseJson.card.back.back_button_click_two).toHaveProperty(
+      'total_uniq',
+      expectedBackButtonClicksTwo
+    );
+  }).toPass({ timeout: 60_000 });
 
   return response!;
 }

@@ -1341,4 +1341,372 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
     ).toHaveProperty('total_uniq', 1);
   });
+
+  test('should create HTML Feed campaign with  2 users and all of them clicks different buttons', async ({
+    request
+  }) => {
+    const numberOfUsers = 2;
+
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    // Create Segment
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload
+    );
+    const createSegmentResponseJson = await createSegmentResponse.json();
+
+    // Preparing payload for campaign creation
+
+    await deleteAllDeeplinks(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+
+    const createDeeplinkResponse = await createDeeplinkWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      {
+        nickname: 'Plawright',
+        target: `${apiUrls.campaigns.v2.base}`
+      }
+    );
+
+    const updateDeeplinkResponse = await updateDeeplinkWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createDeeplinkResponse.id,
+      {
+        nickname: 'Plawright Campaign Deeplink',
+        target: `${apiUrls.campaigns.v2.base}`
+      }
+    );
+
+    createCampaignFeedTwoButtonsWithBackAndDeeplink.segment_ids = [
+      createSegmentResponseJson.segment.id
+    ];
+    createCampaignFeedTwoButtonsWithBackAndDeeplink.card_notification.back_parts.call_to_action.buttons[0].destination =
+      updateDeeplinkResponse.id;
+
+    // Create Campaign
+
+    const createCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignFeedTwoButtonsWithBackAndDeeplink
+    );
+    const createCampaignResponseJson = await createCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createCampaignResponseJson.name).toBe(
+      createCampaignFeedTwoButtonsWithBackAndDeeplink.name
+    );
+
+    const getUsersResponse = await getAllUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getUsersResponseJson = await getUsersResponse.json();
+
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const alias = getUsersResponseJson.data[0].alias;
+    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+
+    // Start Mobile Session
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      startMobileSessionFeedPayload
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      1
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_IMPRESSION
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_TWO
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_BACK_IMPRESSION
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_BACK_BUTTON_CLICK_TWO
+    );
+
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[1].alias;
+    const alias2 = getUsersResponseJson.data[1].alias;
+    updateMobileUserPayload.alias = getUsersResponseJson.data[1].alias;
+
+    // Start Mobile Session
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      startMobileSessionFeedPayload
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias2,
+      1
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias2,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_IMPRESSION
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias2,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_ONE
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias2,
+      0
+    );
+
+    const getCardWithApiAfterReadingResponse = await getCardWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias2,
+      createCampaignResponseJson.guid
+    );
+
+    const getCardWithApiAfterReadingResponseJson =
+      await getCardWithApiAfterReadingResponse.json();
+
+    expect(getCardWithApiAfterReadingResponseJson.is_campaign_unread).toBe(
+      false
+    );
+
+    const getCampaignStatsWithWaitResponse =
+      await getCampaignBackCardStatsWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        createCampaignResponseJson.id,
+        2,
+        1,
+        0,
+        1
+      );
+
+    const getCampaignStatsWithWaitResponseJson =
+      await getCampaignStatsWithWaitResponse.json();
+
+    // Assert Validate Response Body
+    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('card');
+    expect(getCampaignStatsWithWaitResponseJson.card.send).toHaveProperty(
+      'total_uniq',
+      2
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.delivery).toHaveProperty(
+      'total_uniq',
+      2
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.delete).toHaveProperty(
+      'total_uniq',
+      0
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
+      'total_uniq',
+      2
+    );
+
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_impression
+    ).toHaveProperty('total_uniq', 2);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_two
+    ).toHaveProperty('total_uniq', 1);
+
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.back.back_impression
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_one
+    ).toHaveProperty('total_uniq', 0);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_two
+    ).toHaveProperty('total_uniq', 1);
+  });
+
+  test('should create 2 HTML Feed campaign and validate number of feeds cards', async ({
+    request
+  }) => {
+    const numberOfUsers = 1;
+
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    // Create Segment
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload
+    );
+    const createSegmentResponseJson = await createSegmentResponse.json();
+
+    // Create Campaign
+    createCampaignFeedOneButtonToUrl.segment_ids = [
+      createSegmentResponseJson.segment.id
+    ];
+    const createFirstCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignFeedOneButtonToUrl
+    );
+    const createFirstCampaignResponseJson =
+      await createFirstCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createFirstCampaignResponseJson.name).toBe(
+      createCampaignFeedOneButtonToUrl.name
+    );
+
+    const createSecondCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignFeedOneButtonToUrl
+    );
+    const createSecondCampaignResponseJson =
+      await createSecondCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createSecondCampaignResponseJson.name).toBe(
+      createCampaignFeedOneButtonToUrl.name
+    );
+
+    const getUsersResponse = await getAllUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getUsersResponseJson = await getUsersResponse.json();
+
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const alias = getUsersResponseJson.data[0].alias;
+    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+
+    // Start Mobile Session
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      startMobileSessionFeedPayload
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      2
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createFirstCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_IMPRESSION
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createFirstCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_ONE
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      1
+    );
+
+    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createFirstCampaignResponseJson.id,
+      1
+    );
+
+    const getCampaignStatsWithWaitResponseJson =
+      await getCampaignStatsWithWaitResponse.json();
+
+    // Assert Validate Response Body
+    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('card');
+    expect(getCampaignStatsWithWaitResponseJson.card.send).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.delivery).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_impression
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
+    ).toHaveProperty('total_uniq', 1);
+  });
 });
