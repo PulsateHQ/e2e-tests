@@ -13,7 +13,10 @@ import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api
 import { getCardWithApi } from '@_src/api/factories/mobile.notifications.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
+import {
+  getCampaignBackCardStatsWithApi,
+  getCampaignStatsWithApi
+} from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
 import {
@@ -24,7 +27,8 @@ import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.mode
 import {
   createCampaignFeedOneButtonBackWithDismiss,
   createCampaignFeedOneButtonToDeeplinkWithImage,
-  createCampaignFeedOneButtonToUrl
+  createCampaignFeedOneButtonToUrl,
+  createCampaignFeedTwoButtonsWithBackAndDeeplink
 } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import { startMobileSessionFeedPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
@@ -512,11 +516,6 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
-    await deleteAllDeeplinks(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-
     // Preparing payload for campaign creation
     createCampaignFeedOneButtonBackWithDismiss.segment_ids = [
       createSegmentResponseJson.segment.id
@@ -767,14 +766,15 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       false
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignResponseJson.id,
-      1,
-      1,
-      1
-    );
+    const getCampaignStatsWithWaitResponse =
+      await getCampaignBackCardStatsWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        createCampaignResponseJson.id,
+        1,
+        1,
+        1
+      );
 
     const getCampaignStatsWithWaitResponseJson =
       await getCampaignStatsWithWaitResponse.json();
@@ -833,28 +833,50 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
+    // Preparing payload for campaign creation
+
     await deleteAllDeeplinks(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
 
-    // Preparing payload for campaign creation
-    createCampaignFeedOneButtonBackWithDismiss.segment_ids = [
+    const createDeeplinkResponse = await createDeeplinkWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      {
+        nickname: 'Plawright',
+        target: `${apiUrls.campaigns.v2.base}`
+      }
+    );
+
+    const updateDeeplinkResponse = await updateDeeplinkWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createDeeplinkResponse.id,
+      {
+        nickname: 'Plawright Campaign Deeplink',
+        target: `${apiUrls.campaigns.v2.base}`
+      }
+    );
+
+    createCampaignFeedTwoButtonsWithBackAndDeeplink.segment_ids = [
       createSegmentResponseJson.segment.id
     ];
+    createCampaignFeedTwoButtonsWithBackAndDeeplink.card_notification.back_parts.call_to_action.buttons[0].destination =
+      updateDeeplinkResponse.id;
 
     // Create Campaign
 
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonBackWithDismiss
+      createCampaignFeedTwoButtonsWithBackAndDeeplink
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignFeedOneButtonBackWithDismiss.name
+      createCampaignFeedTwoButtonsWithBackAndDeeplink.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -914,8 +936,21 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     // Validate call to action part matches campaign configuration
     const campaignCallToAction =
       createCampaignResponseJson.card_notification.front_parts.call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    // Button 1
+    expect(callToActionPart.attrs[0].label).toBe(
+      campaignCallToAction.buttons[0].label
+    );
+    expect(callToActionPart.attrs[0].destination).toBe(
+      campaignCallToAction.buttons[0].destination
+    );
+
+    // Button 2
+    expect(callToActionPart.attrs[1].label).toBe(
+      campaignCallToAction.buttons[1].label
+    );
+    expect(callToActionPart.attrs[1].destination).toBe(
+      campaignCallToAction.buttons[1].destination
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
@@ -964,20 +999,24 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       (part) => part.type === 'image'
     );
 
-    const headingPartBack = getCardWithApiResponseJson.back.find(
-      (part) => part.type === 'heading'
-    );
-
-    const tablePartBack = getCardWithApiResponseJson.back.find(
-      (part) => part.type === 'table'
-    );
-
     // Validate call to action part matches campaign configuration
     const campaignCallToActionBack =
       createCampaignResponseJson.card_notification.back_parts.call_to_action;
-    expect(callToActionPartBack.active).toBe(campaignCallToActionBack.active);
-    expect(callToActionPartBack.position).toBe(
-      campaignCallToActionBack.position
+
+    // Button 1
+    expect(callToActionPartBack.attrs[0].label).toBe(
+      campaignCallToActionBack.buttons[0].label
+    );
+    expect(callToActionPartBack.attrs[0].destination).toBe(
+      campaignCallToActionBack.buttons[0].destination
+    );
+
+    // Button 2
+    expect(callToActionPartBack.attrs[1].label).toBe(
+      campaignCallToActionBack.buttons[1].label
+    );
+    expect(callToActionPartBack.attrs[1].destination).toBe(
+      campaignCallToActionBack.buttons[1].destination
     );
 
     // Validate button attributes match exactly
@@ -1015,22 +1054,6 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     expect(imagePartBack.active).toBe(campaignImageBack.active);
     expect(imagePartBack.position).toBe(campaignImageBack.position);
 
-    // Validate table part matches campaign configuration
-    const campaignTableBack =
-      createCampaignResponseJson.card_notification.back_parts.table;
-    expect(tablePartBack.active).toBe(campaignTableBack.active);
-    expect(tablePartBack.position).toBe(campaignTableBack.position);
-    expect(tablePartBack.attrs[0].rows[0].value).toBe(
-      campaignTableBack.rows[0].value
-    );
-    expect(tablePartBack.attrs[0].rows[0].label).toBe(
-      campaignTableBack.rows[0].label
-    );
-
-    expect(headingPartBack.active).toBe(campaignTableBack.active);
-    expect(headingPartBack.position).toBe(campaignTableBack.position);
-    expect(headingPartBack.attrs[0].text).toBe(campaignTableBack.heading);
-
     await createWebSdkStatistics(
       request,
       APIE2ETokenSDKModel.apiE2EAppIdSdk,
@@ -1046,7 +1069,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       APIE2ETokenSDKModel.apiE2EAppKeySdk,
       alias,
       createCampaignResponseJson.guid,
-      WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_ONE
+      WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_TWO
     );
 
     await createWebSdkStatistics(
@@ -1064,7 +1087,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       APIE2ETokenSDKModel.apiE2EAppKeySdk,
       alias,
       createCampaignResponseJson.guid,
-      WebSdkStatisticsAction.CARD_BACK_BUTTON_CLICK_ONE
+      WebSdkStatisticsAction.CARD_BACK_BUTTON_CLICK_TWO
     );
 
     await getInboxMessagesWithApi(
@@ -1088,14 +1111,16 @@ test.describe('Feed HTML Post Campaign Tests', () => {
       false
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignResponseJson.id,
-      1,
-      1,
-      1
-    );
+    const getCampaignStatsWithWaitResponse =
+      await getCampaignBackCardStatsWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        createCampaignResponseJson.id,
+        1,
+        1,
+        0,
+        1
+      );
 
     const getCampaignStatsWithWaitResponseJson =
       await getCampaignStatsWithWaitResponse.json();
@@ -1124,6 +1149,9 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     ).toHaveProperty('total_uniq', 1);
     expect(
       getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
+    ).toHaveProperty('total_uniq', 0);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_two
     ).toHaveProperty('total_uniq', 1);
 
     expect(
@@ -1131,6 +1159,186 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     ).toHaveProperty('total_uniq', 1);
     expect(
       getCampaignStatsWithWaitResponseJson.card.back.back_button_click_one
+    ).toHaveProperty('total_uniq', 0);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_two
+    ).toHaveProperty('total_uniq', 1);
+  });
+
+  test('should create an HTML Feed campaign with 2 users but only 1 user clicks the button', async ({
+    request
+  }) => {
+    const numberOfUsers = 2;
+
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    // Create Segment
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload
+    );
+    const createSegmentResponseJson = await createSegmentResponse.json();
+
+    // Create Campaign
+    createCampaignFeedOneButtonToUrl.segment_ids = [
+      createSegmentResponseJson.segment.id
+    ];
+    const createCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignFeedOneButtonToUrl
+    );
+    const createCampaignResponseJson = await createCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createCampaignResponseJson.name).toBe(
+      createCampaignFeedOneButtonToUrl.name
+    );
+
+    const getUsersResponse = await getAllUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getUsersResponseJson = await getUsersResponse.json();
+
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const alias = getUsersResponseJson.data[0].alias;
+    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+
+    // Start Mobile Session
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      startMobileSessionFeedPayload
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      1
+    );
+
+    const getCardWithApiResponse = await getCardWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      createCampaignResponseJson.guid
+    );
+
+    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+
+    // Validate card matches campaign configuration
+    expect(getCardWithApiResponseJson.campaign_guid).toBe(
+      createCampaignResponseJson.guid
+    );
+
+    // Find parts in card response
+    const callToActionPart = getCardWithApiResponseJson.front.find(
+      (part) => part.type === 'call_to_action'
+    );
+    const textPart = getCardWithApiResponseJson.front.find(
+      (part) => part.type === 'text'
+    );
+
+    // Validate call to action part matches campaign configuration
+    const campaignCallToAction =
+      createCampaignResponseJson.card_notification.front_parts.call_to_action;
+    expect(callToActionPart.active).toBe(campaignCallToAction.active);
+    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+
+    // Validate button attributes match exactly
+    const buttonAttrs = callToActionPart.attrs[0];
+    const campaignButton = campaignCallToAction.buttons[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+
+    // Validate text part matches campaign configuration
+    const campaignText =
+      createCampaignResponseJson.card_notification.front_parts.text;
+    expect(textPart.active).toBe(campaignText.active);
+    expect(textPart.position).toBe(campaignText.position);
+    expect(textPart.attrs[0].text).toBe(campaignText.text);
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_IMPRESSION
+    );
+
+    await createWebSdkStatistics(
+      request,
+      APIE2ETokenSDKModel.apiE2EAppIdSdk,
+      APIE2ETokenSDKModel.apiE2EAppKeySdk,
+      alias,
+      createCampaignResponseJson.guid,
+      WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_ONE
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      0
+    );
+
+    const getCardWithApiAfterReadingResponse = await getCardWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      createCampaignResponseJson.guid
+    );
+
+    const getCardWithApiAfterReadingResponseJson =
+      await getCardWithApiAfterReadingResponse.json();
+
+    expect(getCardWithApiAfterReadingResponseJson.is_campaign_unread).toBe(
+      false
+    );
+
+    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      2
+    );
+
+    const getCampaignStatsWithWaitResponseJson =
+      await getCampaignStatsWithWaitResponse.json();
+
+    // Assert Validate Response Body
+    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('card');
+    expect(getCampaignStatsWithWaitResponseJson.card.send).toHaveProperty(
+      'total_uniq',
+      2
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.delivery).toHaveProperty(
+      'total_uniq',
+      2
+    );
+    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_impression
+    ).toHaveProperty('total_uniq', 1);
+    expect(
+      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
     ).toHaveProperty('total_uniq', 1);
   });
 });
