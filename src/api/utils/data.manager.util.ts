@@ -19,7 +19,7 @@ import {
 } from '@_src/api/factories/users.api.factory';
 import { UserRequest } from '@_src/api/models/user.model';
 import { userRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
-import { generateCsvContentForUsersImport } from '@_src/api/test-data/cms/users/generate-user.payload';
+import { generateCsvContentForUsersImport } from '@_src/api/test-data/cms/users/generate-random-users.payload';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, test } from '@playwright/test';

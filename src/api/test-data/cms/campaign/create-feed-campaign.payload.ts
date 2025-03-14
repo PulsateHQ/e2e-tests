@@ -85,91 +85,90 @@ export const createCampaignFeedOneButtonToUrl: CreateCampaignPayload = {
   campaign_expiry: false
 };
 
-export const createCampaignFeedOneButtonToDeeplinkWithImage: CreateCampaignPayload =
-  {
-    state_machine_notifications_state: 'initial',
-    duplication_source_id: '',
-    type: 'CardInboxCampaign',
-    last_builder_page: '1',
-    name: `Feed_Post_Campaign_Button_Deeplink_${faker.lorem.word()}`,
-    control_group: null,
-    goals: [
-      {
-        primary: true,
-        event_kind: 'open_app',
-        event_identifier: null,
-        expiry_time_unit: 'hours',
-        expiry_time_value: 1
-      }
-    ],
-    card_notification: {
-      front_parts: {
-        admin_header_with_message: {
-          side: 'front',
-          position: -1,
-          active: false,
-          message: '',
-          admin: {
-            job_title: null,
-            name: null,
-            avatar_url: null,
-            s_id: null
-          }
-        },
-        image: {
-          side: 'front',
-          name: '1.jpeg',
-          active: true,
-          position: 0,
-          url: 'https://pulsate-campaign-attachments.s3.eu-west-1.amazonaws.com/643e3df7b58b2c3a5e6bd605/2025-03-05/1741185510_1.jpeg'
-        },
-        headline: {
-          side: 'front',
-          active: true,
-          text: `Headline_Feed_Post_Campaigns_${faker.lorem.word()}`,
-          position: 1
-        },
-        text: {
-          side: 'front',
-          active: true,
-          text: `Text_Feed_Post_Campaigns_${faker.lorem.word()}`,
-          position: 2
-        },
-        call_to_action: {
-          buttons: [
-            {
-              label: `Button_Deeplink_${faker.lorem.word()}`,
-              destination_type: 'deeplink',
-              destination: '',
-              txt_color: '',
-              btn_color: ''
-            }
-          ],
-          side: 'front',
-          active: true
+export const createCampaignFeedOneButtonWithDeeplink: CreateCampaignPayload = {
+  state_machine_notifications_state: 'initial',
+  duplication_source_id: '',
+  type: 'CardInboxCampaign',
+  last_builder_page: '1',
+  name: `Feed_Post_Campaign_Button_Deeplink_${faker.lorem.word()}`,
+  control_group: null,
+  goals: [
+    {
+      primary: true,
+      event_kind: 'open_app',
+      event_identifier: null,
+      expiry_time_unit: 'hours',
+      expiry_time_value: 1
+    }
+  ],
+  card_notification: {
+    front_parts: {
+      admin_header_with_message: {
+        side: 'front',
+        position: -1,
+        active: false,
+        message: '',
+        admin: {
+          job_title: null,
+          name: null,
+          avatar_url: null,
+          s_id: null
         }
       },
-      type: 'card',
-      goals: []
+      image: {
+        side: 'front',
+        name: '1.jpeg',
+        active: true,
+        position: 0,
+        url: 'https://pulsate-campaign-attachments.s3.eu-west-1.amazonaws.com/643e3df7b58b2c3a5e6bd605/2025-03-05/1741185510_1.jpeg'
+      },
+      headline: {
+        side: 'front',
+        active: true,
+        text: `Headline_Feed_Post_Campaigns_${faker.lorem.word()}`,
+        position: 1
+      },
+      text: {
+        side: 'front',
+        active: true,
+        text: `Text_Feed_Post_Campaigns_${faker.lorem.word()}`,
+        position: 2
+      },
+      call_to_action: {
+        buttons: [
+          {
+            label: `Button_Deeplink_${faker.lorem.word()}`,
+            destination_type: 'deeplink',
+            destination: '',
+            txt_color: '',
+            btn_color: ''
+          }
+        ],
+        side: 'front',
+        active: true
+      }
     },
-    segment_ids: [],
-    beacon_ids: [],
-    geofence_ids: [],
-    in_app_event_names: [],
-    beacon_events: {},
-    geofence_events: {},
-    geofence_dwelling_times: {},
-    start_now: true,
-    start_at: new Date().toISOString().slice(0, 19),
-    end_at: '',
-    time_frame: 'weeks',
-    time_value: '',
-    time_zone_name: 'Europe/Warsaw',
-    time_zone_offset: '+01:00',
-    delivery: 'current',
-    campaign_limits: false,
-    campaign_expiry: false
-  };
+    type: 'card',
+    goals: []
+  },
+  segment_ids: [],
+  beacon_ids: [],
+  geofence_ids: [],
+  in_app_event_names: [],
+  beacon_events: {},
+  geofence_events: {},
+  geofence_dwelling_times: {},
+  start_now: true,
+  start_at: new Date().toISOString().slice(0, 19),
+  end_at: '',
+  time_frame: 'weeks',
+  time_value: '',
+  time_zone_name: 'Europe/Warsaw',
+  time_zone_offset: '+01:00',
+  delivery: 'current',
+  campaign_limits: false,
+  campaign_expiry: false
+};
 
 export const createCampaignFeedOneButtonBackWithDismiss: CreateCampaignPayload =
   {

@@ -17,10 +17,10 @@ import {
 } from '@_src/api/models/admin.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
-import { startMobileSessionPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
-import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile/users/card/feed-post-front-button-click.payload';
-import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile/users/card/feed-post-impression.payload';
-import { updateMobileUserPayload } from '@_src/api/test-data/mobile/users/update/mobile.users.update.payload';
+import { feedPostFrontButtonClickOneAction } from '@_src/api/test-data/mobile/actions/feed-post-front-button-click.payload';
+import { feedPostFrontImpressionAction } from '@_src/api/test-data/mobile/actions/feed-post-impression.payload';
+import { startMobileSessionFeedPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
+import { updateMobileFeedUserPayload } from '@_src/api/test-data/mobile/update/update-user.payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -107,15 +107,15 @@ test.describe('Feed Post Campaign Tests', () => {
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionPayload.alias = getUsersResponseJson.data[0].alias;
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionPayload
+      startMobileSessionFeedPayload
     );
 
     await getInboxMessagesWithApi(
@@ -138,7 +138,7 @@ test.describe('Feed Post Campaign Tests', () => {
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      { ...updateMobileUserPayload, user_actions: userActions }
+      { ...updateMobileFeedUserPayload, user_actions: userActions }
     );
 
     await getInboxMessagesWithApi(
