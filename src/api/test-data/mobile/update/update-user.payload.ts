@@ -114,3 +114,42 @@ export const updateMobileUserPayload: UpdateMobileUserPayload = {
     userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE]
   ]
 };
+
+/**
+ * Creates a customized mobile user update payload with unique user data
+ * @param overrides - Object with properties to override in the base payload
+ * @param basePayload - The base payload to use (defaults to updateMobileInAppUserPayload)
+ * @returns A new user update payload with unique values
+ */
+export const createUserUpdatePayload = (
+  overrides: Partial<UpdateMobileUserPayload> = {},
+  basePayload = updateMobileInAppUserPayload
+): UpdateMobileUserPayload => {
+  // Generate unique user data
+  const email = faker.internet.email();
+  const phone = faker.phone.number();
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const gender = faker.person.sex();
+
+  return {
+    ...JSON.parse(JSON.stringify(basePayload)), // Deep clone to avoid modifying original
+    occurred_at: Math.floor(Date.now() / 1000),
+    user: {
+      ...basePayload.user,
+      email,
+      firstName,
+      lastName,
+      gender,
+      phone,
+      device: {
+        ...basePayload.user.device,
+        email,
+        phone,
+        token: faker.string.uuid()
+      }
+    },
+    user_actions: overrides.user_actions || [],
+    ...overrides
+  };
+};

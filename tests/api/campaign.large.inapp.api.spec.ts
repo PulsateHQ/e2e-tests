@@ -19,11 +19,16 @@ import {
 import { InAppEvents } from '@_src/api/models/mobile.users.model';
 import {
   createCampaignInAppLargeButtonWithDismiss,
-  createCampaignInAppLargeButtonWithUrl
+  createCampaignInAppLargeButtonWithUrl,
+  createCampaignInAppLargeWithTwoButtons
 } from '@_src/api/test-data/cms/campaign/create-inapp-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
-import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import {
+  createMobileSessionPayload,
+  startMobileSessionInAppPayload
+} from '@_src/api/test-data/mobile/sessions/start-session.payload';
+import {
+  createUserUpdatePayload,
   updateMobileInAppUserPayload,
   userActions
 } from '@_src/api/test-data/mobile/update/update-user.payload';
@@ -114,18 +119,28 @@ test.describe('Large In-App Campaign', () => {
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionInAppPayload.alias = getUsersResponseJson.data[0].alias;
-    updateMobileInAppUserPayload.alias = getUsersResponseJson.data[0].alias;
+    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
-    // Start Mobile Session
+    // First user - will perform actions
+    const firstUser = getUsersResponseJson.data[0];
+    // Second user - will not perform any actions
+    const secondUser = getUsersResponseJson.data[1];
+
+    // Start session for first user
+    const firstUserSessionPayload = {
+      ...startMobileSessionInAppPayload,
+      alias: firstUser.alias
+    };
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionInAppPayload
+      firstUserSessionPayload
     );
 
-    const updateMobileInAppUserPayloadWithActions = {
+    // First user performs actions
+    const firstUserUpdatePayload = {
       ...updateMobileInAppUserPayload,
+      alias: firstUser.alias,
       user_actions: [
         {
           ...userActions[InAppEvents.IN_APP_DELIVERY],
@@ -145,7 +160,31 @@ test.describe('Large In-App Campaign', () => {
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      updateMobileInAppUserPayloadWithActions
+      firstUserUpdatePayload
+    );
+
+    // Start session for second user
+    const secondUserSessionPayload = {
+      ...startMobileSessionInAppPayload,
+      alias: secondUser.alias
+    };
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserSessionPayload
+    );
+
+    // Second user doesn't perform any actions
+    const secondUserUpdatePayload = {
+      ...updateMobileInAppUserPayload,
+      alias: secondUser.alias,
+      user_actions: [] // No actions for this user
+    };
+
+    await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserUpdatePayload
     );
 
     const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
@@ -261,18 +300,28 @@ test.describe('Large In-App Campaign', () => {
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionInAppPayload.alias = getUsersResponseJson.data[0].alias;
-    updateMobileInAppUserPayload.alias = getUsersResponseJson.data[0].alias;
+    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
-    // Start Mobile Session
+    // First user - will perform actions
+    const firstUser = getUsersResponseJson.data[0];
+    // Second user - will not perform any actions
+    const secondUser = getUsersResponseJson.data[1];
+
+    // Start session for first user
+    const firstUserSessionPayload = {
+      ...startMobileSessionInAppPayload,
+      alias: firstUser.alias
+    };
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionInAppPayload
+      firstUserSessionPayload
     );
 
-    const updateMobileInAppUserPayloadWithActions = {
+    // First user performs actions
+    const firstUserUpdatePayload = {
       ...updateMobileInAppUserPayload,
+      alias: firstUser.alias,
       user_actions: [
         {
           ...userActions[InAppEvents.IN_APP_DELIVERY],
@@ -292,7 +341,31 @@ test.describe('Large In-App Campaign', () => {
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      updateMobileInAppUserPayloadWithActions
+      firstUserUpdatePayload
+    );
+
+    // Start session for second user
+    const secondUserSessionPayload = {
+      ...startMobileSessionInAppPayload,
+      alias: secondUser.alias
+    };
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserSessionPayload
+    );
+
+    // Second user doesn't perform any actions
+    const secondUserUpdatePayload = {
+      ...updateMobileInAppUserPayload,
+      alias: secondUser.alias,
+      user_actions: [] // No actions for this user
+    };
+
+    await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserUpdatePayload
     );
 
     const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
@@ -381,18 +454,28 @@ test.describe('Large In-App Campaign', () => {
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionInAppPayload.alias = getUsersResponseJson.data[0].alias;
-    updateMobileInAppUserPayload.alias = getUsersResponseJson.data[0].alias;
+    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
-    // Start Mobile Session
+    // First user - will perform actions
+    const firstUser = getUsersResponseJson.data[0];
+    // Second user - will not perform any actions
+    const secondUser = getUsersResponseJson.data[1];
+
+    // Start session for first user
+    const firstUserSessionPayload = {
+      ...startMobileSessionInAppPayload,
+      alias: firstUser.alias
+    };
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionInAppPayload
+      firstUserSessionPayload
     );
 
-    const updateMobileInAppUserPayloadWithActions = {
+    // First user performs actions
+    const firstUserUpdatePayload = {
       ...updateMobileInAppUserPayload,
+      alias: firstUser.alias,
       user_actions: [
         {
           ...userActions[InAppEvents.IN_APP_DELIVERY],
@@ -412,7 +495,31 @@ test.describe('Large In-App Campaign', () => {
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      updateMobileInAppUserPayloadWithActions
+      firstUserUpdatePayload
+    );
+
+    // Start session for second user
+    const secondUserSessionPayload = {
+      ...startMobileSessionInAppPayload,
+      alias: secondUser.alias
+    };
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserSessionPayload
+    );
+
+    // Second user doesn't perform any actions
+    const secondUserUpdatePayload = {
+      ...updateMobileInAppUserPayload,
+      alias: secondUser.alias,
+      user_actions: [] // No actions for this user
+    };
+
+    await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserUpdatePayload
     );
 
     const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
@@ -501,18 +608,30 @@ test.describe('Large In-App Campaign', () => {
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionInAppPayload.alias = getUsersResponseJson.data[0].alias;
-    updateMobileInAppUserPayload.alias = getUsersResponseJson.data[0].alias;
+    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
-    // Start Mobile Session
+    // First user - will perform actions
+    const firstUser = getUsersResponseJson.data[0];
+    // Second user - will not perform any actions
+    const secondUser = getUsersResponseJson.data[1];
+
+    // Start session for first user
+    const firstUserSessionPayload = createMobileSessionPayload({
+      alias: firstUser.alias,
+      device: {
+        ...startMobileSessionInAppPayload.device
+      }
+    });
+
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionInAppPayload
+      firstUserSessionPayload
     );
 
-    const updateMobileInAppUserPayloadWithActions = {
-      ...updateMobileInAppUserPayload,
+    // First user performs actions
+    const firstUserUpdatePayload = createUserUpdatePayload({
+      alias: firstUser.alias,
       user_actions: [
         {
           ...userActions[InAppEvents.IN_APP_DELIVERY],
@@ -527,19 +646,44 @@ test.describe('Large In-App Campaign', () => {
           guid: createCampaignResponseJson.guid
         }
       ]
-    };
+    });
 
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      updateMobileInAppUserPayloadWithActions
+      firstUserUpdatePayload
+    );
+
+    // Start session for second user
+    const secondUserSessionPayload = createMobileSessionPayload({
+      alias: secondUser.alias,
+      device: {
+        ...startMobileSessionInAppPayload.device
+      }
+    });
+
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserSessionPayload
+    );
+
+    // Second user doesn't perform any actions
+    const secondUserUpdatePayload = createUserUpdatePayload({
+      alias: secondUser.alias
+    });
+
+    await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserUpdatePayload
     );
 
     const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      1
+      2
     );
 
     const getCampaignStatsWithWaitResponseJson =
@@ -553,7 +697,7 @@ test.describe('Large In-App Campaign', () => {
     );
     expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
       'total_uniq',
-      2
+      1
     );
     expect(getCampaignStatsWithWaitResponseJson.in_app.bounce).toHaveProperty(
       'total_uniq',
@@ -577,5 +721,215 @@ test.describe('Large In-App Campaign', () => {
     expect(
       getCampaignStatsWithWaitResponseJson.in_app.impression
     ).toHaveProperty('total_uniq', 1);
+  });
+
+  test('should create an In-App Large campaign with two buttons where one user clicks deeplink and another dismisses', async ({
+    request
+  }) => {
+    const numberOfUsers = 2;
+
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    // Create Segment
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload
+    );
+    const createSegmentResponseJson = await createSegmentResponse.json();
+
+    // Delete any existing deeplinks to avoid conflicts
+    await deleteAllDeeplinks(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+
+    // Create a deeplink for the campaign
+    const createDeeplinkResponse = await createDeeplinkWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      {
+        nickname: 'Two Button Test Deeplink',
+        target: `${apiUrls.campaigns.v2.base}`
+      }
+    );
+
+    // Prepare the campaign with the segment and deeplink
+    createCampaignInAppLargeWithTwoButtons.segment_ids = [
+      createSegmentResponseJson.segment.id
+    ];
+    createCampaignInAppLargeWithTwoButtons.in_app_notification.large.call_to_action.buttons[0].destination =
+      createDeeplinkResponse.id;
+
+    // Create the campaign
+    const createCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignInAppLargeWithTwoButtons
+    );
+    const createCampaignResponseJson = await createCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createCampaignResponseJson.name).toBe(
+      createCampaignInAppLargeWithTwoButtons.name
+    );
+
+    // Get users
+    const getUsersResponse = await getAllUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getUsersResponseJson = await getUsersResponse.json();
+
+    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
+
+    // First user - will click the deeplink button
+    const firstUser = getUsersResponseJson.data[0];
+    // Second user - will click the dismiss button
+    const secondUser = getUsersResponseJson.data[1];
+
+    // Start session for first user
+    const firstUserSessionPayload = createMobileSessionPayload({
+      alias: firstUser.alias,
+      device: {
+        ...startMobileSessionInAppPayload.device
+      }
+    });
+
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      firstUserSessionPayload
+    );
+
+    // First user sees and clicks the deeplink button
+    const firstUserUpdatePayload = createUserUpdatePayload({
+      alias: firstUser.alias,
+      user_actions: [
+        {
+          ...userActions[InAppEvents.IN_APP_DELIVERY],
+          guid: createCampaignResponseJson.guid
+        },
+        {
+          ...userActions[InAppEvents.IN_APP_IMPRESSION],
+          guid: createCampaignResponseJson.guid
+        },
+        {
+          ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE],
+          guid: createCampaignResponseJson.guid
+        }
+      ]
+    });
+
+    await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      firstUserUpdatePayload
+    );
+
+    // Start session for second user with different device type
+    const secondUserSessionPayload = createMobileSessionPayload({
+      alias: secondUser.alias,
+      device: {
+        ...startMobileSessionInAppPayload.device
+      }
+    });
+
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserSessionPayload
+    );
+
+    // Second user sees and clicks the dismiss button
+    const secondUserUpdatePayload = createUserUpdatePayload({
+      alias: secondUser.alias,
+      user_actions: [
+        {
+          ...userActions[InAppEvents.IN_APP_DELIVERY],
+          guid: createCampaignResponseJson.guid
+        },
+        {
+          ...userActions[InAppEvents.IN_APP_IMPRESSION],
+          guid: createCampaignResponseJson.guid
+        },
+        {
+          ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_TWO],
+          guid: createCampaignResponseJson.guid
+        }
+      ]
+    });
+
+    await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserUpdatePayload
+    );
+
+    // Get campaign stats with wait for both users to be processed
+    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      2
+    );
+
+    const getCampaignStatsWithWaitResponseJson =
+      await getCampaignStatsWithWaitResponse.json();
+
+    // Assert Validate Response Body
+    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('in_app');
+
+    // Both users should have received and seen the campaign
+    expect(getCampaignStatsWithWaitResponseJson.in_app.send).toHaveProperty(
+      'total_uniq',
+      2
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
+      'total_uniq',
+      2
+    );
+    expect(
+      getCampaignStatsWithWaitResponseJson.in_app.impression
+    ).toHaveProperty('total_uniq', 2);
+
+    // One user clicked the deeplink button
+    expect(
+      getCampaignStatsWithWaitResponseJson.in_app.button_click_one
+    ).toHaveProperty('total_uniq', 1);
+
+    // One user clicked dismiss
+    expect(getCampaignStatsWithWaitResponseJson.in_app.dismiss).toHaveProperty(
+      'total_uniq',
+      0
+    );
+
+    expect(
+      getCampaignStatsWithWaitResponseJson.in_app.button_click_one
+    ).toHaveProperty('total_uniq', 1);
+
+    expect(
+      getCampaignStatsWithWaitResponseJson.in_app.button_click_two
+    ).toHaveProperty('total_uniq', 1);
+
+    expect(getCampaignStatsWithWaitResponseJson.in_app.clicks).toHaveProperty(
+      'total_uniq',
+      2
+    );
+
+    // No errors or bounces
+    expect(getCampaignStatsWithWaitResponseJson.in_app.bounce).toHaveProperty(
+      'total_uniq',
+      0
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.error).toHaveProperty(
+      'total_uniq',
+      0
+    );
   });
 });
