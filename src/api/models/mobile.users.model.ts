@@ -11,6 +11,7 @@ export interface Device {
   push_permission: boolean;
   location_permission: boolean;
   background_location_permission: boolean;
+  in_app_permission?: boolean;
 }
 
 export interface User {

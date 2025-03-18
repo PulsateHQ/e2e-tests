@@ -670,7 +670,20 @@ test.describe('Large In-App Campaign', () => {
 
     // Second user doesn't perform any actions
     const secondUserUpdatePayload = createUserUpdatePayload({
-      alias: secondUser.alias
+      alias: secondUser.alias,
+      user: {
+        ...updateMobileInAppUserPayload.user,
+        device: {
+          ...updateMobileInAppUserPayload.user.device,
+          in_app_permission: false
+        }
+      },
+      user_actions: [
+        {
+          ...userActions[InAppEvents.IN_APP_DELIVERY],
+          guid: createCampaignResponseJson.guid
+        }
+      ]
     });
 
     await updateMobileUserWithApi(
@@ -697,11 +710,11 @@ test.describe('Large In-App Campaign', () => {
     );
     expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
       'total_uniq',
-      1
+      2
     );
     expect(getCampaignStatsWithWaitResponseJson.in_app.bounce).toHaveProperty(
       'total_uniq',
-      0
+      1
     );
     expect(getCampaignStatsWithWaitResponseJson.in_app.error).toHaveProperty(
       'total_uniq',

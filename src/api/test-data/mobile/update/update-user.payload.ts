@@ -27,7 +27,8 @@ export const updateMobileFeedUserPayload: UpdateMobileUserPayload = {
       timezone: 'GMT+01:00',
       push_permission: true,
       location_permission: true,
-      background_location_permission: true
+      background_location_permission: true,
+      in_app_permission: true
     },
     email: faker.internet.email(),
     firstName: faker.person.firstName(),
@@ -61,7 +62,8 @@ export const updateMobileInAppUserPayload: Omit<
       timezone: 'GMT+01:00',
       push_permission: true,
       location_permission: true,
-      background_location_permission: true
+      background_location_permission: true,
+      in_app_permission: true
     },
     email: faker.internet.email(),
     firstName: faker.person.firstName(),
@@ -146,7 +148,8 @@ export const createUserUpdatePayload = (
         ...basePayload.user.device,
         email,
         phone,
-        token: faker.string.uuid()
+        token: faker.string.uuid(),
+        in_app_permission: basePayload.user.device.in_app_permission
       }
     },
     user_actions: overrides.user_actions || [],
