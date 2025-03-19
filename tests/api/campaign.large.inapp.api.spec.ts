@@ -161,30 +161,6 @@ test.describe('Large In-App Campaign', () => {
       firstUserUpdatePayload
     );
 
-    // Start session for second user
-    const secondUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
-      alias: secondUser.alias
-    };
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      secondUserSessionPayload
-    );
-
-    // Second user doesn't perform any actions
-    const secondUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
-      alias: secondUser.alias,
-      user_actions: [] // No actions for this user
-    };
-
-    await updateMobileUserWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      secondUserUpdatePayload
-    );
-
     const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -342,30 +318,6 @@ test.describe('Large In-App Campaign', () => {
       firstUserUpdatePayload
     );
 
-    // Start session for second user
-    const secondUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
-      alias: secondUser.alias
-    };
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      secondUserSessionPayload
-    );
-
-    // Second user doesn't perform any actions
-    const secondUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
-      alias: secondUser.alias,
-      user_actions: [] // No actions for this user
-    };
-
-    await updateMobileUserWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      secondUserUpdatePayload
-    );
-
     const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -494,30 +446,6 @@ test.describe('Large In-App Campaign', () => {
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       firstUserUpdatePayload
-    );
-
-    // Start session for second user
-    const secondUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
-      alias: secondUser.alias
-    };
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      secondUserSessionPayload
-    );
-
-    // Second user doesn't perform any actions
-    const secondUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
-      alias: secondUser.alias,
-      user_actions: [] // No actions for this user
-    };
-
-    await updateMobileUserWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      secondUserUpdatePayload
     );
 
     const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
