@@ -65,14 +65,12 @@ test.describe('Large In-App Campaign', () => {
   });
 
   test.beforeEach(async ({ request }) => {
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
-
-    await deleteAllSegments(
+    await deleteAllCampaigns(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
-
-    await deleteAllCampaigns(
+    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllSegments(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );

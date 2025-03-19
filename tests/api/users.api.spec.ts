@@ -26,6 +26,7 @@ import {
 } from '@_src/api/test-data/cms/custom-attributes/custom-attribute.payload';
 import { userRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
 import {
+  deleteAllCampaigns,
   deleteAllSegments,
   deleteAllUsers,
   getFreshUserPayload,
@@ -40,7 +41,15 @@ test.describe('User Management', () => {
   };
 
   test.beforeEach(async ({ request }) => {
+    await deleteAllCampaigns(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllSegments(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
   });
 
   test('should import a single user and validate the user details', async ({
