@@ -358,7 +358,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Large campaign with a dismiss button and click it', async ({
+  test('should create a In-App Large campaign with dismiss button and verify user clicks the X close button instead of action button', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -864,7 +864,6 @@ test.describe('Large In-App Campaign', () => {
       2
     );
 
-    // No errors or bounces
     expect(getCampaignStatsWithWaitResponseJson.in_app.bounce).toHaveProperty(
       'total_uniq',
       0

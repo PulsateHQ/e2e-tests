@@ -22,6 +22,7 @@ import {
   createCampaignInAppLargeButtonWithUrl,
   createCampaignInAppLargeWithTwoButtons,
   createCampaignInAppSmallBottomWithDeeplink,
+  createCampaignInAppSmallTopWithDismiss,
   createCampaignInAppSmallTopWithUrl
 } from '@_src/api/test-data/cms/campaign/create-inapp-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
@@ -77,7 +78,7 @@ test.describe('Large In-App Campaign', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
   });
-  test('should create an In-App Small Top campaign with a URL button and click it', async ({
+  test('should create an In-App Small Top campaign with a URL banner and click it', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -205,7 +206,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Small Bottom campaign with a Deeplink button and click it', async ({
+  test('should create an In-App Small Bottom campaign with a Deeplink banner and click it', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -360,7 +361,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Large campaign with a dismiss button and click it', async ({
+  test('should create an In-App Small Top campaign with a dismiss banner, but not click the banner button, but swipe to dismiss', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -381,19 +382,19 @@ test.describe('Large In-App Campaign', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignInAppLargeButtonWithDismiss.segment_ids = [
+    createCampaignInAppSmallTopWithDismiss.segment_ids = [
       createSegmentResponseJson.segment.id
     ];
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeButtonWithDismiss
+      createCampaignInAppSmallTopWithDismiss
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeButtonWithDismiss.name
+      createCampaignInAppSmallTopWithDismiss.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -418,7 +419,7 @@ test.describe('Large In-App Campaign', () => {
       firstUserSessionPayload
     );
 
-    // First user performs actions of dissming inApp by clicking X button, but not clicking Action button
+    // First user performs actions of dissming inApp by swipe to dismiss
     const firstUserUpdatePayload = {
       ...updateMobileInAppUserPayload,
       alias: firstUser.alias,
