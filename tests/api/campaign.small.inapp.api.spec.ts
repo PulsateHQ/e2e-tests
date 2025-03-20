@@ -42,7 +42,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Large In-App Campaign', () => {
+test.describe('Small In-App Campaign', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
 
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
