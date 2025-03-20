@@ -93,6 +93,12 @@ export const userActions: Record<InAppEvents, UserAction> = {
     occurred_at_array: [currentTimestamp],
     type: 'campaign'
   },
+  [InAppEvents.IN_APP_BOUNCE]: {
+    guid: '',
+    key: InAppEvents.IN_APP_BOUNCE,
+    occurred_at_array: [currentTimestamp],
+    type: 'campaign'
+  },
   [InAppEvents.IN_APP_BUTTON_CLICK_ONE]: {
     guid: '',
     key: InAppEvents.IN_APP_BUTTON_CLICK_ONE,

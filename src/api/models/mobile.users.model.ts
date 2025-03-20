@@ -44,6 +44,7 @@ export enum InAppEvents {
   IN_APP_DELIVERY = 'in_app_delivery',
   IN_APP_IMPRESSION = 'in_app_impression',
   IN_APP_DISMISS = 'in_app_dismiss',
+  IN_APP_BOUNCE = 'in_app_bounce',
   IN_APP_BUTTON_CLICK_ONE = 'in_app_button_click_one',
   IN_APP_BUTTON_CLICK_TWO = 'in_app_button_click_two'
 }

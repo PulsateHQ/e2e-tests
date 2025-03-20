@@ -121,8 +121,6 @@ test.describe('Large In-App Campaign', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    // Second user - will not perform any actions
-    const secondUser = getUsersResponseJson.data[1];
 
     // Start session for first user
     const firstUserSessionPayload = {
@@ -278,8 +276,6 @@ test.describe('Large In-App Campaign', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    // Second user - will not perform any actions
-    const secondUser = getUsersResponseJson.data[1];
 
     // Start session for first user
     const firstUserSessionPayload = {
@@ -408,8 +404,6 @@ test.describe('Large In-App Campaign', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    // Second user - will not perform any actions
-    const secondUser = getUsersResponseJson.data[1];
 
     // Start session for first user
     const firstUserSessionPayload = {
@@ -512,22 +506,7 @@ test.describe('Large In-App Campaign', () => {
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
-    // Create Campaign
-    createCampaignInAppLargeButtonWithUrl.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    const createCampaignResponse = await createCampaignWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeButtonWithUrl
-    );
-    const createCampaignResponseJson = await createCampaignResponse.json();
-
-    // Assert Campaign Created
-    expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeButtonWithUrl.name
-    );
-
+    // Get users alias
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -540,6 +519,40 @@ test.describe('Large In-App Campaign', () => {
     const firstUser = getUsersResponseJson.data[0];
     // Second user - will not perform any actions
     const secondUser = getUsersResponseJson.data[1];
+
+    // adjust second user action on in_app permission
+    // Start session for second user
+    const secondUserSessionPayload = createMobileSessionPayload({
+      alias: secondUser.alias,
+      device: {
+        ...startMobileSessionInAppPayload.device,
+        in_app_permission: false
+      }
+    });
+
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      secondUserSessionPayload
+    );
+
+    // Create Campaign
+    createCampaignInAppLargeButtonWithUrl.segment_ids = [
+      createSegmentResponseJson.segment.id
+    ];
+
+    // Create campaign
+    const createCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignInAppLargeButtonWithUrl
+    );
+    const createCampaignResponseJson = await createCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createCampaignResponseJson.name).toBe(
+      createCampaignInAppLargeButtonWithUrl.name
+    );
 
     // Start session for first user
     const firstUserSessionPayload = createMobileSessionPayload({
@@ -580,20 +593,6 @@ test.describe('Large In-App Campaign', () => {
       firstUserUpdatePayload
     );
 
-    // Start session for second user
-    const secondUserSessionPayload = createMobileSessionPayload({
-      alias: secondUser.alias,
-      device: {
-        ...startMobileSessionInAppPayload.device
-      }
-    });
-
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      secondUserSessionPayload
-    );
-
     // Second user doesn't perform any actions
     const secondUserUpdatePayload = createUserUpdatePayload({
       alias: secondUser.alias,
@@ -607,6 +606,10 @@ test.describe('Large In-App Campaign', () => {
       user_actions: [
         {
           ...userActions[InAppEvents.IN_APP_DELIVERY],
+          guid: createCampaignResponseJson.guid
+        },
+        {
+          ...userActions[InAppEvents.IN_APP_BOUNCE],
           guid: createCampaignResponseJson.guid
         }
       ]
