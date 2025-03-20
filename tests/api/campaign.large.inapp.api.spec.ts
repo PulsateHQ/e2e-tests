@@ -416,7 +416,7 @@ test.describe('Large In-App Campaign', () => {
       firstUserSessionPayload
     );
 
-    // First user performs actions
+    // First user performs actions of dissming inApp by clicking X button, but not clicking Action button
     const firstUserUpdatePayload = {
       ...updateMobileInAppUserPayload,
       alias: firstUser.alias,
