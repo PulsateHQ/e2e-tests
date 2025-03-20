@@ -8,7 +8,13 @@ export interface CampaignGoal {
 
 export interface CampaignButton {
   label: string;
-  destination_type: 'card_back' | 'deeplink' | 'dismiss' | 'url' | 'openfeed';
+  destination_type:
+    | 'card_back'
+    | 'deeplink'
+    | 'dismiss'
+    | 'url'
+    | 'openfeed'
+    | 'card';
   destination?: string;
   txt_color: string;
   btn_color: string;

@@ -289,6 +289,7 @@ test.describe('HTML Feed Campaign', () => {
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
+    // Prepare Deeplink
     await deleteAllDeeplinks(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
