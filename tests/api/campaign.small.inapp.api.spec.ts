@@ -18,8 +18,6 @@ import {
 } from '@_src/api/models/admin.model';
 import { InAppEvents } from '@_src/api/models/mobile.users.model';
 import {
-  createCampaignInAppLargeButtonWithUrl,
-  createCampaignInAppLargeWithTwoButtons,
   createCampaignInAppSmallBottomWithDeeplink,
   createCampaignInAppSmallTopWithDismiss,
   createCampaignInAppSmallTopWithUrl
