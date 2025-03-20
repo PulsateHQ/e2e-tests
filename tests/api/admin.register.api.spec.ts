@@ -21,6 +21,7 @@ import {
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import {
+  deleteAllCampaigns,
   deleteAllSegments,
   deleteAllUsers
 } from '@_src/api/utils/data.manager.util';
@@ -42,6 +43,10 @@ test.describe('Company registration and admin management', () => {
   });
 
   test.beforeEach(async ({ request }) => {
+    await deleteAllCampaigns(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
     await deleteAllSegments(
       request,

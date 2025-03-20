@@ -23,6 +23,7 @@ import { generateUniqueCustomTag } from '@_src/api/test-data/cms/custom-attribut
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import { createSegmentSingleAliasPayload } from '@_src/api/test-data/cms/segment/create-segment-single-alias.payload';
 import {
+  deleteAllCampaigns,
   deleteAllSegments,
   deleteAllUsers,
   importRandomUsers
@@ -45,6 +46,10 @@ test.describe('Segment Management', () => {
   });
 
   test.beforeEach(async ({ request }) => {
+    await deleteAllCampaigns(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
     await deleteAllSegments(
       request,

@@ -19,6 +19,7 @@ import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { createGroupSegmentsPayload } from '@_src/api/test-data/cms/group/create-group-segments.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import {
+  deleteAllCampaigns,
   deleteAllGroups,
   deleteAllSegments,
   deleteAllUsers,
@@ -33,6 +34,10 @@ test.describe('Groups Management', () => {
   };
 
   test.beforeEach(async ({ request }) => {
+    await deleteAllCampaigns(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
     await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
     await deleteAllSegments(
       request,

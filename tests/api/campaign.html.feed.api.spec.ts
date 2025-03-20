@@ -26,13 +26,13 @@ import {
 import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.model';
 import {
   createCampaignFeedOneButtonBackWithDismiss,
-  createCampaignFeedOneButtonToDeeplinkWithImage,
   createCampaignFeedOneButtonToUrl,
+  createCampaignFeedOneButtonWithDeeplink,
   createCampaignFeedTwoButtonsWithBackAndDeeplink
 } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
-import { startMobileSessionFeedPayload } from '@_src/api/test-data/mobile/sessions/mobile.sessions.payload';
-import { updateMobileUserPayload } from '@_src/api/test-data/mobile/users/update/mobile.users.update.payload';
+import { startMobileSessionFeedPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
+import { updateMobileFeedUserPayload } from '@_src/api/test-data/mobile/update/update-user.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
 import {
   deleteAllCampaigns,
@@ -48,7 +48,7 @@ import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 const SUPPORTED_ENVIRONMENTS = ['tiger'];
 
 // Use condition() to skip tests on unsupported environments
-test.describe('Feed HTML Post Campaign Tests', () => {
+test.describe('HTML Feed Campaign', () => {
   // This will skip all tests in this suite if not running in a supported environment
   test.beforeEach(() => {
     // eslint-disable-next-line playwright/no-skipped-test
@@ -81,12 +81,12 @@ test.describe('Feed HTML Post Campaign Tests', () => {
   });
 
   test.beforeEach(async ({ request }) => {
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
-    await deleteAllSegments(
+    await deleteAllCampaigns(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
-    await deleteAllCampaigns(
+    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllSegments(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
@@ -136,7 +136,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -314,10 +314,10 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     );
 
     // Preparing payload for campaign creation
-    createCampaignFeedOneButtonToDeeplinkWithImage.segment_ids = [
+    createCampaignFeedOneButtonWithDeeplink.segment_ids = [
       createSegmentResponseJson.segment.id
     ];
-    createCampaignFeedOneButtonToDeeplinkWithImage.card_notification.front_parts.call_to_action.buttons[0].destination =
+    createCampaignFeedOneButtonWithDeeplink.card_notification.front_parts.call_to_action.buttons[0].destination =
       updateDeeplinkResponse.id;
 
     // Create Campaign
@@ -325,13 +325,13 @@ test.describe('Feed HTML Post Campaign Tests', () => {
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonToDeeplinkWithImage
+      createCampaignFeedOneButtonWithDeeplink
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignFeedOneButtonToDeeplinkWithImage.name
+      createCampaignFeedOneButtonWithDeeplink.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -342,7 +342,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -543,7 +543,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -887,7 +887,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1209,7 +1209,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1416,7 +1416,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1470,7 +1470,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[1].alias;
     const alias2 = getUsersResponseJson.data[1].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[1].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[1].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1637,7 +1637,7 @@ test.describe('Feed HTML Post Campaign Tests', () => {
 
     startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
