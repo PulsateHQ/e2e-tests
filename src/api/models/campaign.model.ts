@@ -68,8 +68,22 @@ export interface CampaignLargeNotification {
   call_to_action: CampaignCallToAction;
 }
 
+export interface CampaignSmallNotification {
+  type: 'corporate' | string;
+  position: 'top' | 'bottom';
+  call_to_action: {
+    buttons: CampaignButton[];
+  };
+  image_header_with_message: {
+    name: string;
+    url: string;
+    message: string;
+  };
+}
+
 export interface InAppNotification {
-  large: CampaignLargeNotification;
+  large?: CampaignLargeNotification;
+  small?: CampaignSmallNotification;
 }
 
 export interface CardNotification {
