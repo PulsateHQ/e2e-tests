@@ -8,7 +8,13 @@ export interface CampaignGoal {
 
 export interface CampaignButton {
   label: string;
-  destination_type: 'card_back' | 'deeplink' | 'dismiss' | 'url';
+  destination_type:
+    | 'card_back'
+    | 'deeplink'
+    | 'dismiss'
+    | 'url'
+    | 'openfeed'
+    | 'card';
   destination?: string;
   txt_color: string;
   btn_color: string;
@@ -68,8 +74,22 @@ export interface CampaignLargeNotification {
   call_to_action: CampaignCallToAction;
 }
 
+export interface CampaignSmallNotification {
+  type: 'corporate' | string;
+  position: 'top' | 'bottom';
+  call_to_action: {
+    buttons: CampaignButton[];
+  };
+  image_header_with_message: {
+    name: string;
+    url: string;
+    message: string;
+  };
+}
+
 export interface InAppNotification {
-  large: CampaignLargeNotification;
+  large?: CampaignLargeNotification;
+  small?: CampaignSmallNotification;
 }
 
 export interface CardNotification {
