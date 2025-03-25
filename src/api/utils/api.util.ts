@@ -52,6 +52,11 @@ export const apiUrls = {
     v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/groups`
   },
 
+  // Geofence related endpoints
+  geofences: {
+    v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/geofences`
+  },
+
   // Campaign related endpoints
   campaigns: {
     v2: {
