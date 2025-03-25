@@ -8,6 +8,10 @@ import {
   batchDeleteCampaignsWithApi,
   getCampaignsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
+import {
+  batchDestroyGeofencesWithApi,
+  listGeofencesWithApi
+} from '@_src/api/factories/geofence.factory';
 import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
   batchDeleteSegmentsWithApi,
@@ -79,6 +83,39 @@ export async function deleteAllSegments(
     expect(finalSegmentCount).toBe(0);
 
     await test.step(`Deleted ${initialSegmentCount} segments, ${finalSegmentCount} remaining.`, async () => {});
+  });
+}
+
+export async function deleteAllGeofences(
+  request: APIRequestContext,
+  token: string
+): Promise<void> {
+  await test.step('Deleting all geofences', async () => {
+    const getGeofencesResponse = await listGeofencesWithApi(request, token);
+    const getGeofencesResponseJson = await getGeofencesResponse.json();
+    const initialGeofenceCount = getGeofencesResponseJson.data.length;
+
+    await batchDestroyGeofencesWithApi(
+      request,
+      token,
+      getGeofencesResponseJson.data.map(
+        (geofence: { id: string }) => geofence.id
+      )
+    );
+
+    const getGeofencesResponseAfterDeletion = await listGeofencesWithApi(
+      request,
+      token
+    );
+    const getGeofencesResponseJsonAfterDeletion =
+      await getGeofencesResponseAfterDeletion.json();
+    const finalGeofenceCount =
+      getGeofencesResponseJsonAfterDeletion.data.length;
+
+    expect(getGeofencesResponseAfterDeletion.status()).toBe(200);
+    expect(finalGeofenceCount).toBe(0);
+
+    await test.step(`Deleted ${initialGeofenceCount} geofences, ${finalGeofenceCount} remaining.`, async () => {});
   });
 }
 
