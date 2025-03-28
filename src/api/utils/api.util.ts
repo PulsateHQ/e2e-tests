@@ -88,6 +88,11 @@ export const apiUrls = {
       v4: {
         card: `${SDK_API_URL}/api/mobile/v4/notifications/card`
       }
+    },
+    geofences: {
+      v2: {
+        sendGeofenceEvent: `${SDK_API_URL}/api/mobile/v2/general/send_geofence_event`
+      }
     }
   },
 

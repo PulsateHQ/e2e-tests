@@ -38,3 +38,45 @@ export async function startMobileSessionsWithApi(
 
   return response!;
 }
+
+export async function startMobileSessionsForGeofenceWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  payload: StartMobileSessionPayload,
+  geofenceName: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  const url = `${apiUrls.sdk.sessions.v4.start}`;
+
+  let response: APIResponse;
+
+  await expect(async () => {
+    response = await request.post(url, {
+      headers,
+      data: JSON.stringify(payload)
+    });
+    const responseBody = await response.text();
+    const expectedStatusCode = 201;
+
+    const responseJson = JSON.parse(responseBody);
+
+    expect(
+      response.status(),
+      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+    ).toBe(expectedStatusCode);
+    expect(responseJson).toHaveProperty('geofences');
+
+    const geofences = responseJson.geofences as Array<{ name: string }>;
+    expect(
+      geofences.some((geofence) => geofence.name === geofenceName),
+      `Expected to find geofence with name: ${geofenceName}`
+    ).toBeTruthy();
+  }).toPass({ timeout: 30_000 });
+
+  return response!;
+}
