@@ -9,7 +9,7 @@ import { createGeofenceWithApi } from '@_src/api/factories/geofence.factory';
 import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
 import { startMobileSessionsForGeofenceWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
-import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
+import { getInAppCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import {
   APIE2ELoginUserModel,
@@ -184,7 +184,7 @@ test.describe('Geofence Campaign', () => {
       firstUserUpdatePayload
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getInAppCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,

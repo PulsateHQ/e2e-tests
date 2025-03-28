@@ -14,7 +14,8 @@ import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.fa
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
 import {
   getCampaignBackCardStatsWithApi,
-  getCampaignStatsWithApi
+  getCardCampaignStatsWithApi,
+  getInAppCardCampaignStatsWithApi
 } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
@@ -249,7 +250,7 @@ test.describe('In-App Campaign with Feed', () => {
       createFeedCampaignResponseJson.guid
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createInAppCampaignResponseJson.id,
@@ -478,14 +479,15 @@ test.describe('In-App Campaign with Feed', () => {
       WebSdkStatisticsAction.CARD_FRONT_BUTTON_CLICK_ONE
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createInAppFeedCampaignResponseJson.id,
-      1,
-      1,
-      1
-    );
+    const getCampaignStatsWithWaitResponse =
+      await getInAppCardCampaignStatsWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        createInAppFeedCampaignResponseJson.id,
+        1,
+        1,
+        1
+      );
 
     const getCampaignStatsWithWaitResponseJson =
       await getCampaignStatsWithWaitResponse.json();

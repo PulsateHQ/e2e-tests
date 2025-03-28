@@ -15,7 +15,7 @@ import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
 import {
   getCampaignBackCardStatsWithApi,
-  getCampaignStatsWithApi
+  getCardCampaignStatsWithApi
 } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
@@ -237,7 +237,7 @@ test.describe('HTML Feed Campaign', () => {
       false
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
@@ -465,7 +465,7 @@ test.describe('HTML Feed Campaign', () => {
       false
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
@@ -1311,7 +1311,7 @@ test.describe('HTML Feed Campaign', () => {
       false
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
@@ -1679,7 +1679,7 @@ test.describe('HTML Feed Campaign', () => {
       1
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createFirstCampaignResponseJson.id,
