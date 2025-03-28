@@ -205,6 +205,34 @@ export async function getUserSegmentsWithApi(
   return response;
 }
 
+export async function getUserGeofenceEventsWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  userId: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.users.v2}/${userId}/geofence_events`;
+
+  const response = await request.get(url, { headers });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 200;
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('data');
+  expect(responseJson).toHaveProperty('metadata');
+
+  return response;
+}
+
 export async function createUserWithApi(
   request: APIRequestContext,
   authToken: string,
