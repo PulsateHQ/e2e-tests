@@ -1,4 +1,7 @@
-import { CreateCampaignPayload } from '@_src/api/models/campaign.model';
+import {
+  CampaignDetailsResponse,
+  CreateCampaignPayload
+} from '@_src/api/models/campaign.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
@@ -132,4 +135,39 @@ export async function batchDeleteCampaignsWithApi(
   ).toBe(expectedStatusCode);
 
   return response;
+}
+
+export async function getCampaignDetailsWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  campaignId: string,
+  expectedStatusCampaign: string
+): Promise<CampaignDetailsResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.campaigns.v2.base}/${campaignId}`;
+
+  let response: APIResponse;
+
+  await expect(async () => {
+    response = await request.get(url, { headers });
+    const responseBody = await response.text();
+    const expectedStatusCode = 200;
+
+    const responseJson = JSON.parse(responseBody) as CampaignDetailsResponse;
+
+    expect(
+      response.status(),
+      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+    ).toBe(expectedStatusCode);
+    expect(responseJson).toHaveProperty('id');
+    expect(responseJson).toHaveProperty('name');
+    expect(responseJson).toHaveProperty('type');
+    expect(responseJson).toHaveProperty('status', expectedStatusCampaign);
+  }).toPass({ timeout: 60_000 });
+
+  return JSON.parse(await response.text()) as CampaignDetailsResponse;
 }

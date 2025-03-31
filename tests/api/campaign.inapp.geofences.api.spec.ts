@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import { createGeofenceWithApi } from '@_src/api/factories/geofence.factory';
 import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
 import { startMobileSessionsForGeofenceWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
@@ -118,6 +121,15 @@ test.describe('Geofence InApp Campaign', () => {
       createCampaignInAppLargeButtonWithUrl.name
     );
 
+    const getCampaignDetailsResponse = await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Active'
+    );
+
+    expect(getCampaignDetailsResponse.status).toBe('Active');
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -205,7 +217,7 @@ test.describe('Geofence InApp Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      0,
+      1,
       1
     );
 
@@ -216,7 +228,7 @@ test.describe('Geofence InApp Campaign', () => {
     expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('in_app');
     expect(getCampaignStatsWithWaitResponseJson.in_app.send).toHaveProperty(
       'total_uniq',
-      0
+      1
     );
     expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
       'total_uniq',
@@ -300,6 +312,15 @@ test.describe('Geofence InApp Campaign', () => {
     expect(createCampaignResponseJson.name).toBe(
       createCampaignInAppSmallTopWithUrl.name
     );
+
+    const getCampaignDetailsResponse = await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Active'
+    );
+
+    expect(getCampaignDetailsResponse.status).toBe('Active');
 
     // Start session for first user
     const firstUserSessionPayload = {
@@ -430,7 +451,7 @@ test.describe('Geofence InApp Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      0,
+      2,
       1
     );
 
@@ -441,7 +462,7 @@ test.describe('Geofence InApp Campaign', () => {
     expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('in_app');
     expect(getCampaignStatsWithWaitResponseJson.in_app.send).toHaveProperty(
       'total_uniq',
-      0
+      2
     );
     expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
       'total_uniq',

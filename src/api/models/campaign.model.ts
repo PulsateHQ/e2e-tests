@@ -7,7 +7,7 @@ export interface CampaignGoal {
 }
 
 export interface CampaignButton {
-  label: string;
+  btn_color: string;
   destination_type:
     | 'card_back'
     | 'deeplink'
@@ -16,8 +16,13 @@ export interface CampaignButton {
     | 'openfeed'
     | 'card';
   destination?: string;
+  in_app_events: null | Array<{
+    name: string;
+    count: number;
+  }>;
+  label: string;
+  order_number: number;
   txt_color: string;
-  btn_color: string;
 }
 
 export interface CampaignCallToAction {
@@ -51,6 +56,37 @@ export interface CampaignTable extends CampaignBasePart {
     value: string;
     label: string;
   }>;
+}
+
+export interface CampaignAdminHeader {
+  active: boolean;
+  admin: null | any;
+  message: null | any;
+  position: number;
+}
+
+export interface CampaignInAppNotification {
+  large: {
+    call_to_action: CampaignCallToAction;
+    admin_header_with_message: CampaignAdminHeader;
+    position: string;
+    headline: {
+      active: boolean;
+      position: number;
+      text: string;
+    };
+    image: {
+      active: boolean;
+      name: null | string;
+      position: number;
+      url: null | string;
+    };
+    text: {
+      active: boolean;
+      position: number;
+      text: string;
+    };
+  };
 }
 
 export interface CampaignAdminHeaderWithMessage {
@@ -140,4 +176,103 @@ export interface CreateCampaignPayload {
   campaign_expiry: boolean;
   expiry_time_frame?: 'hours' | 'days' | 'weeks';
   expiry_time_value?: number;
+}
+
+export interface CampaignTarget {
+  events: {
+    details: Array<{
+      name: string;
+      count: number;
+    }>;
+    count: number;
+  };
+  geofences: {
+    details: string[];
+    count: number;
+  };
+  segments: {
+    details: Array<{
+      name: string;
+      count: number;
+    }>;
+    count: number;
+  };
+  beacons: {
+    details: Array<{
+      name: string;
+      count: number;
+    }>;
+    count: number;
+  };
+}
+
+export interface CampaignDetailsResponse {
+  id: string;
+  name: string;
+  author_name: string;
+  allow_reply: boolean;
+  broadcast_type: string;
+  beacon_events: Record<string, string> | null;
+  beacon_ids: string[];
+  beacon_dwelling_times: Record<string, number> | null;
+  campaign_expiry: boolean;
+  campaign_limits: boolean;
+  card_notification: CardNotification | null;
+  control_group: null | {
+    id: string;
+    name: string;
+  };
+  created_at: string;
+  delivered_at: null | string;
+  delivery: string;
+  display_type: string;
+  dispatch_rate: number;
+  duplication_source_id: string;
+  email_notification: null | {
+    subject: string;
+    body: string;
+  };
+  end_at: null | string;
+  expiry_date: null | string;
+  expiry_time_frame: string;
+  expiry_time_value: null | number;
+  geofence_events: Record<string, string>;
+  geofence_ids: string[];
+  geofence_dwelling_times: Record<string, number> | null;
+  goals_attributes: CampaignGoal[];
+  group_ids: string[];
+  guid: string;
+  hidable: boolean;
+  hidden: boolean;
+  hidden_at: null | string;
+  hidden_from_feed: boolean;
+  in_app_event_names: string[];
+  in_app_notification: InAppNotification;
+  last_builder_page: string;
+  push_variants: null | Array<{
+    id: string;
+    name: string;
+    content: string;
+  }>;
+  segment_ids: string[];
+  sms_notification: null | {
+    content: string;
+    sender: string;
+  };
+  start_at: string;
+  start_now: boolean;
+  status: string;
+  target: CampaignTarget;
+  time_frame: null | string;
+  time_value: null | number;
+  time_zone_name: string;
+  time_zone_offset: string;
+  time_windows: Array<{
+    start: string;
+    end: string;
+    days: string[];
+  }>;
+  type: string;
+  type_list: string[];
+  updated_at: string;
 }
