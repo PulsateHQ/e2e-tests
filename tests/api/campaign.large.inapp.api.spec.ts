@@ -10,7 +10,7 @@ import { updateDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
+import { getInAppCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import {
   APIE2ELoginUserModel,
@@ -159,7 +159,7 @@ test.describe('Large In-App Campaign', () => {
       firstUserUpdatePayload
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getInAppCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
@@ -314,7 +314,7 @@ test.describe('Large In-App Campaign', () => {
       firstUserUpdatePayload
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getInAppCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
@@ -442,7 +442,7 @@ test.describe('Large In-App Campaign', () => {
       firstUserUpdatePayload
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getInAppCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
@@ -621,7 +621,7 @@ test.describe('Large In-App Campaign', () => {
       secondUserUpdatePayload
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getInAppCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
@@ -814,7 +814,7 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // Get campaign stats with wait for both users to be processed
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getInAppCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,

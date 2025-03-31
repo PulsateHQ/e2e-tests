@@ -9,7 +9,7 @@ import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
 import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { getCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
+import { getCardCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import {
   APIE2ELoginUserModel,
@@ -146,7 +146,7 @@ test.describe('Feed Post Campaign', () => {
       0
     );
 
-    const getCampaignStatsWithWaitResponse = await getCampaignStatsWithApi(
+    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,

@@ -10,5 +10,5 @@ export const geofencePayload: GeofencePayload = {
   groups: [],
   is_draggable: true,
   is_editable: false,
-  name: faker.word.words(3)
+  name: faker.word.words(1) + '_geofence'
 };
