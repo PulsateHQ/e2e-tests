@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import { createGeofenceWithApi } from '@_src/api/factories/geofence.factory';
 import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
@@ -60,7 +63,9 @@ test.describe('Geofence Feed Campaign', () => {
     const sdkCredentials = await sdkCredentialsResponse.json();
 
     APIE2ETokenSDKModel = {
-      apiE2EAccessTokenSdk: sdkCredentials.access_token
+      apiE2EAccessTokenSdk: sdkCredentials.access_token,
+      apiE2EAppIdSdk: sdkCredentials.app_id,
+      apiE2EAppKeySdk: sdkCredentials.app_key
     };
   });
 
@@ -121,6 +126,15 @@ test.describe('Geofence Feed Campaign', () => {
     expect(createCampaignResponseJson.name).toBe(
       createCampaignFeedOneButtonToUrl.name
     );
+
+    const getCampaignDetailsResponse = await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Active'
+    );
+
+    expect(getCampaignDetailsResponse.status).toBe('Active');
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
