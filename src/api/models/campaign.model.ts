@@ -60,8 +60,8 @@ export interface CampaignTable extends CampaignBasePart {
 
 export interface CampaignAdminHeader {
   active: boolean;
-  admin: null | any;
-  message: null | any;
+  admin: null | string;
+  message: null | string;
   position: number;
 }
 
