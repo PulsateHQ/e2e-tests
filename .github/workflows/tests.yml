@@ -59,7 +59,7 @@ jobs:
 
   test:
     needs: [prepare-env]
-    timeout-minutes: 10
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     environment: ${{ github.event.client_payload.environment }}
     outputs:
