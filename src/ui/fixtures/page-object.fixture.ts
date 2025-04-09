@@ -1,6 +1,5 @@
 import { MainNavigationComponent } from '@_src/ui/components/mainNavigation.component';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
-import { BeaconsPage } from '@_src/ui/pages/beacons.page';
 import { CampaignStatsPage } from '@_src/ui/pages/campaignStats.page';
 import { CampaignsPage } from '@_src/ui/pages/campaigns.page';
 import { CompanyRegistrationPage } from '@_src/ui/pages/companyRegistration.page';
@@ -21,7 +20,6 @@ interface Pages {
   campaignStatsPage: CampaignStatsPage;
   segmentsPage: SegmentsPage;
   geofencesPage: GeofencesPage;
-  beaconsPage: BeaconsPage;
   campaignsPage: CampaignsPage;
   journeysPage: JourneysPage;
   usersPage: UsersPage;
@@ -59,10 +57,6 @@ export const pageObjectTest = baseTest.extend<Pages>({
   geofencesPage: async ({ page }, use) => {
     const geofencesPage = new GeofencesPage(page);
     await use(geofencesPage);
-  },
-  beaconsPage: async ({ page }, use) => {
-    const beaconsPage = new BeaconsPage(page);
-    await use(beaconsPage);
   },
   campaignsPage: async ({ page }, use) => {
     const campaignsPage = new CampaignsPage(page);

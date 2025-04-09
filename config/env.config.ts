@@ -45,3 +45,4 @@ export const UI_E2E_ACCESS_TOKEN_ADMIN = requireEnvVariable(
   'UI_E2E_ACCESS_TOKEN_ADMIN',
   isSealionEnv
 );
+export const UI_E2E_APP_ID = requireEnvVariable('UI_E2E_APP_ID', isSealionEnv);

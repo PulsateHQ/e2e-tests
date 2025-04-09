@@ -9,7 +9,7 @@ export default defineConfig({
   globalSetup: require.resolve('./config/global.setup.ts'),
   timeout: 90_000,
   expect: {
-    timeout: 60_000
+    timeout: 5_000
   },
   fullyParallel: false,
   retries: 1,

@@ -3,6 +3,10 @@ import { Page } from '@playwright/test';
 export class SideBarComponent {
   constructor(private page: Page) {}
 
+  sidebarCategoryOpportunities = this.page.getByRole('listitem', {
+    name: 'Sidebar item: Opportunities'
+  });
+
   sidebarCategoryAnalyse = this.page.getByRole('listitem', {
     name: 'Sidebar category: Analyze'
   });
@@ -27,10 +31,6 @@ export class SideBarComponent {
     name: 'Sidebar item: Geofences'
   });
 
-  sidebarItemBeacons = this.page.getByRole('listitem', {
-    name: 'Sidebar item: Beacons'
-  });
-
   sidebarCategoryCampaigns = this.page.getByRole('listitem', {
     name: 'Sidebar category: Campaigns'
   });
@@ -42,6 +42,12 @@ export class SideBarComponent {
   sidebarCategoryUsers = this.page.getByRole('listitem', {
     name: 'Sidebar category: Users'
   });
+
+  sidebarToggleButton = this.page.getByRole('button', { name: 'Hamburger' });
+
+  async clickSidebarCategoryOpportunities(): Promise<void> {
+    await this.sidebarCategoryOpportunities.click();
+  }
 
   async clickSidebarCategoryAnalyse(): Promise<void> {
     await this.sidebarCategoryAnalyse.click();
@@ -67,10 +73,6 @@ export class SideBarComponent {
     await this.sidebarItemGeofences.click();
   }
 
-  async clickSidebarItemBeacons(): Promise<void> {
-    await this.sidebarItemBeacons.click();
-  }
-
   async clickSidebarCategoryCampaigns(): Promise<void> {
     await this.sidebarCategoryCampaigns.click();
   }
@@ -81,5 +83,9 @@ export class SideBarComponent {
 
   async clickSidebarCategoryUsers(): Promise<void> {
     await this.sidebarCategoryUsers.click();
+  }
+
+  async toggleSidebar(): Promise<void> {
+    await this.sidebarToggleButton.click();
   }
 }
