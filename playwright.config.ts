@@ -44,6 +44,13 @@ export default defineConfig({
       }
     },
     {
+      name: 'ui',
+      testDir: './tests/ui',
+      use: {
+        ...devices['Desktop Chrome']
+      }
+    },
+    {
       name: 'chrome',
       testDir: './tests/api',
       use: {

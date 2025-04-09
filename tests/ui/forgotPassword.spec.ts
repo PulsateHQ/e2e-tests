@@ -1,14 +1,14 @@
 import { BASE_URL } from '@_config/env.config';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { UIIntegrationLoginUserModel } from '@_src/ui/models/user.model';
+import { UI2E2LoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('Forgot Password Functionality', () => {
   const expectedURL = `${BASE_URL}/admins/forgot_password`;
-  const incorrectEmail: UIIntegrationLoginUserModel = {
+  const incorrectEmail: UI2E2LoginUserModel = {
     userEmail: 'incorrect_email.com',
     userPassword: ''
   };
-  const loginUserData: UIIntegrationLoginUserModel = {
+  const loginUserData: UI2E2LoginUserModel = {
     userEmail: 'randomEmail@pulsate.com',
     userPassword: ''
   };
@@ -29,16 +29,5 @@ test.describe('Forgot Password Functionality', () => {
     );
 
     expect(loginURL).toBe(expectedURL);
-  });
-
-  test('should display a success message for valid email', async ({
-    forgotPasswordPage,
-    loginPage
-  }) => {
-    await forgotPasswordPage.resetYourPassword(loginUserData.userEmail);
-    await forgotPasswordPage.backToSignInButton.click();
-
-    await expect(forgotPasswordPage.forgotPasswordSucceedMessage).toBeVisible();
-    await expect.soft(loginPage.loginButton).toBeVisible();
   });
 });

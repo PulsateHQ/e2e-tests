@@ -1,4 +1,4 @@
-import { UIIntegrationLoginUserModel } from '@_src/ui/models/user.model';
+import { UI2E2LoginUserModel } from '@_src/ui/models/user.model';
 import { BasePage } from '@_src/ui/pages/base.page';
 import { DashboardPage } from '@_src/ui/pages/dashboard.page';
 import { Page } from '@playwright/test';
@@ -42,9 +42,7 @@ export class LoginPage extends BasePage {
     this.page = page;
   }
 
-  async login(
-    loginUserData: UIIntegrationLoginUserModel
-  ): Promise<DashboardPage> {
+  async login(loginUserData: UI2E2LoginUserModel): Promise<DashboardPage> {
     await this.userEmailInput.fill(loginUserData.userEmail);
     await this.userPasswordInput.fill(loginUserData.userPassword);
     await this.loginButton.click();

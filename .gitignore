@@ -6,6 +6,7 @@ node_modules/
 /playwright-report/
 /playwright/.cache/
 .vscode/
+.cursor/
 
 .env.tiger
 .env.leopard

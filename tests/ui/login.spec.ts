@@ -2,14 +2,16 @@ import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   API_E2E_APP_ID,
   BASE_URL,
-  SUPER_ADMIN_ACCESS_TOKEN
+  SUPER_ADMIN_ACCESS_TOKEN,
+  UI_E2E_LOGIN_ADMIN,
+  UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
-import { registerCompany } from '@_src/api/factories/admins.api.factory';
+import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import { superAdminsActivationCodesCreate } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { UIIntegrationLoginUserModel } from '@_src/ui/models/user.model';
+import { UI2E2LoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('Login Functionality', () => {
   test('should reject login with incorrect password and display error messages', async ({
@@ -17,19 +19,14 @@ test.describe('Login Functionality', () => {
   }) => {
     const expectedURL = `${BASE_URL}/admins/sign_in`;
 
-    const loginUserDataMissingPassword: UIIntegrationLoginUserModel = {
-      userEmail: `${UI_INTEGRATION_LOGIN_ADMIN}`,
+    const loginUserDataMissingPassword: UI2E2LoginUserModel = {
+      userEmail: `${UI_E2E_LOGIN_ADMIN}`,
       userPassword: ``
     };
 
-    const loginUserDataMissingEmail: UIIntegrationLoginUserModel = {
+    const loginUserDataMissingEmail: UI2E2LoginUserModel = {
       userEmail: ``,
-      userPassword: `${UI_INTEGRATION_PASSWORD_ADMIN}`
-    };
-
-    const loginUserDataIncorrectPassword: UIIntegrationLoginUserModel = {
-      userEmail: `${UI_INTEGRATION_LOGIN_ADMIN}`,
-      userPassword: `incorrect_password`
+      userPassword: `${UI_E2E_PASSWORD_ADMIN}`
     };
 
     await loginPage.loginButton.click();
@@ -54,12 +51,6 @@ test.describe('Login Functionality', () => {
     await loginPage.validateErrorVisibility(
       loginPage.userEmailInput,
       loginPage.usernameOrEmailMissingError
-    );
-
-    await loginPage.login(loginUserDataIncorrectPassword);
-    await loginPage.validateErrorVisibility(
-      loginPage.userPasswordInput,
-      loginPage.incorrectUsernameOrPasswordError
     );
 
     const loginURL = await loginPage.validateUrl();

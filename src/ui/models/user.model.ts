@@ -1,4 +1,4 @@
-export interface UIIntegrationLoginUserModel {
+export interface UI2E2LoginUserModel {
   userEmail: string;
   userPassword: string;
 }
