@@ -32,8 +32,8 @@ test.describe('In-App Campaign Creation', () => {
     const campaignName = `InApp Large Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
-    const buttonText = 'Shop Now';
-    const buttonUrl = 'https://www.google.com';
+    const buttonText = `URL_${faker.lorem.word()}`;
+    const buttonUrl = `https://www.google.com`;
 
     await campaignsPage.enterCampaignName(campaignName);
     await campaignsPage.clickSaveAndContinue();
@@ -55,6 +55,11 @@ test.describe('In-App Campaign Creation', () => {
     // Configure call to action
     await campaignsPage.openCallToActionSection();
     await campaignsPage.selectButtonCount(1);
+    await campaignsPage.selectCTAButtonType('URL');
+    await campaignsPage.enterButtonUrl(buttonUrl);
     await campaignsPage.enterButtonText(buttonText);
+
+    // Save and continue
+    await campaignsPage.clickSaveAndContinue();
   });
 });
