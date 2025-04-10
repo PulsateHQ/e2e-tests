@@ -40,18 +40,18 @@ export class CampaignsPage extends BasePage {
   callToActionSection = this.page.getByText('Call to Action', { exact: true });
 
   // Toggle switches
-  personalMessageSwitch = this.page
-    .locator('div:has-text("Personal Message") ~ div .react-switch')
-    .locator('input[data-testid="collapseSwitch"]');
-  imageSwitch = this.page
-    .locator('div:has-text("Image") ~ div .react-switch')
-    .locator('input[data-testid="collapseSwitch"]');
-  headlineSwitch = this.page
-    .locator('div:has-text("Headline") ~ div .react-switch')
-    .locator('input[data-testid="collapseSwitch"]');
-  textSwitch = this.page
-    .locator('div:has-text("Text") ~ div .react-switch')
-    .locator('input[data-testid="collapseSwitch"]');
+  personalMessageToggle = this.page
+    .locator('div:has-text("Personal Message") ~ div .react-switch-bg')
+    .first();
+  imageToggle = this.page
+    .locator('div:has-text("Image") ~ div .react-switch-bg')
+    .first();
+  headlineToggle = this.page
+    .locator('div:has-text("Headline") ~ div .react-switch-bg')
+    .first();
+  textToggle = this.page
+    .locator('div:has-text("Text") ~ div .react-switch-bg')
+    .first();
 
   // Content input fields
   personalMessageInput = this.page
@@ -63,14 +63,9 @@ export class CampaignsPage extends BasePage {
     })
     .locator('div[data-testid="textarea"]');
 
-  headlineInput = this.page
-    .locator('div[data-testid="collapse"]')
-    .filter({
-      has: this.page.locator(
-        '.textarea__placeholder:has-text("Add a Headline")'
-      )
-    })
-    .locator('div[data-testid="textarea"]');
+  headlineInput = this.page.locator(
+    'div:nth-child(2) > .collapse > div > div > div[data-testid="textarea"][contenteditable="true"]'
+  );
 
   textInput = this.page
     .locator('div[data-testid="collapse"]')
@@ -150,50 +145,23 @@ export class CampaignsPage extends BasePage {
   // =========================================================================
   // Content Section Methods
   // =========================================================================
-  async toggleSection(
-    section: 'Personal Message' | 'Image' | 'Headline' | 'Text',
-    enable: boolean
-  ): Promise<void> {
-    let sectionSwitch: Locator;
-    let sectionHeader: Locator;
-
-    switch (section) {
-      case 'Personal Message':
-        sectionSwitch = this.personalMessageSwitch;
-        sectionHeader = this.personalMessageSection;
-        break;
-      case 'Image':
-        sectionSwitch = this.imageSwitch;
-        sectionHeader = this.imageSection;
-        break;
-      case 'Headline':
-        sectionSwitch = this.headlineSwitch;
-        sectionHeader = this.headlineSection;
-        break;
-      case 'Text':
-        sectionSwitch = this.textSwitch;
-        sectionHeader = this.textSection;
-        break;
-    }
-
-    const isChecked = await sectionSwitch.isChecked();
-    if (isChecked !== enable) {
-      await sectionHeader.click();
-    }
-  }
 
   async enterPersonalMessage(message: string): Promise<void> {
-    await this.toggleSection('Personal Message', true);
     await this.personalMessageInput.fill(message);
   }
 
   async enterHeadline(headline: string): Promise<void> {
-    await this.toggleSection('Headline', true);
+    // First, make sure the Headline section is expanded
+    await this.headlineSection.click();
+
+    // Wait for the editable element to be visible
+    await this.headlineInput.waitFor({ state: 'visible', timeout: 5000 });
+
+    // Fill in the text
     await this.headlineInput.fill(headline);
   }
 
   async enterText(text: string): Promise<void> {
-    await this.toggleSection('Text', true);
     await this.textInput.fill(text);
   }
 
@@ -320,40 +288,54 @@ export class CampaignsPage extends BasePage {
   // =========================================================================
 
   /**
-   * Sets up the content sections of an in-app campaign
-   * @param options Configuration options for each section
+   * Expands or collapses a content section
+   * @param section The section to expand/collapse
    */
-  async setupInAppSections(options: {
-    personalMessage?: { enabled: boolean; text?: string };
-    headline?: { enabled: boolean; text?: string };
-    text?: { enabled: boolean; text?: string };
-  }): Promise<void> {
-    // Set up Personal Message section if specified
-    if (options.personalMessage) {
-      await this.toggleSection(
-        'Personal Message',
-        options.personalMessage.enabled
-      );
-      if (options.personalMessage.enabled && options.personalMessage.text) {
-        await this.personalMessageInput.fill(options.personalMessage.text);
-      }
+  async expandCollapseSection(
+    section: 'Personal Message' | 'Image' | 'Headline' | 'Text'
+  ): Promise<void> {
+    switch (section) {
+      case 'Personal Message':
+        await this.personalMessageSection.click();
+        break;
+      case 'Image':
+        await this.imageSection.click();
+        break;
+      case 'Headline':
+        await this.headlineSection.click();
+        break;
+      case 'Text':
+        await this.textSection.click();
+        break;
+    }
+  }
+
+  /**
+   * Toggles a content section using the toggle switch
+   * @param section The section to toggle
+   */
+  async toggleSectionSwitch(
+    section: 'Personal Message' | 'Image' | 'Headline' | 'Text'
+  ): Promise<void> {
+    let sectionToggle: Locator;
+
+    switch (section) {
+      case 'Personal Message':
+        sectionToggle = this.personalMessageToggle;
+        break;
+      case 'Image':
+        sectionToggle = this.imageToggle;
+        break;
+      case 'Headline':
+        sectionToggle = this.headlineToggle;
+        break;
+      case 'Text':
+        sectionToggle = this.textToggle;
+        break;
     }
 
-    // Set up Headline section if specified
-    if (options.headline) {
-      await this.toggleSection('Headline', options.headline.enabled);
-      if (options.headline.enabled && options.headline.text) {
-        await this.headlineInput.fill(options.headline.text);
-      }
-    }
-
-    // Set up Text section if specified
-    if (options.text) {
-      await this.toggleSection('Text', options.text.enabled);
-      if (options.text.enabled && options.text.text) {
-        await this.textInput.fill(options.text.text);
-      }
-    }
+    // Just click the toggle
+    await sectionToggle.click();
   }
 
   /**

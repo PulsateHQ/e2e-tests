@@ -45,11 +45,13 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignsPage.callToActionSection).toBeVisible();
 
     // Toggle of Personal Message and Image sections
-    await campaignsPage.toggleSection('Personal Message', false);
-    await campaignsPage.toggleSection('Image', false);
+    await campaignsPage.toggleSectionSwitch('Personal Message');
+    await campaignsPage.toggleSectionSwitch('Image');
 
     // Enter Headline and Text
+    await campaignsPage.expandCollapseSection('Headline');
     await campaignsPage.enterHeadline(campaignHeadline);
+    await campaignsPage.expandCollapseSection('Text');
     await campaignsPage.enterText(campaignText);
 
     // Configure call to action
