@@ -1,5 +1,6 @@
 import { UI_E2E_APP_ID } from '@_config/env.config';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
+import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
   // Front-end access token for authentication
@@ -25,25 +26,35 @@ test.describe('In-App Campaign Creation', () => {
     await campaignsPage.selectInAppCampaignType();
 
     // Select Full-Screen layout
-    await campaignsPage.selectFullScreenLayout();
+    await campaignsPage.selectInAppLargeLayout();
 
     // Create campaign with required details
     const campaignName = `InApp Large Campaign ${Date.now()}`;
+    const campaignHeadline = `Headline_${faker.lorem.word()}`;
+    const campaignText = `Text_${faker.lorem.word()}`;
     const buttonText = 'Shop Now';
     const buttonUrl = 'https://www.google.com';
 
-    await campaignsPage.createInAppCampaign(
-      campaignName,
-      buttonText,
-      buttonUrl
-    );
+    await campaignsPage.enterCampaignName(campaignName);
+    await campaignsPage.clickSaveAndContinue();
 
-    // Verify campaign setup progress
-    await expect(campaignsPage.campaignNameInput).toHaveValue(campaignName);
-    await expect(campaignsPage.buttonTextInput).toHaveValue(buttonText);
-    await expect(campaignsPage.urlInput).toHaveValue(buttonUrl);
+    await expect(campaignsPage.personalMessageSection).toBeVisible();
+    await expect(campaignsPage.imageSection).toBeVisible();
+    await expect(campaignsPage.headlineSection).toBeVisible();
+    await expect(campaignsPage.textSection).toBeVisible();
+    await expect(campaignsPage.callToActionSection).toBeVisible();
 
-    // Verify that Save & Continue was clicked
-    // Additional verification could be added here if needed
+    // Toggle of Personal Message and Image sections
+    await campaignsPage.toggleSection('Personal Message', false);
+    await campaignsPage.toggleSection('Image', false);
+
+    // Enter Headline and Text
+    await campaignsPage.enterHeadline(campaignHeadline);
+    await campaignsPage.enterText(campaignText);
+
+    // Configure call to action
+    await campaignsPage.openCallToActionSection();
+    await campaignsPage.selectButtonCount(1);
+    await campaignsPage.enterButtonText(buttonText);
   });
 });
