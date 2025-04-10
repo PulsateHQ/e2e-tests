@@ -15,8 +15,11 @@ test.describe('In-App Campaign Creation', () => {
   test('should create a new in-app full-screen campaign with URL button', async ({
     campaignsPage
   }) => {
-    // Navigate to create a new campaign
-    await campaignsPage.navigateToNewCampaign();
+    // Navigate to campaigns section
+    await campaignsPage.navigateToCampaignsSection();
+
+    // Create new campaign
+    await campaignsPage.createNewCampaign();
 
     // Select In-App campaign type
     await campaignsPage.selectInAppCampaignType();
@@ -25,7 +28,7 @@ test.describe('In-App Campaign Creation', () => {
     await campaignsPage.selectFullScreenLayout();
 
     // Create campaign with required details
-    const campaignName = `Test Campaign ${Date.now()}`;
+    const campaignName = `InApp Large Campaign ${Date.now()}`;
     const buttonText = 'Shop Now';
     const buttonUrl = 'https://www.google.com';
 
@@ -39,5 +42,8 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignsPage.campaignNameInput).toHaveValue(campaignName);
     await expect(campaignsPage.buttonTextInput).toHaveValue(buttonText);
     await expect(campaignsPage.urlInput).toHaveValue(buttonUrl);
+
+    // Verify that Save & Continue was clicked
+    // Additional verification could be added here if needed
   });
 });

@@ -18,6 +18,9 @@ export class CampaignsPage extends BasePage {
 
   // Form elements
   campaignNameInput = this.page.getByRole('textbox', { name: 'Campaign Name' });
+  saveAndContinueButton = this.page.getByRole('button', {
+    name: 'Save & Continue'
+  });
 
   // Call to Action section
   callToActionSection = this.page.getByText('Call to Action', { exact: true });
@@ -41,9 +44,12 @@ export class CampaignsPage extends BasePage {
     await this.newCampaignButton.click();
   }
 
-  async navigateToNewCampaign(): Promise<void> {
-    await this.sideBar.toggleSidebar();
+  // Split into separate navigation steps (without toggling sidebar)
+  async navigateToCampaignsSection(): Promise<void> {
     await this.clickSidebarCategoryCampaigns();
+  }
+
+  async createNewCampaign(): Promise<void> {
     await this.clickNewCampaign();
   }
 
@@ -77,6 +83,10 @@ export class CampaignsPage extends BasePage {
     await this.urlInput.fill(url);
   }
 
+  async clickSaveAndContinue(): Promise<void> {
+    await this.saveAndContinueButton.click();
+  }
+
   // Combine all actions for creating a campaign
   async createInAppCampaign(
     campaignName: string,
@@ -84,6 +94,7 @@ export class CampaignsPage extends BasePage {
     buttonUrl: string
   ): Promise<void> {
     await this.enterCampaignName(campaignName);
+    await this.clickSaveAndContinue();
     await this.openCallToActionSection();
     await this.enterButtonText(buttonText);
     await this.selectUrlButtonType();
