@@ -1,5 +1,5 @@
 import { BasePage } from '@_src/ui/pages/base.page';
-import { Locator, Page, expect } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 // Type for CTA (Call to Action) button types (Copied from CampaignsPage)
 export type CTAButtonType = 'Deeplink' | 'URL' | 'Open Feed' | 'Dismiss';
@@ -50,9 +50,7 @@ export class CampaignBuilderPage extends BasePage {
     })
     .locator('div[data-testid="textarea"]');
 
-  headlineInput = this.page
-    .locator('div:has(> [data-testid="collapseTitle"]:has-text("Headline"))')
-    .locator('[data-testid="textarea"]');
+  headlineInput = this.page.locator('div:nth-child(2) > .collapse > div > div');
 
   textInput = this.page
     .locator('div')
@@ -84,6 +82,16 @@ export class CampaignBuilderPage extends BasePage {
     name: 'https://www.example.com'
   });
   deeplinkDropdown = this.page.getByRole('button', { name: 'Select Deeplink' });
+
+  // =========================================================================
+  // Target Step Locators (New)
+  // =========================================================================
+  segmentsTargetingToggle = this.page.locator('.react-switch-bg').first();
+
+  segmentsSectionLabel = this.page.getByText('segments', { exact: true });
+  getSegmentTargetingOption(segmentName: string): Locator {
+    return this.page.getByRole('button', { name: segmentName, exact: true });
+  }
 
   // =========================================================================
   // Constructor
@@ -120,26 +128,13 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   async enterHeadline(headline: string): Promise<void> {
-    // 1. Ensure the headline section is expanded first (assuming expandCollapseSection is called externally if needed)
-    await this.headlineSection.click(); // Ensure section is expanded
-
-    // 2. Wait for placeholder to be visible (indicates content area is ready)
-    const headlinePlaceholder = this.page
-      .locator('div:has(> [data-testid="collapseTitle"]:has-text("Headline"))') // Find headline section
-      .locator('.textarea__placeholder:has-text("Add a Headline")'); // Find placeholder within
-    await expect(
-      headlinePlaceholder,
-      'Headline placeholder should be visible after animation'
-    ).toBeVisible({ timeout: 5000 });
-
-    // 3. Click the actual input div (headlineInput) to focus it
-    await this.headlineInput.click();
-
-    // 4. Type the text using the keyboard
+    // Reverted to simpler version based on user's previous commits
+    await this.headlineInput.first().click(); // Assuming first() is needed if locator isn't unique
     await this.page.keyboard.type(headline);
   }
 
   async enterText(text: string): Promise<void> {
+    // Reverted to simpler version based on user's previous commits
     await this.textInput.click();
     await this.page.keyboard.type(text);
   }
@@ -152,7 +147,6 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   async selectButtonCount(count: 1 | 2): Promise<void> {
-    await this.openCallToActionSection(); // Ensure section is open
     await this.buttonCountDropdown.click();
 
     if (count === 1) {
@@ -181,7 +175,6 @@ export class CampaignBuilderPage extends BasePage {
     type: CTAButtonType,
     buttonIndex: number = 0
   ): Promise<void> {
-    await this.openCallToActionSection(); // Ensure section is open
     await this.getCTAButton(type, buttonIndex).click();
   }
 
@@ -196,7 +189,6 @@ export class CampaignBuilderPage extends BasePage {
   buttonTwoTextInput = this.getButtonTextInput(2);
 
   async enterButtonText(text: string, buttonIndex?: number): Promise<void> {
-    await this.openCallToActionSection(); // Ensure section is open
     if (buttonIndex === 2) {
       await this.buttonTwoTextInput.fill(text);
     } else {
@@ -206,7 +198,6 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   async enterButtonUrl(url: string): Promise<void> {
-    await this.openCallToActionSection(); // Ensure section is open
     await this.urlInput.fill(url);
   }
 
@@ -340,5 +331,18 @@ export class CampaignBuilderPage extends BasePage {
     await this.openCallToActionSection();
     await this.selectCTAButtonType('Dismiss', buttonIndex);
     await this.enterButtonText(buttonText, buttonIndex === 0 ? 1 : 2);
+  }
+
+  // =========================================================================
+  // Target Step Methods
+  // =========================================================================
+
+  async selectTargetSegment(segmentName: string): Promise<void> {
+    await this.segmentsTargetingToggle.click();
+
+    await this.segmentsSectionLabel.click();
+
+    const segmentOption = this.getSegmentTargetingOption(segmentName);
+    await segmentOption.click();
   }
 }

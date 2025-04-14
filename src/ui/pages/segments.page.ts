@@ -1,7 +1,7 @@
 import { UI_E2E_APP_ID } from '@_config/env.config';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
 import { BasePage } from '@_src/ui/pages/base.page';
-import { Locator, Page } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 
 export class SegmentsPage extends BasePage {
   url = `/mobile/apps/${UI_E2E_APP_ID}/segments`;
@@ -85,6 +85,21 @@ export class SegmentsPage extends BasePage {
     await this.saveSegmentDefinition();
   }
 
+  getSegmentLinkByName(segmentName: string): Locator {
+    // Helper to get the dynamic locator for a segment link
+    return this.page.getByRole('link', {
+      name: `Segment Name: ${segmentName}`
+    });
+  }
+
+  async verifySegmentLinkIsVisible(segmentName: string): Promise<void> {
+    const segmentLink = this.getSegmentLinkByName(segmentName);
+    await expect(
+      segmentLink,
+      `Link for segment '${segmentName}' should be visible`
+    ).toBeVisible();
+  }
+
   async createSegmentWithAlias(
     aliasValue: string,
     segmentName: string
@@ -93,5 +108,6 @@ export class SegmentsPage extends BasePage {
     await this.addAliasCondition(aliasValue);
     await this.saveSegmentDefinition();
     await this.nameAndSaveSegment(segmentName);
+    await this.verifySegmentLinkIsVisible(segmentName);
   }
 }

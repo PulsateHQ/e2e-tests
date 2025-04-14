@@ -4,13 +4,13 @@ import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
   // Front-end access token for authentication
-  const accessToken = '655381dbcf03c4c67f8a2b7ad9ed8b953627';
+  const accessTokenForSender = '655381dbcf03c4c67f8a2b7ad9ed8b953627';
   // App ID to use with this token
   const appId = UI_E2E_APP_ID;
 
   test.beforeEach(async ({ loginPage }) => {
     // Login with token before proceeding
-    await loginPage.loginWithToken(accessToken, appId);
+    await loginPage.loginWithToken(accessTokenForSender, appId);
   });
 
   test('should create a new in-app full-screen campaign with URL button', async ({
@@ -75,6 +75,14 @@ test.describe('In-App Campaign Creation', () => {
     await campaignBuilderPage.enterButtonText(buttonText);
     await campaignBuilderPage.selectCTAButtonType('URL');
     await campaignBuilderPage.enterButtonUrl(buttonUrl);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Target Segment
+    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
+
+    await campaignBuilderPage.selectTargetSegment(segmentName);
 
     // Save and continue
     await campaignBuilderPage.clickSaveAndContinue();
