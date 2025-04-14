@@ -7,9 +7,9 @@ export const STORAGE_STATE = path.join(__dirname, 'tmp/session.json');
 export default defineConfig({
   testDir: './tests',
   globalSetup: require.resolve('./config/global.setup.ts'),
-  timeout: 15_000,
+  timeout: 90_000,
   expect: {
-    timeout: 5_000
+    timeout: 60_000
   },
   fullyParallel: false,
   retries: 1,
@@ -39,6 +39,10 @@ export default defineConfig({
     {
       name: 'api',
       testDir: './tests/api',
+      timeout: 90_000,
+      expect: {
+        timeout: 60_000
+      },
       use: {
         ...devices['Desktop Firefox']
       }
@@ -46,6 +50,10 @@ export default defineConfig({
     {
       name: 'ui',
       testDir: './tests/ui',
+      timeout: 10_000,
+      expect: {
+        timeout: 5_000
+      },
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 }

@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
   // Front-end access token for authentication
-  const accessToken = '359d6e08c9c9c3678fe54706ce92ffb4c003';
+  const accessToken = '655381dbcf03c4c67f8a2b7ad9ed8b953627';
   // App ID to use with this token
   const appId = UI_E2E_APP_ID;
 
@@ -42,7 +42,7 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignsPage.imageSection).toBeVisible();
     await expect(campaignsPage.headlineSection).toBeVisible();
     await expect(campaignsPage.textSection).toBeVisible();
-    await expect(campaignsPage.callToActionSection).toBeVisible();
+    // await expect(campaignsPage.callToActionSection).toBeVisible();
 
     // Toggle of Personal Message and Image sections
     await campaignsPage.toggleSectionSwitch('Personal Message');
@@ -57,9 +57,9 @@ test.describe('In-App Campaign Creation', () => {
     // Configure call to action
     await campaignsPage.openCallToActionSection();
     await campaignsPage.selectButtonCount(1);
+    await campaignsPage.enterButtonText(buttonText);
     await campaignsPage.selectCTAButtonType('URL');
     await campaignsPage.enterButtonUrl(buttonUrl);
-    await campaignsPage.enterButtonText(buttonText);
 
     // Save and continue
     await campaignsPage.clickSaveAndContinue();

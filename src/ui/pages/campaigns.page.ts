@@ -1,7 +1,7 @@
 import { UI_E2E_APP_ID } from '@_config/env.config';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
 import { BasePage } from '@_src/ui/pages/base.page';
-import { Locator, Page } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 
 // Type for CTA (Call to Action) button types
 export type CTAButtonType = 'Deeplink' | 'URL' | 'Open Feed' | 'Dismiss';
@@ -37,7 +37,7 @@ export class CampaignsPage extends BasePage {
   imageSection = this.page.getByText('Image', { exact: true });
   headlineSection = this.page.getByText('Headline', { exact: true });
   textSection = this.page.getByText('Text', { exact: true });
-  callToActionSection = this.page.getByText('Call to Action', { exact: true });
+  callToActionSection = this.page.getByText('Call to action');
 
   // Toggle switches
   personalMessageToggle = this.page
@@ -63,24 +63,18 @@ export class CampaignsPage extends BasePage {
     })
     .locator('div[data-testid="textarea"]');
 
-  headlineInput = this.page.locator(
-    'div:nth-child(2) > .collapse > div > div > div[data-testid="textarea"][contenteditable="true"]'
-  );
+  headlineInput = this.page.locator('div:nth-child(2) > .collapse > div > div');
 
   textInput = this.page
-    .locator('div[data-testid="collapse"]')
-    .filter({
-      has: this.page.locator(
-        '.textarea__placeholder:has-text("Tell people more about your campaign")'
-      )
-    })
-    .locator('div[data-testid="textarea"]');
+    .locator('div')
+    .filter({ hasText: /^Tell people more about your campaign\.\.\.$/ });
 
   // =========================================================================
   // Call To Action Locators
   // =========================================================================
 
-  // Button count selection
+  // Button count selection -> feature flag is needed for it called Enable extra buttons for InApps/Feeds
+
   buttonCountDropdown = this.page
     .locator('.dropdown-toggle')
     .filter({ hasText: /1 Button|2 Buttons/ })
@@ -151,18 +145,14 @@ export class CampaignsPage extends BasePage {
   }
 
   async enterHeadline(headline: string): Promise<void> {
-    // First, make sure the Headline section is expanded
-    await this.headlineSection.click();
+    await this.headlineInput.first().click();
 
-    // Wait for the editable element to be visible
-    await this.headlineInput.waitFor({ state: 'visible', timeout: 5000 });
-
-    // Fill in the text
-    await this.headlineInput.fill(headline);
+    await this.page.keyboard.type(headline);
   }
 
   async enterText(text: string): Promise<void> {
-    await this.textInput.fill(text);
+    await this.textInput.click();
+    await this.page.keyboard.type(text);
   }
 
   // =========================================================================
@@ -173,7 +163,6 @@ export class CampaignsPage extends BasePage {
   }
 
   async selectButtonCount(count: 1 | 2): Promise<void> {
-    await this.openCallToActionSection();
     await this.buttonCountDropdown.click();
 
     if (count === 1) {
@@ -202,7 +191,6 @@ export class CampaignsPage extends BasePage {
     type: CTAButtonType,
     buttonIndex: number = 0
   ): Promise<void> {
-    await this.openCallToActionSection();
     await this.getCTAButton(type, buttonIndex).click();
   }
 
@@ -210,9 +198,8 @@ export class CampaignsPage extends BasePage {
   getButtonTextInput(buttonNumber: 1 | 2): Locator {
     return this.page
       .locator(`div`)
-      .filter({ hasText: new RegExp(`Button ${buttonNumber}`) })
-      .locator('.input-group')
-      .locator('input[placeholder="Button Text"]');
+      .filter({ hasText: new RegExp(`Button ${buttonNumber}$`) })
+      .getByPlaceholder('Button Text');
   }
 
   // Specific button text inputs
@@ -224,6 +211,7 @@ export class CampaignsPage extends BasePage {
       await this.buttonTwoTextInput.fill(text);
     } else {
       // Default to first button if no index or index is 1
+      await this.buttonOneTextInput.click();
       await this.buttonOneTextInput.fill(text);
     }
   }
