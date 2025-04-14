@@ -14,8 +14,23 @@ test.describe('In-App Campaign Creation', () => {
   });
 
   test('should create a new in-app full-screen campaign with URL button', async ({
-    campaignsPage
+    campaignsPage,
+    campaignBuilderPage,
+    segmentsPage
   }) => {
+    // Create segment with required details
+    const segmentName = `Segment_${faker.lorem.word()}`;
+    const aliasValue = `67fd1377a97cea96f501d7a8`;
+
+    // Navigate to Targeting section
+    await segmentsPage.clickSidebarCategoryTargeting();
+
+    // Navigate to Segments section
+    await segmentsPage.clickSidebarItemSegments();
+
+    // Create new segment
+    await segmentsPage.createSegmentWithAlias(aliasValue, segmentName);
+
     // Navigate to campaigns section
     await campaignsPage.navigateToCampaignsSection();
 
@@ -23,10 +38,10 @@ test.describe('In-App Campaign Creation', () => {
     await campaignsPage.createNewCampaign();
 
     // Select In-App campaign type
-    await campaignsPage.selectInAppCampaignType();
+    await campaignBuilderPage.selectInAppCampaignType();
 
     // Select Full-Screen layout
-    await campaignsPage.selectInAppLargeLayout();
+    await campaignBuilderPage.selectInAppLargeLayout();
 
     // Create campaign with required details
     const campaignName = `InApp Large Campaign ${Date.now()}`;
@@ -35,33 +50,33 @@ test.describe('In-App Campaign Creation', () => {
     const buttonText = `URL_${faker.lorem.word()}`;
     const buttonUrl = `https://www.google.com`;
 
-    await campaignsPage.enterCampaignName(campaignName);
-    await campaignsPage.clickSaveAndContinue();
+    await campaignBuilderPage.enterCampaignName(campaignName);
+    await campaignBuilderPage.clickSaveAndContinue();
 
-    await expect(campaignsPage.personalMessageSection).toBeVisible();
-    await expect(campaignsPage.imageSection).toBeVisible();
-    await expect(campaignsPage.headlineSection).toBeVisible();
-    await expect(campaignsPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.personalMessageSection).toBeVisible();
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
     // await expect(campaignsPage.callToActionSection).toBeVisible();
 
     // Toggle of Personal Message and Image sections
-    await campaignsPage.toggleSectionSwitch('Personal Message');
-    await campaignsPage.toggleSectionSwitch('Image');
+    await campaignBuilderPage.toggleSectionSwitch('Personal Message');
+    await campaignBuilderPage.toggleSectionSwitch('Image');
 
     // Enter Headline and Text
-    await campaignsPage.expandCollapseSection('Headline');
-    await campaignsPage.enterHeadline(campaignHeadline);
-    await campaignsPage.expandCollapseSection('Text');
-    await campaignsPage.enterText(campaignText);
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
 
     // Configure call to action
-    await campaignsPage.openCallToActionSection();
-    await campaignsPage.selectButtonCount(1);
-    await campaignsPage.enterButtonText(buttonText);
-    await campaignsPage.selectCTAButtonType('URL');
-    await campaignsPage.enterButtonUrl(buttonUrl);
+    await campaignBuilderPage.openCallToActionSection();
+    await campaignBuilderPage.selectButtonCount(1);
+    await campaignBuilderPage.enterButtonText(buttonText);
+    await campaignBuilderPage.selectCTAButtonType('URL');
+    await campaignBuilderPage.enterButtonUrl(buttonUrl);
 
     // Save and continue
-    await campaignsPage.clickSaveAndContinue();
+    await campaignBuilderPage.clickSaveAndContinue();
   });
 });

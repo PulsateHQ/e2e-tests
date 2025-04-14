@@ -1,3 +1,4 @@
+import { CampaignBuilderPage } from '../pages/campaignBuilder.page';
 import { MainNavigationComponent } from '@_src/ui/components/mainNavigation.component';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
 import { CampaignStatsPage } from '@_src/ui/pages/campaignStats.page';
@@ -21,6 +22,7 @@ interface Pages {
   segmentsPage: SegmentsPage;
   geofencesPage: GeofencesPage;
   campaignsPage: CampaignsPage;
+  campaignBuilderPage: CampaignBuilderPage;
   journeysPage: JourneysPage;
   usersPage: UsersPage;
   sideBarComponent: SideBarComponent;
@@ -61,6 +63,10 @@ export const pageObjectTest = baseTest.extend<Pages>({
   campaignsPage: async ({ page }, use) => {
     const campaignsPage = new CampaignsPage(page);
     await use(campaignsPage);
+  },
+  campaignBuilderPage: async ({ page }, use) => {
+    const campaignBuilderPage = new CampaignBuilderPage(page);
+    await use(campaignBuilderPage);
   },
   journeysPage: async ({ page }, use) => {
     const journeysPage = new JourneysPage(page);
