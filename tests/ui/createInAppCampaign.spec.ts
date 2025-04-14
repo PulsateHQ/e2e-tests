@@ -86,5 +86,25 @@ test.describe('In-App Campaign Creation', () => {
 
     // Save and continue
     await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Delivery Settings
+    await expect(campaignBuilderPage.deliverStepHeading).toBeVisible();
+
+    await campaignBuilderPage.configureDeliverySettings();
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Review
+    await expect(campaignBuilderPage.reviewStepHeading).toBeVisible();
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Send Campaign
+    await campaignBuilderPage.sendCampaign();
+
+    // Verify campaign is created
+    await campaignsPage.verifyCampaignIsCreated(campaignName);
   });
 });

@@ -1,5 +1,6 @@
 import { BasePage } from '@_src/ui/pages/base.page';
 import { Locator, Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 // Type for CTA (Call to Action) button types (Copied from CampaignsPage)
 export type CTAButtonType = 'Deeplink' | 'URL' | 'Open Feed' | 'Dismiss';
@@ -92,6 +93,39 @@ export class CampaignBuilderPage extends BasePage {
   getSegmentTargetingOption(segmentName: string): Locator {
     return this.page.getByRole('button', { name: segmentName, exact: true });
   }
+
+  // =========================================================================
+  // Deliver Step Locators (New)
+  // =========================================================================
+  deliverStepHeading: Locator = this.page.getByRole('heading', {
+    name: 'Which users should receive' // Using partial name for robustness
+  });
+  // Using getByText for now, might need refinement if structure changes
+  oneTimeSegmentOption: Locator = this.page.getByText(
+    'One Time Segment', // Find the container by this text
+    { exact: false } // Allow partial match in case description changes slightly
+  );
+  immediatelyActivationButton: Locator = this.page.getByText('Immediately', {
+    exact: true
+  });
+  // Assuming 'Never' relates to an expiry setting that appears
+  neverExpireOption: Locator = this.page.getByText('Never', { exact: true });
+
+  // =========================================================================
+  // Review Step Locators (New)
+  // =========================================================================
+
+  reviewStepHeading: Locator = this.page.getByRole('heading', {
+    name: 'You are about to send this In-App Campaign'
+  });
+
+  sendCampaignButton: Locator = this.page.getByRole('button', {
+    name: 'Send Campaign'
+  });
+
+  sendCampaignDialogButton: Locator = this.page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Send Campaign' });
 
   // =========================================================================
   // Constructor
@@ -344,5 +378,31 @@ export class CampaignBuilderPage extends BasePage {
 
     const segmentOption = this.getSegmentTargetingOption(segmentName);
     await segmentOption.click();
+  }
+
+  // =========================================================================
+  // Deliver Step Methods (New)
+  // =========================================================================
+  /**
+   * Configures the basic delivery settings: One Time Segment, Immediate activation, Never expires.
+   */
+  async configureDeliverySettings(): Promise<void> {
+    // Select the "One Time Segment" option
+    await this.oneTimeSegmentOption.click();
+
+    // Select "Immediately" for activation
+    await this.immediatelyActivationButton.click();
+
+    // Select "Never" for expiry (assuming this appears after clicking Immediately or is default)
+    await this.neverExpireOption.click();
+  }
+
+  // =========================================================================
+  // Review Step Methods (New)
+  // =========================================================================
+
+  async sendCampaign(): Promise<void> {
+    await this.sendCampaignButton.click();
+    await this.sendCampaignDialogButton.click();
   }
 }

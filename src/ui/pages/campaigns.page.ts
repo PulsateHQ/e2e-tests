@@ -1,7 +1,7 @@
 import { UI_E2E_APP_ID } from '@_config/env.config';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
 import { BasePage } from '@_src/ui/pages/base.page';
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 export class CampaignsPage extends BasePage {
   url = `/mobile/apps/${UI_E2E_APP_ID}/campaigns`;
@@ -29,5 +29,12 @@ export class CampaignsPage extends BasePage {
 
   async createNewCampaign(): Promise<void> {
     await this.newCampaignButton.click();
+  }
+
+  async verifyCampaignIsCreated(campaignName: string): Promise<void> {
+    await expect(
+      this.page.getByText(campaignName),
+      `Campaign '${campaignName}' should be visible`
+    ).toBeVisible();
   }
 }
