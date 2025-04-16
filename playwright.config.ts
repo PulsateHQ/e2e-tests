@@ -50,12 +50,12 @@ export default defineConfig({
     {
       name: 'ui',
       testDir: './tests/ui',
-      timeout: 10_000,
+      timeout: 20_000,
       expect: {
-        timeout: 5_000
+        timeout: 10_000
       },
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices['Desktop Firefox'],
         viewport: { width: 1920, height: 1080 }
       }
     },

@@ -101,10 +101,10 @@ export class CampaignBuilderPage extends BasePage {
     name: 'Which users should receive' // Using partial name for robustness
   });
   // Using getByText for now, might need refinement if structure changes
-  oneTimeSegmentOption: Locator = this.page.getByText(
-    'One Time Segment', // Find the container by this text
-    { exact: false } // Allow partial match in case description changes slightly
-  );
+  oneTimeSegmentOption: Locator = this.page.getByRole('img', {
+    name: 'One Time Segment'
+  });
+
   immediatelyActivationButton: Locator = this.page.getByText('Immediately', {
     exact: true
   });
@@ -115,8 +115,8 @@ export class CampaignBuilderPage extends BasePage {
   // Review Step Locators (New)
   // =========================================================================
 
-  reviewStepHeading: Locator = this.page.getByRole('heading', {
-    name: 'You are about to send this In-App Campaign'
+  notificationStepHeading: Locator = this.page.getByRole('heading', {
+    name: 'Notification'
   });
 
   sendCampaignButton: Locator = this.page.getByRole('button', {
@@ -302,8 +302,6 @@ export class CampaignBuilderPage extends BasePage {
         await this.callToActionSection.click();
         break;
     }
-    // Add a small wait for animations potentially triggered by expansion
-    await this.page.waitForTimeout(500);
   }
 
   async toggleSectionSwitch(

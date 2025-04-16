@@ -96,15 +96,19 @@ test.describe('In-App Campaign Creation', () => {
     await campaignBuilderPage.clickSaveAndContinue();
 
     // Select Review
-    await expect(campaignBuilderPage.reviewStepHeading).toBeVisible();
-
-    // Save and continue
-    await campaignBuilderPage.clickSaveAndContinue();
+    await expect(campaignBuilderPage.notificationStepHeading).toBeVisible();
 
     // Send Campaign
     await campaignBuilderPage.sendCampaign();
 
+    // Verify that new campaign button is visible
+    await expect(campaignsPage.newCampaignButton).toBeVisible();
+
     // Verify campaign is created
     await campaignsPage.verifyCampaignIsCreated(campaignName);
+
+    // Verify campaign status
+    await campaignsPage.verifyCampaignStatus(campaignName, 'Scheduled', 30_000);
+    await campaignsPage.verifyCampaignStatus(campaignName, 'Delivered', 30_000);
   });
 });
