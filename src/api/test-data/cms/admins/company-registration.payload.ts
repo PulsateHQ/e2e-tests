@@ -14,7 +14,7 @@ export const generateCompanyPayload = (
     password_confirmation: password,
     activation_code: activationCode,
     company_name: faker.company.name(),
-    app_name: faker.company.catchPhrase(),
+    app_name: faker.company.name(),
     role: 'master_admin',
     generate_admin_token: true
   };

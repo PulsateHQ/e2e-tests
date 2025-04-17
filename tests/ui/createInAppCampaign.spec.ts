@@ -1,89 +1,97 @@
 import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN,
-  UI_E2E_APP_ID
+  UI_E2E_ACCESS_TOKEN_ADMIN,
+  UI_E2E_APP_ID,
+  UI_E2E_FRONT_END_ACCESS_TOKEN
 } from '@_config/env.config';
-import {
-  getAdminById,
-  getAllAdmins,
-  registerCompany
-} from '@_src/api/factories/admin.api.factory';
+import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import {
   superAdminsActivationCodesCreate,
   superAdminsFeatureFLagDefaultBatchUpdate
 } from '@_src/api/factories/super.admin.api.factory';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
+import { UIE2ELoginUserModel } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
   // Front-end access token for authentication
-  const accessTokenForSender = '655381dbcf03c4c67f8a2b7ad9ed8b953627';
-  // App ID to use with this token
-  const appId = UI_E2E_APP_ID;
 
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
+  const UIE2ELoginUserModel: UIE2ELoginUserModel = {
+    uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
+    uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
+    uiE2EAppId: `${UI_E2E_APP_ID}`,
+    uiE2EFrontEndAccessToken: `${UI_E2E_FRONT_END_ACCESS_TOKEN}`
   };
 
-  beforeEach(async ({ request }) => {
+  let adminAliasForCampaignReciver: string;
+  let adminFrontendAccessTokenForCampaignReciver: string;
+  let appIdForCampaignReciver: string;
+
+  test.beforeEach(async ({ request, loginPage }) => {
     // Arrange
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
         request,
-        APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin
+        UIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin
       );
-
     const supserAdminActivationCodeCreateResponseJson =
       await supserAdminActivationCodeCreateResponse.json();
-
     const activationCode =
       supserAdminActivationCodeCreateResponseJson.activation_code;
-
     const registrationData = generateCompanyPayload(activationCode);
 
-    // Register Company
     const companyRegistrationResponse = await registerCompany(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      UIE2ELoginUserModel.uiE2EAccessTokenAdmin,
       registrationData
     );
 
     const companyRegistrationResponseJson =
       await companyRegistrationResponse.json();
 
-    const appIdForCampaignReciver =
+    appIdForCampaignReciver =
       companyRegistrationResponseJson.data.recent_mobile_app_id;
 
-    const adminAccessToken =
-      companyRegistrationResponseJson.data.admin_access_token;
+    adminFrontendAccessTokenForCampaignReciver =
+      companyRegistrationResponseJson.data.front_end_access_token;
 
-    const adminFrontedAccessToken =
-      companyRegistrationResponseJson.data.fronted_access_token;
+    // adminAccessTokenForCampaignReciver =
+    //   companyRegistrationResponseJson.data.admin_access_token;
 
-    // Get Admin Information
-    const getAllAdminsResponse = await getAllAdmins(
-      request,
-      adminAccessToken,
-      appIdForCampaignReciver
-    );
-
-    const getAllAdminsResponseJson = await getAllAdminsResponse.json();
-
-    const adminDetailResponse = await getAdminById(
-      request,
-      adminAccessToken,
-      appIdForCampaignReciver,
-      getAllAdminsResponseJson.data[0].id
-    );
+    adminAliasForCampaignReciver =
+      companyRegistrationResponseJson.data._id.$oid;
 
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
+      UIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin,
       [appIdForCampaignReciver]
+    );
+
+    // // 2. Get Admin Information
+    // const getAllAdminsResponse = await getAllAdmins(
+    //   request,
+    //   adminAccessTokenForCampaignReciver,
+    //   appIdForCampaignReciver
+    // );
+    // const getAllAdminsResponseJson = await getAllAdminsResponse.json();
+
+    // const whoAmIResponse = await getWhoAmI(
+    //   request,
+    //   adminAccessTokenForCampaignReciver
+    // );
+    // const whoAmIResponseJson = await whoAmIResponse.json();
+    // console.log(whoAmIResponseJson);
+
+    // await getAdminById(
+    //   request,
+    //   adminAccessTokenForCampaignReciver,
+    //   appIdForCampaignReciver,
+    //   getAllAdminsResponseJson.data[0].id
+
+    await loginPage.loginWithToken(
+      adminFrontendAccessTokenForCampaignReciver,
+      appIdForCampaignReciver
     );
   });
 
@@ -94,10 +102,13 @@ test.describe('In-App Campaign Creation', () => {
     segmentsPage
   }) => {
     // Login with token before proceeding
-    await loginPage.loginWithToken(accessTokenForSender, appId);
+    await loginPage.loginWithToken(
+      UIE2ELoginUserModel.uiE2EFrontEndAccessToken,
+      UIE2ELoginUserModel.uiE2EAppId
+    );
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `67fd1377a97cea96f501d7a8`;
+    const aliasValue = `${adminAliasForCampaignReciver}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -189,6 +200,11 @@ test.describe('In-App Campaign Creation', () => {
       campaignName,
       'Delivered',
       60_000
+    );
+
+    await loginPage.loginWithToken(
+      adminFrontendAccessTokenForCampaignReciver,
+      appIdForCampaignReciver
     );
   });
 });

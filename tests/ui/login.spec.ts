@@ -1,16 +1,16 @@
 import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
   BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
+  UI_E2E_ACCESS_TOKEN_ADMIN,
+  UI_E2E_APP_ID,
   UI_E2E_LOGIN_ADMIN,
   UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
 import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import { superAdminsActivationCodesCreate } from '@_src/api/factories/super.admin.api.factory';
-import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
+import { UIE2ELoginUserModel } from '@_src/ui/models/admin.model';
 import { UI2E2LoginUserModel } from '@_src/ui/models/user.model';
 
 test.describe('Login Functionality', () => {
@@ -78,17 +78,17 @@ test.describe('Login Functionality', () => {
     mainNavigationComponent,
     request
   }) => {
-    const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-      apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-      apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-      apiE2EAppId: `${API_E2E_APP_ID}`
+    const APIE2ELoginUserModel: UIE2ELoginUserModel = {
+      uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
+      uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
+      uiE2EAppId: `${UI_E2E_APP_ID}`
     };
 
     // Arrange
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
         request,
-        APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin
+        APIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin
       );
     const supserAdminActivationCodeCreateResponseJson =
       await supserAdminActivationCodeCreateResponse.json();
@@ -100,7 +100,7 @@ test.describe('Login Functionality', () => {
     // 1. Register Company
     const companyRegistrationResponse = await registerCompany(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.uiE2EAccessTokenAdmin,
       registrationData
     );
 

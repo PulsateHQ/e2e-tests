@@ -8,10 +8,6 @@ test.describe('Forgot Password Functionality', () => {
     userEmail: 'incorrect_email.com',
     userPassword: ''
   };
-  const loginUserData: UI2E2LoginUserModel = {
-    userEmail: 'randomEmail@pulsate.com',
-    userPassword: ''
-  };
 
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.forgotPasswordButton.click();

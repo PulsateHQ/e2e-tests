@@ -24,7 +24,7 @@ export const featureFlagsTestData: FeatureFlagsRequest = {
         ff_campaigns_goals: false,
         ff_messages: false,
         ff_segment_delivery: false,
-        ff_web_sdk: false,
+        ff_web_sdk: true,
         ff_csv_users_upload: true,
         ff_pulsate_beta: true,
         ff_dashboard_beta: true,

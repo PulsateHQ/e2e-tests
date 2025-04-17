@@ -13,17 +13,23 @@ export function generateCompanyRegistrationData(): CompanyRegistrationModel {
     prefix: 'A1!'
   });
 
+  // Generate single-word names using specific Faker methods
+  const fullName = faker.person.firstName(); // Just a first name
+  const username = faker.internet.userName().split('.')[0]; // First part of username
+  const companyName = faker.company.buzzPhrase().split(' ')[0]; // First word of a company phrase
+  const appName = faker.commerce.productName().split(' ')[0]; // First word of a product name
+
   return {
-    fullName: faker.internet.userName(),
-    username: faker.internet.userName(),
+    fullName,
+    username,
     invalidEmail: 'wrong_email.com',
     validEmail: faker.internet.email(),
     shortPassword: faker.internet.password({ length: 7 }),
     validPassword,
     // Intentionally different from validPassword to test mismatch errors
     passwordConfirmation: 'Password',
-    companyName: faker.company.name(),
-    appName: faker.company.name(),
+    companyName,
+    appName,
     activationCode: '012345678012345678012345678012345678'
   };
 }
