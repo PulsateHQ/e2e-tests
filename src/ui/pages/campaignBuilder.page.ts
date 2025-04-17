@@ -1,13 +1,12 @@
 import { BasePage } from '@_src/ui/pages/base.page';
 import { Locator, Page } from '@playwright/test';
-import { expect } from '@playwright/test';
 
-// Type for CTA (Call to Action) button types (Copied from CampaignsPage)
+// Type for CTA (Call to Action) button types
 export type CTAButtonType = 'Deeplink' | 'URL' | 'Open Feed' | 'Dismiss';
 
 export class CampaignBuilderPage extends BasePage {
   // =========================================================================
-  // Campaign Setup Locators (Moved from CampaignsPage)
+  // Campaign Setup Locators
   // =========================================================================
   inAppCampaignTile = this.page.getByTestId('in_app');
   inAppLargeLayoutOption = this.page.getByTestId('inapp-large');
@@ -19,7 +18,7 @@ export class CampaignBuilderPage extends BasePage {
   campaignNameInput = this.page.getByRole('textbox', { name: 'Campaign Name' });
 
   // =========================================================================
-  // Content Section Locators (Moved from CampaignsPage)
+  // Content Section Locators
   // =========================================================================
   personalMessageSection = this.page.getByText('Personal Message', {
     exact: true
@@ -58,7 +57,7 @@ export class CampaignBuilderPage extends BasePage {
     .filter({ hasText: /^Tell people more about your campaign\.\.\.$/ });
 
   // =========================================================================
-  // Call To Action Locators (Moved from CampaignsPage)
+  // Call To Action Locators
   // =========================================================================
   buttonCountDropdown = this.page
     .locator('.dropdown-toggle')
@@ -85,7 +84,7 @@ export class CampaignBuilderPage extends BasePage {
   deeplinkDropdown = this.page.getByRole('button', { name: 'Select Deeplink' });
 
   // =========================================================================
-  // Target Step Locators (New)
+  // Target Step Locators
   // =========================================================================
   segmentsTargetingToggle = this.page.locator('.react-switch-bg').first();
 
@@ -95,7 +94,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   // =========================================================================
-  // Deliver Step Locators (New)
+  // Deliver Step Locators
   // =========================================================================
   deliverStepHeading: Locator = this.page.getByRole('heading', {
     name: 'Which users should receive' // Using partial name for robustness
@@ -112,7 +111,7 @@ export class CampaignBuilderPage extends BasePage {
   neverExpireOption: Locator = this.page.getByText('Never', { exact: true });
 
   // =========================================================================
-  // Review Step Locators (New)
+  // Review Step Locators
   // =========================================================================
 
   notificationStepHeading: Locator = this.page.getByRole('heading', {
@@ -136,7 +135,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   // =========================================================================
-  // Campaign Setup Methods (Moved from CampaignsPage)
+  // Campaign Setup Methods
   // =========================================================================
   async selectInAppCampaignType(): Promise<void> {
     await this.inAppCampaignTile.click();
@@ -155,7 +154,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   // =========================================================================
-  // Content Section Methods (Moved from CampaignsPage)
+  // Content Section Methods
   // =========================================================================
   async enterPersonalMessage(message: string): Promise<void> {
     await this.personalMessageInput.fill(message);
@@ -174,7 +173,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   // =========================================================================
-  // Call To Action Methods (Moved from CampaignsPage)
+  // Call To Action Methods
   // =========================================================================
   async openCallToActionSection(): Promise<void> {
     await this.callToActionSection.click();
@@ -275,7 +274,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   // =========================================================================
-  // Setup Helper Methods (Moved from CampaignsPage)
+  // Setup Helper Methods
   // =========================================================================
   async expandCollapseSection(
     section:
@@ -379,7 +378,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   // =========================================================================
-  // Deliver Step Methods (New)
+  // Deliver Step Methods
   // =========================================================================
   /**
    * Configures the basic delivery settings: One Time Segment, Immediate activation, Never expires.
@@ -396,7 +395,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   // =========================================================================
-  // Review Step Methods (New)
+  // Review Step Methods
   // =========================================================================
 
   async sendCampaign(): Promise<void> {

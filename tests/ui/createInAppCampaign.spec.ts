@@ -16,8 +16,7 @@ test.describe('In-App Campaign Creation', () => {
   test('should create a new in-app full-screen campaign with URL button', async ({
     campaignsPage,
     campaignBuilderPage,
-    segmentsPage,
-    page
+    segmentsPage
   }) => {
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
