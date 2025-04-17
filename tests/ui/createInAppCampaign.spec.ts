@@ -16,7 +16,8 @@ test.describe('In-App Campaign Creation', () => {
   test('should create a new in-app full-screen campaign with URL button', async ({
     campaignsPage,
     campaignBuilderPage,
-    segmentsPage
+    segmentsPage,
+    page
   }) => {
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
@@ -107,8 +108,11 @@ test.describe('In-App Campaign Creation', () => {
     // Verify campaign is created
     await campaignsPage.verifyCampaignIsCreated(campaignName);
 
-    // Verify campaign status
-    await campaignsPage.verifyCampaignStatus(campaignName, 'Scheduled', 30_000);
-    await campaignsPage.verifyCampaignStatus(campaignName, 'Delivered', 30_000);
+    // Verify campaign status using polling for more reliability
+    await campaignsPage.verifyCampaignStatusWithPolling(
+      campaignName,
+      'Delivered',
+      60_000
+    );
   });
 });

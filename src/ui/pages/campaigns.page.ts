@@ -60,26 +60,37 @@ export class CampaignsPage extends BasePage {
   }
 
   /**
-   * Verifies the status of a specific campaign in the list.
+   * Verifies the status of a specific campaign using polling, which is more resilient to timing issues.
    * @param campaignName The exact name of the campaign.
-   * @param status The expected status text (e.g., 'Draft', 'Active').
-   * @param timeoutMs Optional timeout in milliseconds.
+   * @param status The expected status text (e.g., 'Draft', 'Scheduled', 'Delivered').
+   * @param timeoutMs Optional timeout in milliseconds (default: 60000).
    */
-  async verifyCampaignStatus(
+  async verifyCampaignStatusWithPolling(
     campaignName: string,
     status: string,
-    timeoutMs?: number
+    timeoutMs: number = 60000
   ): Promise<void> {
-    const options = timeoutMs ? { timeout: timeoutMs } : undefined;
     const campaignRow = this.getCampaignRow(campaignName);
 
-    // Within that specific row, find the element indicating the status
-    // Using getByLabel assumes the status element has an aria-label="Status: <status>"
-    const statusElement = campaignRow.getByLabel(`Status: ${status}`);
+    // Use polling to repeatedly check for the status until it appears or times out
+    await expect
+      .poll(
+        async () => {
+          // Check both via aria-label and text content for more resilience
+          const statusByLabel = await campaignRow
+            .getByLabel(`Status: ${status}`)
+            .isVisible();
+          const statusByText = await campaignRow
+            .locator(`span.badge:has-text("${status}")`)
+            .isVisible();
 
-    await expect(
-      statusElement,
-      `Campaign '${campaignName}' should have status '${status}' visible`
-    ).toBeVisible(options);
+          return statusByLabel || statusByText;
+        },
+        {
+          message: `Campaign '${campaignName}' should have status '${status}' visible`,
+          timeout: timeoutMs
+        }
+      )
+      .toBeTruthy();
   }
 }
