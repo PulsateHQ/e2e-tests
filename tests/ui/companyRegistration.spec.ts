@@ -1,28 +1,15 @@
 import { BASE_URL } from '@_config/env.config';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { CompanyRegistrationModel } from '@_src/ui/models/user.model';
-import { faker } from '@faker-js/faker/locale/en';
-
-const registrationData: CompanyRegistrationModel = {
-  fullName: faker.internet.username(),
-  username: faker.internet.username(),
-  invalidEmail: 'wrong_email.com',
-  validEmail: faker.internet.email(),
-  shortPassword: faker.internet.password({ length: 7 }),
-  validPassword: faker.internet.password({
-    length: 8,
-    memorable: false,
-    pattern: /[A-Za-z0-9!@#$%^&*()_+]/,
-    prefix: 'A1!'
-  }),
-  passwordConfirmation: 'Password',
-  companyName: faker.company.name(),
-  appName: faker.company.name(),
-  activationCode: '012345678012345678012345678012345678'
-};
+import { generateCompanyRegistrationData } from '@_src/ui/test-data/company-registration.data';
 
 test.describe('Company Registration Page', () => {
+  let registrationData: CompanyRegistrationModel;
+
   test.beforeEach(async ({ companyRegistrationPage }) => {
+    // Generate fresh test data for each test
+    registrationData = generateCompanyRegistrationData();
+
     const expectedURL = `${BASE_URL}/admins/company_registration`;
     const companyRegistrationURL = await companyRegistrationPage.validateUrl();
     expect(companyRegistrationURL).toBe(expectedURL);
