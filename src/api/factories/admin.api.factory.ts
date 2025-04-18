@@ -383,3 +383,22 @@ export async function deleteAdmin(
 
   return response;
 }
+
+export async function logoutAdmin(
+  request: APIRequestContext,
+  authToken: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
+    Authorization: `Token token=${authToken}`
+  };
+
+  const response = await request.delete(apiUrls.admins.v2.logout, {
+    headers
+  });
+
+  // Validate successful logout - just check the status code
+  expect(response.status()).toBe(200);
+
+  return response;
+}

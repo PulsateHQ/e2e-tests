@@ -8,7 +8,7 @@ export const generateCompanyPayload = (
 
   return {
     name: faker.person.fullName(),
-    email: faker.internet.email({ provider: 'pulsatehq.com' }),
+    email: faker.internet.email({ provider: 'pulsatehq.com' }).toLowerCase(),
     username: faker.internet.username().toLowerCase(),
     password: password,
     password_confirmation: password,

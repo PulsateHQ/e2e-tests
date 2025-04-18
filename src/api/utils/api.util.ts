@@ -18,7 +18,8 @@ export const apiUrls = {
     v2: {
       register: `${BASE_URL}/admins/api/v2/register`,
       whoami: `${BASE_URL}/sessions/api/v2/whoami`,
-      currentAdmin: `${BASE_URL}/admins/current_admin`
+      currentAdmin: `${BASE_URL}/admins/current_admin`,
+      logout: `${BASE_URL}/admins/api/v2/logout`
     }
   },
 

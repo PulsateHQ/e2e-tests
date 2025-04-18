@@ -5,11 +5,17 @@ import {
   UI_E2E_FRONT_END_ACCESS_TOKEN
 } from '@_config/env.config';
 import { registerCompany } from '@_src/api/factories/admin.api.factory';
+import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import {
   superAdminsActivationCodesCreate,
   superAdminsFeatureFLagDefaultBatchUpdate
 } from '@_src/api/factories/super.admin.api.factory';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+import {
+  createMobileSessionPayload,
+  startMobileSessionInAppPayload
+} from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { UIE2ELoginUserModel } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
@@ -27,8 +33,10 @@ test.describe('In-App Campaign Creation', () => {
   let adminAliasForCampaignReciver: string;
   let adminFrontendAccessTokenForCampaignReciver: string;
   let appIdForCampaignReciver: string;
+  let sdkAccessTokenForCampaignReciver: string;
+  let adminAccessTokenForCampaignReciver: string;
 
-  test.beforeEach(async ({ request, loginPage }) => {
+  test.beforeEach(async ({ request }) => {
     // Arrange
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
@@ -56,42 +64,39 @@ test.describe('In-App Campaign Creation', () => {
     adminFrontendAccessTokenForCampaignReciver =
       companyRegistrationResponseJson.data.front_end_access_token;
 
-    // adminAccessTokenForCampaignReciver =
-    //   companyRegistrationResponseJson.data.admin_access_token;
+    adminAccessTokenForCampaignReciver =
+      companyRegistrationResponseJson.data.admin_access_token;
 
     adminAliasForCampaignReciver =
       companyRegistrationResponseJson.data._id.$oid;
+
+    const sdkCredentialsResponse = await getSdkCredentials(
+      request,
+      adminAccessTokenForCampaignReciver,
+      appIdForCampaignReciver
+    );
+
+    const sdkCredentialsResponseJson = await sdkCredentialsResponse.json();
+
+    sdkAccessTokenForCampaignReciver = sdkCredentialsResponseJson.access_token;
+
+    const userSessionPayloadForCampaignReciver = createMobileSessionPayload({
+      alias: adminAliasForCampaignReciver,
+      device: {
+        ...startMobileSessionInAppPayload.device
+      }
+    });
+
+    await startMobileSessionsWithApi(
+      request,
+      sdkAccessTokenForCampaignReciver,
+      userSessionPayloadForCampaignReciver
+    );
 
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
       UIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin,
       [appIdForCampaignReciver]
-    );
-
-    // // 2. Get Admin Information
-    // const getAllAdminsResponse = await getAllAdmins(
-    //   request,
-    //   adminAccessTokenForCampaignReciver,
-    //   appIdForCampaignReciver
-    // );
-    // const getAllAdminsResponseJson = await getAllAdminsResponse.json();
-
-    // const whoAmIResponse = await getWhoAmI(
-    //   request,
-    //   adminAccessTokenForCampaignReciver
-    // );
-    // const whoAmIResponseJson = await whoAmIResponse.json();
-    // console.log(whoAmIResponseJson);
-
-    // await getAdminById(
-    //   request,
-    //   adminAccessTokenForCampaignReciver,
-    //   appIdForCampaignReciver,
-    //   getAllAdminsResponseJson.data[0].id
-
-    await loginPage.loginWithToken(
-      adminFrontendAccessTokenForCampaignReciver,
-      appIdForCampaignReciver
     );
   });
 
@@ -100,7 +105,8 @@ test.describe('In-App Campaign Creation', () => {
     campaignsPage,
     campaignBuilderPage,
     segmentsPage,
-    dashboardPage
+    dashboardPage,
+    page
   }) => {
     // Login with token before proceeding
     await loginPage.loginWithToken(
@@ -208,6 +214,8 @@ test.describe('In-App Campaign Creation', () => {
       appIdForCampaignReciver
     );
 
-    await dashboardPage.verifyInAppButtonWithPolling(buttonText, 120_000);
+    await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
+    await page.reload();
+    await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
   });
 });
