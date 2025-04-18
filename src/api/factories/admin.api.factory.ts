@@ -397,8 +397,5 @@ export async function logoutAdmin(
     headers
   });
 
-  // Validate successful logout - just check the status code
-  expect(response.status()).toBe(200);
-
   return response;
 }

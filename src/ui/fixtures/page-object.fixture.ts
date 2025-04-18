@@ -1,3 +1,4 @@
+import { AccountSettingsPage } from '../pages/accountSettings.page';
 import { CampaignBuilderPage } from '../pages/campaignBuilder.page';
 import { MainNavigationComponent } from '@_src/ui/components/mainNavigation.component';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
@@ -15,6 +16,7 @@ import { test as baseTest } from '@playwright/test';
 
 interface Pages {
   loginPage: LoginPage;
+  accountSettingsPage: AccountSettingsPage;
   forgotPasswordPage: ForgotPasswordPage;
   companyRegistrationPage: CompanyRegistrationPage;
   dashboardPage: DashboardPage;
@@ -83,5 +85,9 @@ export const pageObjectTest = baseTest.extend<Pages>({
   mainNavigationComponent: async ({ page }, use) => {
     const mainNavigationComponent = new MainNavigationComponent(page);
     await use(mainNavigationComponent);
+  },
+  accountSettingsPage: async ({ page }, use) => {
+    const accountSettingsPage = new AccountSettingsPage(page);
+    await use(accountSettingsPage);
   }
 });

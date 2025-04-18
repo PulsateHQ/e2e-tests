@@ -4,7 +4,10 @@ import {
   UI_E2E_APP_ID,
   UI_E2E_FRONT_END_ACCESS_TOKEN
 } from '@_config/env.config';
-import { registerCompany } from '@_src/api/factories/admin.api.factory';
+import {
+  logoutAdmin,
+  registerCompany
+} from '@_src/api/factories/admin.api.factory';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import {
@@ -106,7 +109,7 @@ test.describe('In-App Campaign Creation', () => {
     campaignBuilderPage,
     segmentsPage,
     dashboardPage,
-    page
+    request
   }) => {
     // Login with token before proceeding
     await loginPage.loginWithToken(
@@ -208,14 +211,15 @@ test.describe('In-App Campaign Creation', () => {
       'Delivered',
       60_000
     );
+    // await accountSettingsPage.signOut();
+
+    await logoutAdmin(request, UIE2ELoginUserModel.uiE2EAccessTokenAdmin);
 
     await loginPage.loginWithToken(
       adminFrontendAccessTokenForCampaignReciver,
       appIdForCampaignReciver
     );
 
-    await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
-    await page.reload();
     await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
   });
 });
