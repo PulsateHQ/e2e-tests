@@ -99,7 +99,8 @@ test.describe('In-App Campaign Creation', () => {
     loginPage,
     campaignsPage,
     campaignBuilderPage,
-    segmentsPage
+    segmentsPage,
+    dashboardPage
   }) => {
     // Login with token before proceeding
     await loginPage.loginWithToken(
@@ -206,5 +207,7 @@ test.describe('In-App Campaign Creation', () => {
       adminFrontendAccessTokenForCampaignReciver,
       appIdForCampaignReciver
     );
+
+    await dashboardPage.verifyInAppButtonWithPolling(buttonText, 120_000);
   });
 });
