@@ -1,4 +1,5 @@
 import {
+  BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
   UI_E2E_ACCESS_TOKEN_ADMIN,
   UI_E2E_APP_ID,
@@ -116,6 +117,12 @@ test.describe('In-App Campaign Creation', () => {
       UIE2ELoginUserModel.uiE2EFrontEndAccessToken,
       UIE2ELoginUserModel.uiE2EAppId
     );
+    const expectedURL = `${BASE_URL}/mobile/apps/${UIE2ELoginUserModel.uiE2EAppId}/dashboard_beta`;
+    const dashboardURL = await dashboardPage.validateUrl();
+
+    // Assert
+    expect(dashboardURL).toBe(expectedURL);
+
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${adminAliasForCampaignReciver}`;
