@@ -36,6 +36,8 @@ export class SegmentsPage extends BasePage {
     exact: true
   });
 
+  totalUsersSpan: Locator = this.page.getByLabel('Total Users');
+
   // =========================================================================
   // Constructor
   // =========================================================================
@@ -100,6 +102,16 @@ export class SegmentsPage extends BasePage {
     ).toBeVisible();
   }
 
+  async verifySegmentTotalUsers(
+    segmentName: string,
+    expectedUserCount: string
+  ): Promise<void> {
+    await expect(
+      this.totalUsersSpan,
+      `Total users for segment '${segmentName}' should be '${expectedUserCount}'`
+    ).toHaveText(expectedUserCount);
+  }
+
   async createSegmentWithAlias(
     aliasValue: string,
     segmentName: string
@@ -109,5 +121,6 @@ export class SegmentsPage extends BasePage {
     await this.saveSegmentDefinition();
     await this.nameAndSaveSegment(segmentName);
     await this.verifySegmentLinkIsVisible(segmentName);
+    await this.verifySegmentTotalUsers(segmentName, '1'); // Added validation for 1 user
   }
 }

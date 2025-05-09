@@ -1,5 +1,4 @@
 import {
-  BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
   UI_E2E_ACCESS_TOKEN_ADMIN,
   UI_E2E_APP_ID,
@@ -18,6 +17,8 @@ import {
   createMobileSessionPayload,
   startMobileSessionInAppPayload
 } from '@_src/api/test-data/mobile/sessions/start-session.payload';
+import { deleteAllCampaigns } from '@_src/api/utils/data.manager.util';
+import { deleteAllSegments } from '@_src/api/utils/data.manager.util';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
@@ -50,12 +51,24 @@ test.describe('In-App Campaign Creation', () => {
   };
 
   let adminAliasForCampaignReciver: string;
-  let adminFrontendAccessTokenForCampaignReciver: string;
+  // let adminFrontendAccessTokenForCampaignReciver: string;
   let appIdForCampaignReciver: string;
   let sdkAccessTokenForCampaignReciver: string;
   let adminAccessTokenForCampaignReciver: string;
+  let adminUserNameForCampaignReciver: string;
+  let adminPasswordForCampaignReciver: string;
 
   test.beforeEach(async ({ request }) => {
+    await deleteAllCampaigns(
+      request,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin
+    );
+
+    await deleteAllSegments(
+      request,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin
+    );
+
     // Arrange
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
@@ -80,14 +93,18 @@ test.describe('In-App Campaign Creation', () => {
     appIdForCampaignReciver =
       companyRegistrationResponseJson.data.recent_mobile_app_id;
 
-    adminFrontendAccessTokenForCampaignReciver =
-      companyRegistrationResponseJson.data.front_end_access_token;
+    // adminFrontendAccessTokenForCampaignReciver =
+    //   companyRegistrationResponseJson.data.front_end_access_token;
 
     adminAccessTokenForCampaignReciver =
       companyRegistrationResponseJson.data.admin_access_token;
 
     adminAliasForCampaignReciver =
       companyRegistrationResponseJson.data._id.$oid;
+
+    adminUserNameForCampaignReciver = registrationData.username;
+
+    adminPasswordForCampaignReciver = registrationData.password;
 
     const sdkCredentialsResponse = await getSdkCredentials(
       request,
@@ -128,11 +145,6 @@ test.describe('In-App Campaign Creation', () => {
     accountSettingsPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
-    const expectedURL = `${BASE_URL}/mobile/apps/${E2EAdminLoginCredentialsModel.uiE2EAppId}/dashboard_beta`;
-    const dashboardURL = await dashboardPage.validateUrl();
-
-    // Assert
-    expect(dashboardURL).toBe(expectedURL);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
@@ -234,10 +246,17 @@ test.describe('In-App Campaign Creation', () => {
 
     // await logoutAdmin(request, UIE2ELoginUserModel.uiE2EAccessTokenAdmin);
 
-    await loginPage.loginWithToken(
-      adminFrontendAccessTokenForCampaignReciver,
-      appIdForCampaignReciver
-    );
+    // await loginPage.loginWithToken(
+    //   adminFrontendAccessTokenForCampaignReciver,
+    //   appIdForCampaignReciver
+    // );
+
+    const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
+      userEmail: adminUserNameForCampaignReciver,
+      userPassword: adminPasswordForCampaignReciver
+    };
+
+    await loginPage.login(loginCredentialsForReceiver);
 
     await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
   });

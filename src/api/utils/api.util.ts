@@ -103,6 +103,7 @@ export const apiUrls = {
   // Web SDK related endpoints
   webSdk: {
     v1: {
+      start: `${WEB_SDK_API_URL}/api/v1/session/start`,
       statistics: `${WEB_SDK_API_URL}/api/v1/statistics`
     }
   }
