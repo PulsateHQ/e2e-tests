@@ -2,8 +2,7 @@ import {
   BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
   UI_E2E_ACCESS_TOKEN_ADMIN,
-  UI_E2E_APP_ID,
-  UI_E2E_FRONT_END_ACCESS_TOKEN
+  UI_E2E_APP_ID
 } from '@_config/env.config';
 import {
   logoutAdmin,
@@ -30,8 +29,7 @@ test.describe('In-App Campaign Creation', () => {
   const UIE2ELoginUserModel: UIE2ELoginUserModel = {
     uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
     uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    uiE2EAppId: `${UI_E2E_APP_ID}`,
-    uiE2EFrontEndAccessToken: `${UI_E2E_FRONT_END_ACCESS_TOKEN}`
+    uiE2EAppId: `${UI_E2E_APP_ID}`
   };
 
   let adminAliasForCampaignReciver: string;
