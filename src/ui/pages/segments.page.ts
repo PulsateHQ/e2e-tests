@@ -36,8 +36,6 @@ export class SegmentsPage extends BasePage {
     exact: true
   });
 
-  totalUsersSpan: Locator = this.page.getByLabel('Total Users');
-
   // =========================================================================
   // Constructor
   // =========================================================================
@@ -106,8 +104,15 @@ export class SegmentsPage extends BasePage {
     segmentName: string,
     expectedUserCount: string
   ): Promise<void> {
+    const segmentLinkLocator = this.getSegmentLinkByName(segmentName);
+    const segmentRowLocator = this.page.getByRole('row').filter({
+      has: segmentLinkLocator
+    });
+    // Get the "Total Users" span *within that specific row*
+    const totalUsersSpanInRow = segmentRowLocator.getByLabel('Total Users');
+
     await expect(
-      this.totalUsersSpan,
+      totalUsersSpanInRow, // Use the correctly scoped locator
       `Total users for segment '${segmentName}' should be '${expectedUserCount}'`
     ).toHaveText(expectedUserCount);
   }

@@ -17,8 +17,6 @@ import {
   createMobileSessionPayload,
   startMobileSessionInAppPayload
 } from '@_src/api/test-data/mobile/sessions/start-session.payload';
-import { deleteAllCampaigns } from '@_src/api/utils/data.manager.util';
-import { deleteAllSegments } from '@_src/api/utils/data.manager.util';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
@@ -59,16 +57,6 @@ test.describe('In-App Campaign Creation', () => {
   let adminPasswordForCampaignReciver: string;
 
   test.beforeEach(async ({ request }) => {
-    await deleteAllCampaigns(
-      request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin
-    );
-
-    await deleteAllSegments(
-      request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin
-    );
-
     // Arrange
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
