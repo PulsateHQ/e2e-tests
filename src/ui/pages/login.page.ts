@@ -42,9 +42,12 @@ export class LoginPage extends BasePage {
     this.page = page;
   }
 
-  async login(loginUserData: UI2E2LoginUserModel): Promise<DashboardPage> {
-    await this.userEmailInput.fill(loginUserData.userEmail);
-    await this.userPasswordInput.fill(loginUserData.userPassword);
+  async login(
+    login: UI2E2LoginUserModel,
+    password: UI2E2LoginUserModel
+  ): Promise<DashboardPage> {
+    await this.userEmailInput.fill(login.userEmail);
+    await this.userPasswordInput.fill(login.userPassword);
     await this.loginButton.click();
 
     return new DashboardPage(this.page);

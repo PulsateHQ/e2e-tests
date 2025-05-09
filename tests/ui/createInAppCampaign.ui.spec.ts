@@ -2,7 +2,9 @@ import {
   BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
   UI_E2E_ACCESS_TOKEN_ADMIN,
-  UI_E2E_APP_ID
+  UI_E2E_APP_ID,
+  UI_E2E_LOGIN_ADMIN,
+  UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
 import {
   logoutAdmin,
@@ -22,6 +24,7 @@ import {
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { UIE2ELoginUserModel } from '@_src/ui/models/admin.model';
+import { UI2E2LoginUserModel } from '@_src/ui/models/user.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
@@ -40,6 +43,11 @@ test.describe('In-App Campaign Creation', () => {
     uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
     uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
     uiE2EAppId: `${UI_E2E_APP_ID}`
+  };
+
+  const UI2E2LoginUserModel: UI2E2LoginUserModel = {
+    userEmail: `${UI_E2E_LOGIN_ADMIN}`,
+    userPassword: `${UI_E2E_PASSWORD_ADMIN}`
   };
 
   let adminAliasForCampaignReciver: string;
@@ -120,9 +128,9 @@ test.describe('In-App Campaign Creation', () => {
     dashboardPage,
     request
   }) => {
-    await loginPage.loginWithToken(
-      UIE2ELoginUserModel.uiE2EFrontEndAccessToken,
-      UIE2ELoginUserModel.uiE2EAppId
+    await loginPage.login(
+      UIE2ELoginUserModel.uiE2ELoginAdmin,
+      UIE2ELoginUserModel.uiE2EPasswordAdmin
     );
     const expectedURL = `${BASE_URL}/mobile/apps/${UIE2ELoginUserModel.uiE2EAppId}/dashboard_beta`;
     const dashboardURL = await dashboardPage.validateUrl();
