@@ -18,12 +18,12 @@ import {
   getCardCampaignStatsWithApi
 } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
-import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
+import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
-import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.model';
+import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import {
   createCampaignFeedOneButtonBackWithDismiss,
   createCampaignFeedOneButtonToUrl,

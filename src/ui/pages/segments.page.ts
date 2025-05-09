@@ -102,19 +102,29 @@ export class SegmentsPage extends BasePage {
 
   async verifySegmentTotalUsers(
     segmentName: string,
-    expectedUserCount: string
+    expectedUserCount: string,
+    timeoutMs: number = 120000
   ): Promise<void> {
-    const segmentLinkLocator = this.getSegmentLinkByName(segmentName);
-    const segmentRowLocator = this.page.getByRole('row').filter({
-      has: segmentLinkLocator
-    });
-    // Get the "Total Users" span *within that specific row*
-    const totalUsersSpanInRow = segmentRowLocator.getByLabel('Total Users');
-
-    await expect(
-      totalUsersSpanInRow, // Use the correctly scoped locator
-      `Total users for segment '${segmentName}' should be '${expectedUserCount}'`
-    ).toHaveText(expectedUserCount);
+    await expect
+      .poll(
+        async () => {
+          const segmentLinkLocator = this.getSegmentLinkByName(segmentName);
+          const segmentRowLocator = this.page.getByRole('row').filter({
+            has: segmentLinkLocator
+          });
+          const totalUsersSpanInRow =
+            segmentRowLocator.getByLabel('Total Users');
+          return (
+            (await totalUsersSpanInRow.isVisible()) &&
+            (await totalUsersSpanInRow.textContent()) === expectedUserCount
+          );
+        },
+        {
+          message: `Total users for segment '${segmentName}' should become '${expectedUserCount}' within ${timeoutMs}ms`,
+          timeout: timeoutMs
+        }
+      )
+      .toBeTruthy();
   }
 
   async createSegmentWithAlias(

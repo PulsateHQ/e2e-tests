@@ -18,13 +18,13 @@ import {
   getInAppCardCampaignStatsWithApi
 } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
-import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
+import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
 import { InAppEvents } from '@_src/api/models/mobile.users.model';
-import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.model';
+import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createCampaignInAppLargeWithOpenFeed } from '@_src/api/test-data/cms/campaign/create-inapp-campaign.payload';
 import {

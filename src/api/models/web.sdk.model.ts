@@ -12,3 +12,13 @@ export interface WebSdkStatisticsPayload {
   campaignGuid: string;
   key: WebSdkStatisticsAction;
 }
+
+export interface WebSdkSessionPayload {
+  alias: string;
+  guid: string;
+  device: {
+    type: 'web';
+    location_permission: false;
+    push_permission: false;
+  };
+}

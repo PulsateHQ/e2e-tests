@@ -5,13 +5,20 @@ import {
   UI_E2E_LOGIN_ADMIN,
   UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
-import { registerCompany } from '@_src/api/factories/admin.api.factory';
+import {
+  logoutAdmin,
+  registerCompany
+} from '@_src/api/factories/admin.api.factory';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import {
   superAdminsActivationCodesCreate,
   superAdminsFeatureFLagDefaultBatchUpdate
 } from '@_src/api/factories/super.admin.api.factory';
+import {
+  startWebSdkSessionForAdmin,
+  startWebSdkSessionWithApi
+} from '@_src/api/factories/web.sdk.api.factory';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import {
   createMobileSessionPayload,
@@ -104,14 +111,13 @@ test.describe('In-App Campaign Creation', () => {
 
     sdkAccessTokenForCampaignReciver = sdkCredentialsResponseJson.access_token;
 
-    const userSessionPayloadForCampaignReciver = createMobileSessionPayload({
-      alias: adminAliasForCampaignReciver,
-      device: {
-        ...startMobileSessionInAppPayload.device
-      }
+    const userSessionPayloadForCampaignReciver = startWebSdkSessionForAdmin({
+      request,
+      sdkAccessTokenForCampaignReciver,
+      adminAliasForCampaignReciver
     });
 
-    await startMobileSessionsWithApi(
+    await startWebSdkSessionWithApi(
       request,
       sdkAccessTokenForCampaignReciver,
       userSessionPayloadForCampaignReciver
@@ -231,8 +237,6 @@ test.describe('In-App Campaign Creation', () => {
     );
 
     await accountSettingsPage.signOut();
-
-    // await logoutAdmin(request, UIE2ELoginUserModel.uiE2EAccessTokenAdmin);
 
     // await loginPage.loginWithToken(
     //   adminFrontendAccessTokenForCampaignReciver,
