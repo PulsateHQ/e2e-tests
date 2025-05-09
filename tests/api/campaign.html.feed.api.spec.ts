@@ -41,23 +41,9 @@ import {
   deleteAllUsers,
   importRandomUsers
 } from '@_src/api/utils/data.manager.util';
-import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-// Define the environments where this test should run
-const SUPPORTED_ENVIRONMENTS = ['tiger'];
-
-// Use condition() to skip tests on unsupported environments
 test.describe('HTML Feed Campaign', () => {
-  // This will skip all tests in this suite if not running in a supported environment
-  test.beforeEach(() => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
-      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
-    );
-  });
-
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: API_E2E_ACCESS_TOKEN_ADMIN,

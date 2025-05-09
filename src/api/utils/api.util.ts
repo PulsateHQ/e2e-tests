@@ -20,6 +20,9 @@ export const apiUrls = {
       whoami: `${BASE_URL}/sessions/api/v2/whoami`,
       currentAdmin: `${BASE_URL}/admins/current_admin`,
       logout: `${BASE_URL}/admins/api/v2/logout`
+    },
+    mobile: {
+      base: `${BASE_URL}/mobile/apps`
     }
   },
 

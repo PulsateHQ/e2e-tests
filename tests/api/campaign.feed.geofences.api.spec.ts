@@ -47,7 +47,7 @@ test.describe('Geofence Feed Campaign', () => {
   };
 
   // Define the environments where this test should run
-  const SUPPORTED_ENVIRONMENTS = ['tiger'];
+  const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
 
   test.beforeAll(async ({ request }) => {
     // eslint-disable-next-line playwright/no-skipped-test

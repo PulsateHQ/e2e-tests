@@ -50,7 +50,7 @@ import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 // Define the environments where this test should run
-const SUPPORTED_ENVIRONMENTS = ['tiger'];
+const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
 
 test.describe('In-App Campaign with Feed', () => {
   // This will skip all tests in this suite if not running in a supported environment
