@@ -6,10 +6,7 @@ import {
   UI_E2E_LOGIN_ADMIN,
   UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
-import {
-  logoutAdmin,
-  registerCompany
-} from '@_src/api/factories/admin.api.factory';
+import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import {
@@ -23,8 +20,10 @@ import {
 } from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { UIE2ELoginUserModel } from '@_src/ui/models/admin.model';
-import { UI2E2LoginUserModel } from '@_src/ui/models/user.model';
+import {
+  E2EAdminAuthDataModel,
+  E2EAdminLoginCredentialsModel
+} from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
@@ -39,15 +38,15 @@ test.describe('In-App Campaign Creation', () => {
     );
   });
 
-  const UIE2ELoginUserModel: UIE2ELoginUserModel = {
-    uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
-    uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
+  const E2EAdminLoginCredentialsModel: E2EAdminLoginCredentialsModel = {
+    userEmail: `${UI_E2E_LOGIN_ADMIN}`,
+    userPassword: `${UI_E2E_PASSWORD_ADMIN}`,
     uiE2EAppId: `${UI_E2E_APP_ID}`
   };
 
-  const UI2E2LoginUserModel: UI2E2LoginUserModel = {
-    userEmail: `${UI_E2E_LOGIN_ADMIN}`,
-    userPassword: `${UI_E2E_PASSWORD_ADMIN}`
+  const E2EAdminAuthDataModel: E2EAdminAuthDataModel = {
+    uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
+    uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
   };
 
   let adminAliasForCampaignReciver: string;
@@ -61,7 +60,7 @@ test.describe('In-App Campaign Creation', () => {
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
         request,
-        UIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin
+        E2EAdminAuthDataModel.uiE2EAccessTokenSuperAdmin
       );
     const supserAdminActivationCodeCreateResponseJson =
       await supserAdminActivationCodeCreateResponse.json();
@@ -71,7 +70,7 @@ test.describe('In-App Campaign Creation', () => {
 
     const companyRegistrationResponse = await registerCompany(
       request,
-      UIE2ELoginUserModel.uiE2EAccessTokenAdmin,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       registrationData
     );
 
@@ -115,7 +114,7 @@ test.describe('In-App Campaign Creation', () => {
 
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
-      UIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin,
+      E2EAdminAuthDataModel.uiE2EAccessTokenSuperAdmin,
       [appIdForCampaignReciver]
     );
   });
@@ -126,13 +125,10 @@ test.describe('In-App Campaign Creation', () => {
     campaignBuilderPage,
     segmentsPage,
     dashboardPage,
-    request
+    accountSettingsPage
   }) => {
-    await loginPage.login(
-      UIE2ELoginUserModel.uiE2ELoginAdmin,
-      UIE2ELoginUserModel.uiE2EPasswordAdmin
-    );
-    const expectedURL = `${BASE_URL}/mobile/apps/${UIE2ELoginUserModel.uiE2EAppId}/dashboard_beta`;
+    await loginPage.login(E2EAdminLoginCredentialsModel);
+    const expectedURL = `${BASE_URL}/mobile/apps/${E2EAdminLoginCredentialsModel.uiE2EAppId}/dashboard_beta`;
     const dashboardURL = await dashboardPage.validateUrl();
 
     // Assert
@@ -233,9 +229,10 @@ test.describe('In-App Campaign Creation', () => {
       'Delivered',
       60_000
     );
-    // await accountSettingsPage.signOut();
 
-    await logoutAdmin(request, UIE2ELoginUserModel.uiE2EAccessTokenAdmin);
+    await accountSettingsPage.signOut();
+
+    // await logoutAdmin(request, UIE2ELoginUserModel.uiE2EAccessTokenAdmin);
 
     await loginPage.loginWithToken(
       adminFrontendAccessTokenForCampaignReciver,

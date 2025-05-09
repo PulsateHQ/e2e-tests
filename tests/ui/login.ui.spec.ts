@@ -2,7 +2,6 @@ import {
   BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
   UI_E2E_ACCESS_TOKEN_ADMIN,
-  UI_E2E_APP_ID,
   UI_E2E_LOGIN_ADMIN,
   UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
@@ -10,8 +9,10 @@ import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import { superAdminsActivationCodesCreate } from '@_src/api/factories/super.admin.api.factory';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { UIE2ELoginUserModel } from '@_src/ui/models/admin.model';
-import { UI2E2LoginUserModel } from '@_src/ui/models/user.model';
+import {
+  E2EAdminAuthDataModel,
+  E2EAdminLoginCredentialsModel
+} from '@_src/ui/models/admin.model';
 
 test.describe('Login Functionality', () => {
   test('should reject login with incorrect password and display error messages', async ({
@@ -19,12 +20,12 @@ test.describe('Login Functionality', () => {
   }) => {
     const expectedURL = `${BASE_URL}/admins/sign_in`;
 
-    const loginUserDataMissingPassword: UI2E2LoginUserModel = {
+    const loginUserDataMissingPassword: E2EAdminLoginCredentialsModel = {
       userEmail: `${UI_E2E_LOGIN_ADMIN}`,
       userPassword: ``
     };
 
-    const loginUserDataMissingEmail: UI2E2LoginUserModel = {
+    const loginUserDataMissingEmail: E2EAdminLoginCredentialsModel = {
       userEmail: ``,
       userPassword: `${UI_E2E_PASSWORD_ADMIN}`
     };
@@ -78,10 +79,9 @@ test.describe('Login Functionality', () => {
     mainNavigationComponent,
     request
   }) => {
-    const APIE2ELoginUserModel: UIE2ELoginUserModel = {
+    const APIE2ELoginUserModel: E2EAdminAuthDataModel = {
       uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
-      uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-      uiE2EAppId: `${UI_E2E_APP_ID}`
+      uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
     };
 
     // Arrange
