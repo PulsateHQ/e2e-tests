@@ -19,12 +19,22 @@ import {
   createMobileSessionPayload,
   startMobileSessionInAppPayload
 } from '@_src/api/test-data/mobile/sessions/start-session.payload';
+import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { UIE2ELoginUserModel } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
-  // Front-end access token for authentication
+  // Define the environments where this test should run
+  const SUPPORTED_ENVIRONMENTS = ['sealion'];
+
+  test.beforeAll(async ({ request }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
+  });
 
   const UIE2ELoginUserModel: UIE2ELoginUserModel = {
     uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
@@ -110,7 +120,6 @@ test.describe('In-App Campaign Creation', () => {
     dashboardPage,
     request
   }) => {
-    // Login with token before proceeding
     await loginPage.loginWithToken(
       UIE2ELoginUserModel.uiE2EFrontEndAccessToken,
       UIE2ELoginUserModel.uiE2EAppId
