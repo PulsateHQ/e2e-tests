@@ -28,7 +28,7 @@ test.describe('In-App Campaign Creation', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
 
-  test.beforeAll(async ({ request }) => {
+  test.beforeAll(async ({}) => {
     // eslint-disable-next-line playwright/no-skipped-test
     test.skip(
       !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
