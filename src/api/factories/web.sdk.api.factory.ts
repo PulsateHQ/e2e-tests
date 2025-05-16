@@ -1,3 +1,4 @@
+import { UI_E2E_WEB_SDK_KEY } from '@_config/env.config';
 import { Headers } from '@_src/api/models/headers.model';
 import {
   WebSdkSessionPayload,
@@ -111,14 +112,12 @@ export async function postWebSdkStatisticsWithApi(
 
 export async function startWebSdkSessionWithApi(
   request: APIRequestContext,
-  sdkAppId: string,
-  sdkAppKey: string,
   payload: WebSdkSessionPayload
 ): Promise<APIResponse> {
   const headers: Headers = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'x-key': `${sdkAppId}${sdkAppKey}`,
+    'x-key': `${UI_E2E_WEB_SDK_KEY}`,
     source: 'native'
   };
 
@@ -168,24 +167,4 @@ export async function startWebSdkSessionWithApi(
   }
 
   return response;
-}
-
-/**
- * Convenience function to start a web SDK session using an admin alias
- * @param request - API request context
- * @param sdkAppId - SDK application ID
- * @param sdkAppKey - SDK application key
- * @param adminAlias - Admin alias to use for session
- * @param overrides - Optional payload overrides
- * @returns API response
- */
-export async function startWebSdkSessionForAdmin(
-  request: APIRequestContext,
-  sdkAppId: string,
-  sdkAppKey: string,
-  adminAlias: string,
-  overrides: Partial<WebSdkSessionPayload> = {}
-): Promise<APIResponse> {
-  const payload = createWebSdkSessionPayload(adminAlias, overrides);
-  return startWebSdkSessionWithApi(request, sdkAppId, sdkAppKey, payload);
 }

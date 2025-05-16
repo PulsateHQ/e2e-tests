@@ -5,25 +5,13 @@ import {
   UI_E2E_LOGIN_ADMIN,
   UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
-import {
-  logoutAdmin,
-  registerCompany
-} from '@_src/api/factories/admin.api.factory';
-import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
+import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import {
   superAdminsActivationCodesCreate,
   superAdminsFeatureFLagDefaultBatchUpdate
 } from '@_src/api/factories/super.admin.api.factory';
-import {
-  startWebSdkSessionForAdmin,
-  startWebSdkSessionWithApi
-} from '@_src/api/factories/web.sdk.api.factory';
+import { startWebSdkSessionWithApi } from '@_src/api/factories/web.sdk.api.factory';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
-import {
-  createMobileSessionPayload,
-  startMobileSessionInAppPayload
-} from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
@@ -56,10 +44,7 @@ test.describe('In-App Campaign Creation', () => {
   };
 
   let adminAliasForCampaignReciver: string;
-  // let adminFrontendAccessTokenForCampaignReciver: string;
   let appIdForCampaignReciver: string;
-  let sdkAccessTokenForCampaignReciver: string;
-  let adminAccessTokenForCampaignReciver: string;
   let adminUserNameForCampaignReciver: string;
   let adminPasswordForCampaignReciver: string;
 
@@ -88,12 +73,6 @@ test.describe('In-App Campaign Creation', () => {
     appIdForCampaignReciver =
       companyRegistrationResponseJson.data.recent_mobile_app_id;
 
-    // adminFrontendAccessTokenForCampaignReciver =
-    //   companyRegistrationResponseJson.data.front_end_access_token;
-
-    adminAccessTokenForCampaignReciver =
-      companyRegistrationResponseJson.data.admin_access_token;
-
     adminAliasForCampaignReciver =
       companyRegistrationResponseJson.data._id.$oid;
 
@@ -101,27 +80,15 @@ test.describe('In-App Campaign Creation', () => {
 
     adminPasswordForCampaignReciver = registrationData.password;
 
-    const sdkCredentialsResponse = await getSdkCredentials(
-      request,
-      adminAccessTokenForCampaignReciver,
-      appIdForCampaignReciver
-    );
-
-    const sdkCredentialsResponseJson = await sdkCredentialsResponse.json();
-
-    sdkAccessTokenForCampaignReciver = sdkCredentialsResponseJson.access_token;
-
-    const userSessionPayloadForCampaignReciver = startWebSdkSessionForAdmin({
-      request,
-      sdkAccessTokenForCampaignReciver,
-      adminAliasForCampaignReciver
+    await startWebSdkSessionWithApi(request, {
+      alias: adminAliasForCampaignReciver,
+      guid: adminAliasForCampaignReciver,
+      device: {
+        type: 'web',
+        location_permission: false,
+        push_permission: false
+      }
     });
-
-    await startWebSdkSessionWithApi(
-      request,
-      sdkAccessTokenForCampaignReciver,
-      userSessionPayloadForCampaignReciver
-    );
 
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
@@ -237,11 +204,6 @@ test.describe('In-App Campaign Creation', () => {
     );
 
     await accountSettingsPage.signOut();
-
-    // await loginPage.loginWithToken(
-    //   adminFrontendAccessTokenForCampaignReciver,
-    //   appIdForCampaignReciver
-    // );
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
       userEmail: adminUserNameForCampaignReciver,
