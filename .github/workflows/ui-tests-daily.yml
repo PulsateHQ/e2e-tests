@@ -35,11 +35,9 @@ jobs:
       - name: Get installed Playwright version
         id: playwright-version
         run: |
-          PLAYWRIGHT_VERSION=$(node -e "
-          const pkgLock = require('./package-lock.json');
-          const version = pkgLock.packages['node_modules/@playwright/test']?.version || 'not-found';
-          ")
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test --json | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4)
           echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+          echo "Found Playwright version: $PLAYWRIGHT_VERSION"
       - name: Cache playwright binaries
         uses: actions/cache@v4
         id: playwright-cache
@@ -47,6 +45,8 @@ jobs:
           path: |
             ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Cache node_modules
         uses: actions/cache@v4
         id: node-cache
@@ -58,9 +58,12 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Install Playwright Browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps firefox
-
+        run: |
+          # Ensure Firefox is installed
+          if [ ! -d ~/.cache/ms-playwright/firefox-* ] || [ ! -f ~/.cache/ms-playwright/firefox-*/firefox/firefox ]; then
+            echo "Installing Playwright browsers"
+            npx playwright install --with-deps firefox
+          fi
   test:
     needs: [prepare-env]
     timeout-minutes: 30 # Increased timeout for UI tests
