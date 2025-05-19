@@ -44,7 +44,7 @@
   "devDependencies": {
     "@eslint/js": "^9.12.0",
     "@faker-js/faker": "^9.1.0",
-    "@playwright/test": "^1.51.1",
+    "@playwright/test": "^1.52",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/faker": "^5.5.9",
     "@types/node": "^22.5.5",
