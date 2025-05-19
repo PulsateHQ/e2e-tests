@@ -1,0 +1,226 @@
+name: Daily UI Tests - Sealion
+
+on:
+  schedule:
+    # Run at 2:00 AM UTC every day
+    - cron: '0 2 * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  ALLURE_RESULTS_DIR: allure-results
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
+  REPORT_URL: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html
+  ENVIRONMENT: sealion
+
+permissions:
+  contents: read
+  checks: write
+  id-token: write
+
+jobs:
+  prepare-env:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    environment: sealion
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: |
+          PLAYWRIGHT_VERSION=$(node -e "
+          const pkgLock = require('./package-lock.json');
+          const version = pkgLock.packages['node_modules/@playwright/test']?.version || 'not-found';
+          ")
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps firefox
+
+  test:
+    needs: [prepare-env]
+    timeout-minutes: 30 # Increased timeout for UI tests
+    runs-on: ubuntu-latest
+    environment: sealion
+    outputs:
+      test_outcome: ${{ steps.set-outcome.outputs.test_outcome }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Create env file
+        run: |
+          touch .env
+          echo BASE_URL=${{ vars.BASE_URL }} >> .env
+          echo WEB_SDK_API_URL=${{ vars.WEB_SDK_API_URL }} >> .env
+          echo API_E2E_APP_ID=${{ vars.API_E2E_APP_ID }} >> .env
+          echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env
+          echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env
+          echo SUPER_ADMIN_ACCESS_TOKEN=${{ secrets.SUPER_ADMIN_ACCESS_TOKEN }} >> .env
+          echo UI_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.UI_E2E_ACCESS_TOKEN_ADMIN }} >> .env
+          echo UI_E2E_APP_ID=${{ secrets.UI_E2E_APP_ID }} >> .env
+          echo UI_E2E_LOGIN_ADMIN=${{ secrets.UI_E2E_LOGIN_ADMIN }} >> .env
+          echo UI_E2E_PASSWORD_ADMIN=${{ secrets.UI_E2E_PASSWORD_ADMIN }} >> .env
+          echo UI_E2E_WEB_SDK_KEY=${{ secrets.UI_E2E_WEB_SDK_KEY }} >> .env
+          echo ENVIRONMENT=sealion >> .env
+      - name: Run Playwright UI tests
+        id: run-tests
+        run: |
+          # Create allure-results directory
+          mkdir -p allure-results
+
+          # Run the tests
+          npx dotenv -e .env.sealion -- npx playwright test --project=ui
+
+      - name: Set Test Outcome
+        id: set-outcome
+        run: echo "test_outcome=${{ steps.run-tests.outcome }}" >> "$GITHUB_OUTPUT"
+
+      - name: Archive test results
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-results
+          path: |
+            playwright-report/**/*.*
+            test-results/**/*.*
+            allure-results/**/*.*
+
+  reports:
+    needs: [test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-test-results
+          path: downloaded-artifacts
+
+      - name: Prepare directories and restore artifacts
+        run: |
+          # Create required directories
+          mkdir -p allure-results allure-report playwright-report test-results
+
+          # Move files to their correct locations
+          if [ -d "downloaded-artifacts/allure-results" ]; then
+            cp -r downloaded-artifacts/allure-results/* allure-results/
+          fi
+          if [ -d "downloaded-artifacts/playwright-report" ]; then
+            cp -r downloaded-artifacts/playwright-report/* playwright-report/
+          fi
+          if [ -d "downloaded-artifacts/test-results" ]; then
+            cp -r downloaded-artifacts/test-results/* test-results/
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Download previous history
+        run: |
+          AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
+          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/ui-daily/history" "allure-results/history" --recursive || true
+
+      - name: Create Allure executor configuration
+        run: |
+          echo '{
+            "name": "GitHub Actions",
+            "type": "github",
+            "buildOrder": ${{ github.run_number }},
+            "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+            "reportUrl": "https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html",
+            "reportName": "Daily UI Tests - Sealion",
+            "buildName": "Run #${{ github.run_number }} - Sealion UI Daily"
+          }' > allure-results/executor.json
+
+      - name: Create Allure environment properties
+        run: |
+          echo "Environment=sealion
+          Browser=Firefox
+          Node_Version=$(node -v)
+          Playwright_Version=$(npx playwright --version)" > allure-results/environment.properties
+
+      - name: Generate Allure report
+        run: npx allure generate allure-results --clean -o allure-report
+
+      - name: Upload report to S3 bucket
+        run: |
+          AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
+          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/ui-daily" --delete
+
+  notify:
+    needs: [test, reports]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Slack Notification - Daily UI Test Results
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook-type: webhook-trigger
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "text": "Daily UI Test Results 🧪",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Daily UI Test Results for Sealion*\n• Repository: *Smokesignals*\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ env.REPORT_URL }}|Click here to view>"
+                  }
+                }
+              ]
+            }
