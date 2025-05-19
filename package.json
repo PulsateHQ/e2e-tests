@@ -21,6 +21,7 @@
     "test:jaguar:headed": "dotenv -e .env.jaguar -- npx playwright test --headed --project=api",
     "test:jaguar:headless": "dotenv -e .env.jaguar -- npx playwright test --project=api",
     "test:sealion": "dotenv -e .env.sealion -- npx playwright test --ui",
+    "test:sealion:ui": "dotenv -e .env.sealion -- npx playwright test --ui --project=ui",
     "test:sealion:headed": "dotenv -e .env.sealion -- npx playwright test --headed --project=api",
     "test:sealion:headless": "dotenv -e .env.sealion -- npx playwright test --project=api",
     "test:bear": "dotenv -e .env.bear -- npx playwright test --ui",

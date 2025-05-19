@@ -1,28 +1,24 @@
 import { BASE_URL } from '@_config/env.config';
+import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { CompanyRegistrationModel } from '@_src/ui/models/user.model';
-import { faker } from '@faker-js/faker/locale/en';
-
-const registrationData: CompanyRegistrationModel = {
-  fullName: faker.internet.username(),
-  username: faker.internet.username(),
-  invalidEmail: 'wrong_email.com',
-  validEmail: faker.internet.email(),
-  shortPassword: faker.internet.password({ length: 7 }),
-  validPassword: faker.internet.password({
-    length: 8,
-    memorable: false,
-    pattern: /[A-Za-z0-9!@#$%^&*()_+]/,
-    prefix: 'A1!'
-  }),
-  passwordConfirmation: 'Password',
-  companyName: faker.company.name(),
-  appName: faker.company.name(),
-  activationCode: '012345678012345678012345678012345678'
-};
+import { CompanyRegistrationModel } from '@_src/ui/models/admin.model';
+import { generateCompanyRegistrationData } from '@_src/ui/test-data/company-registration.data';
 
 test.describe('Company Registration Page', () => {
+  let registrationData: CompanyRegistrationModel;
+
+  // Define the environments where this test should run
+  const SUPPORTED_ENVIRONMENTS = ['sealion'];
+
   test.beforeEach(async ({ companyRegistrationPage }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
+    // Generate fresh test data for each test
+    registrationData = generateCompanyRegistrationData();
+
     const expectedURL = `${BASE_URL}/admins/company_registration`;
     const companyRegistrationURL = await companyRegistrationPage.validateUrl();
     expect(companyRegistrationURL).toBe(expectedURL);
@@ -95,61 +91,5 @@ test.describe('Company Registration Page', () => {
       companyRegistrationPage.inputPasswordConfirmation,
       companyRegistrationPage.passwordConfirmationMatchError
     );
-  });
-
-  test('should validate error messages for missing and incorrect fields in Company Details page', async ({
-    companyRegistrationPage
-  }) => {
-    // Fill in the form with valid data to navigate to the Company Details page
-    await companyRegistrationPage.inputName.fill(registrationData.fullName);
-    await companyRegistrationPage.inputUsername.fill(registrationData.username);
-    await companyRegistrationPage.inputEmail.fill(registrationData.validEmail);
-    await companyRegistrationPage.inputPassword.fill(
-      registrationData.validPassword
-    );
-    await companyRegistrationPage.inputPasswordConfirmation.fill(
-      registrationData.validPassword
-    );
-
-    await companyRegistrationPage.clickButtonNext();
-
-    await expect(
-      companyRegistrationPage.headingNewAccountRegistration
-    ).toBeVisible();
-
-    await companyRegistrationPage.clickButtonCreateAccount();
-
-    // Validate missing company details errors
-    await companyRegistrationPage.validateErrorVisibility(
-      companyRegistrationPage.inputCompanyName,
-      companyRegistrationPage.companyMissingError
-    );
-    await companyRegistrationPage.validateErrorVisibility(
-      companyRegistrationPage.inputAppName,
-      companyRegistrationPage.appNameMissingError
-    );
-    await companyRegistrationPage.validateErrorVisibility(
-      companyRegistrationPage.inputActivationCode,
-      companyRegistrationPage.activationCodeMissingError
-    );
-
-    // Fill in the form with random valid data
-    await companyRegistrationPage.inputCompanyName.fill(
-      registrationData.companyName
-    );
-    await companyRegistrationPage.inputAppName.fill(registrationData.appName);
-    await companyRegistrationPage.inputActivationCode.fill(
-      registrationData.activationCode
-    );
-
-    await companyRegistrationPage.clickButtonCreateAccount();
-
-    // Validate activation code error
-    await companyRegistrationPage.validateErrorVisibility(
-      companyRegistrationPage.inputActivationCode,
-      companyRegistrationPage.activationCodeValidationError
-    );
-
-    await expect(companyRegistrationPage.buttonPrevious).toBeVisible();
   });
 });

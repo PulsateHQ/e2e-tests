@@ -18,13 +18,13 @@ import {
   getInAppCardCampaignStatsWithApi
 } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
-import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
+import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
 import { InAppEvents } from '@_src/api/models/mobile.users.model';
-import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.model';
+import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createCampaignInAppLargeWithOpenFeed } from '@_src/api/test-data/cms/campaign/create-inapp-campaign.payload';
 import {
@@ -50,7 +50,7 @@ import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 // Define the environments where this test should run
-const SUPPORTED_ENVIRONMENTS = ['tiger'];
+const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
 
 test.describe('In-App Campaign with Feed', () => {
   // This will skip all tests in this suite if not running in a supported environment

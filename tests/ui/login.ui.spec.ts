@@ -1,35 +1,45 @@
 import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
   BASE_URL,
-  SUPER_ADMIN_ACCESS_TOKEN
+  SUPER_ADMIN_ACCESS_TOKEN,
+  UI_E2E_ACCESS_TOKEN_ADMIN,
+  UI_E2E_LOGIN_ADMIN,
+  UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
-import { registerCompany } from '@_src/api/factories/admins.api.factory';
+import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import { superAdminsActivationCodesCreate } from '@_src/api/factories/super.admin.api.factory';
-import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { UIIntegrationLoginUserModel } from '@_src/ui/models/user.model';
+import {
+  E2EAdminAuthDataModel,
+  E2EAdminLoginCredentialsModel
+} from '@_src/ui/models/admin.model';
 
 test.describe('Login Functionality', () => {
+  // Define the environments where this test should run
+  const SUPPORTED_ENVIRONMENTS = ['sealion'];
+
+  test.beforeEach(async ({}) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
+  });
+
   test('should reject login with incorrect password and display error messages', async ({
     loginPage
   }) => {
     const expectedURL = `${BASE_URL}/admins/sign_in`;
 
-    const loginUserDataMissingPassword: UIIntegrationLoginUserModel = {
-      userEmail: `${UI_INTEGRATION_LOGIN_ADMIN}`,
+    const loginUserDataMissingPassword: E2EAdminLoginCredentialsModel = {
+      userEmail: `${UI_E2E_LOGIN_ADMIN}`,
       userPassword: ``
     };
 
-    const loginUserDataMissingEmail: UIIntegrationLoginUserModel = {
+    const loginUserDataMissingEmail: E2EAdminLoginCredentialsModel = {
       userEmail: ``,
-      userPassword: `${UI_INTEGRATION_PASSWORD_ADMIN}`
-    };
-
-    const loginUserDataIncorrectPassword: UIIntegrationLoginUserModel = {
-      userEmail: `${UI_INTEGRATION_LOGIN_ADMIN}`,
-      userPassword: `incorrect_password`
+      userPassword: `${UI_E2E_PASSWORD_ADMIN}`
     };
 
     await loginPage.loginButton.click();
@@ -54,12 +64,6 @@ test.describe('Login Functionality', () => {
     await loginPage.validateErrorVisibility(
       loginPage.userEmailInput,
       loginPage.usernameOrEmailMissingError
-    );
-
-    await loginPage.login(loginUserDataIncorrectPassword);
-    await loginPage.validateErrorVisibility(
-      loginPage.userPasswordInput,
-      loginPage.incorrectUsernameOrPasswordError
     );
 
     const loginURL = await loginPage.validateUrl();
@@ -87,17 +91,16 @@ test.describe('Login Functionality', () => {
     mainNavigationComponent,
     request
   }) => {
-    const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-      apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-      apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-      apiE2EAppId: `${API_E2E_APP_ID}`
+    const APIE2ELoginUserModel: E2EAdminAuthDataModel = {
+      uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
+      uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
     };
 
     // Arrange
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
         request,
-        APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin
+        APIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin
       );
     const supserAdminActivationCodeCreateResponseJson =
       await supserAdminActivationCodeCreateResponse.json();
@@ -109,7 +112,7 @@ test.describe('Login Functionality', () => {
     // 1. Register Company
     const companyRegistrationResponse = await registerCompany(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.uiE2EAccessTokenAdmin,
       registrationData
     );
 

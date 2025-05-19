@@ -1,6 +1,12 @@
-export interface UIIntegrationLoginUserModel {
+export interface E2EAdminLoginCredentialsModel {
   userEmail: string;
   userPassword: string;
+  uiE2EAppId?: string;
+}
+
+export interface E2EAdminAuthDataModel {
+  uiE2EAccessTokenAdmin: string;
+  uiE2EAccessTokenSuperAdmin?: string;
 }
 
 export interface CompanyRegistrationModel {

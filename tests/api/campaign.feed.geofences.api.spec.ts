@@ -18,12 +18,12 @@ import {
   getAllUsersWithApi,
   getUserGeofenceEventsWithApi
 } from '@_src/api/factories/users.api.factory';
-import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
+import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
-import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.model';
+import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
@@ -47,7 +47,7 @@ test.describe('Geofence Feed Campaign', () => {
   };
 
   // Define the environments where this test should run
-  const SUPPORTED_ENVIRONMENTS = ['tiger'];
+  const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
 
   test.beforeAll(async ({ request }) => {
     // eslint-disable-next-line playwright/no-skipped-test

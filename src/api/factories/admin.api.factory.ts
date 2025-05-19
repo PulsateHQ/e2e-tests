@@ -2,7 +2,6 @@ import {
   AdminDetailResponse,
   AdminListResponse,
   CompanyAdminRegistrationRequest,
-  CurrentAdminResponse,
   UpdateAdminPrivilegesRequest,
   UpdateAdminPrivilegesResponse,
   WhoAmIResponse
@@ -201,68 +200,6 @@ export async function getWhoAmI(
   return response;
 }
 
-export async function getCurrentAdmin(
-  request: APIRequestContext,
-  authToken: string
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Cookie: `user_token=${authToken}`
-  };
-
-  const response = await request.get(apiUrls.admins.v2.currentAdmin, {
-    headers
-  });
-
-  const responseJson = (await response.json()) as CurrentAdminResponse;
-
-  expect(response.status()).toBe(200);
-
-  // Validate main structure
-  expect(responseJson).toHaveProperty('admin');
-  expect(responseJson).toHaveProperty('companies');
-  expect(responseJson).toHaveProperty('current_app');
-  expect(responseJson).toHaveProperty('info');
-  expect(responseJson).toHaveProperty('unlayer_access_key');
-  expect(responseJson).toHaveProperty('google_api_key');
-  expect(responseJson).toHaveProperty('path');
-
-  // Validate admin object
-  const admin = responseJson.admin;
-  expect(admin).toHaveProperty('admin_access_token');
-  expect(admin).toHaveProperty('company_ids');
-  expect(admin).toHaveProperty('created_at');
-  expect(admin).toHaveProperty('email');
-  expect(admin).toHaveProperty('front_end_access_token');
-  expect(admin).toHaveProperty('hidden');
-  expect(admin).toHaveProperty('name');
-  expect(admin).toHaveProperty('provider');
-  expect(admin).toHaveProperty('role');
-  expect(admin).toHaveProperty('username');
-  expect(admin).toHaveProperty('id');
-  expect(admin).toHaveProperty('is_default_avatar');
-  expect(admin).toHaveProperty('master_admin');
-
-  // Validate companies array
-  expect(Array.isArray(responseJson.companies)).toBe(true);
-  responseJson.companies.forEach((company) => {
-    expect(company).toHaveProperty('id');
-    expect(company).toHaveProperty('name');
-  });
-
-  // Validate current_app
-  expect(responseJson.current_app).toHaveProperty('id');
-  expect(responseJson.current_app).toHaveProperty('type');
-  expect(responseJson.current_app.type).toBe('app');
-
-  // Validate date formats
-  expect(new Date(admin.updated_at)).toBeInstanceOf(Date);
-  expect(new Date(admin.created_at)).toBeInstanceOf(Date);
-
-  return response;
-}
-
 export async function updateAdminPrivileges(
   request: APIRequestContext,
   authToken: string,
@@ -380,6 +317,22 @@ export async function deleteAdmin(
   expect(response.status()).toBe(200);
   expect(responseJson).toHaveProperty('message');
   expect(responseJson.message).toBe('Request performed successfully');
+
+  return response;
+}
+
+export async function logoutAdmin(
+  request: APIRequestContext,
+  authToken: string
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Accept: 'application/json',
+    Authorization: `Token token=${authToken}`
+  };
+
+  const response = await request.delete(apiUrls.admins.v2.logout, {
+    headers
+  });
 
   return response;
 }

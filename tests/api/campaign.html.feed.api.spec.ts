@@ -18,12 +18,12 @@ import {
   getCardCampaignStatsWithApi
 } from '@_src/api/factories/stats.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
-import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.statistics.api.factory';
+import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
-import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.statistics.model';
+import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import {
   createCampaignFeedOneButtonBackWithDismiss,
   createCampaignFeedOneButtonToUrl,
@@ -45,25 +45,24 @@ import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 // Define the environments where this test should run
-const SUPPORTED_ENVIRONMENTS = ['tiger'];
+const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
 
-// Use condition() to skip tests on unsupported environments
 test.describe('HTML Feed Campaign', () => {
-  // This will skip all tests in this suite if not running in a supported environment
-  test.beforeEach(() => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
-      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
-    );
-  });
-
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
     apiE2EAccessTokenAdmin: API_E2E_ACCESS_TOKEN_ADMIN,
     apiE2EAccessTokenSuperAdmin: SUPER_ADMIN_ACCESS_TOKEN,
     apiE2EAppId: API_E2E_APP_ID
   };
+
+  // This will skip all tests in this suite if not running in a supported environment
+  test.beforeAll(() => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
+  });
 
   test.beforeAll(async ({ request }) => {
     const sdkCredentialsResponse = await getSdkCredentials(

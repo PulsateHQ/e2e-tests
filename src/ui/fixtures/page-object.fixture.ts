@@ -1,6 +1,7 @@
+import { AccountSettingsPage } from '../pages/accountSettings.page';
+import { CampaignBuilderPage } from '../pages/campaignBuilder.page';
 import { MainNavigationComponent } from '@_src/ui/components/mainNavigation.component';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
-import { BeaconsPage } from '@_src/ui/pages/beacons.page';
 import { CampaignStatsPage } from '@_src/ui/pages/campaignStats.page';
 import { CampaignsPage } from '@_src/ui/pages/campaigns.page';
 import { CompanyRegistrationPage } from '@_src/ui/pages/companyRegistration.page';
@@ -15,14 +16,15 @@ import { test as baseTest } from '@playwright/test';
 
 interface Pages {
   loginPage: LoginPage;
+  accountSettingsPage: AccountSettingsPage;
   forgotPasswordPage: ForgotPasswordPage;
   companyRegistrationPage: CompanyRegistrationPage;
   dashboardPage: DashboardPage;
   campaignStatsPage: CampaignStatsPage;
   segmentsPage: SegmentsPage;
   geofencesPage: GeofencesPage;
-  beaconsPage: BeaconsPage;
   campaignsPage: CampaignsPage;
+  campaignBuilderPage: CampaignBuilderPage;
   journeysPage: JourneysPage;
   usersPage: UsersPage;
   sideBarComponent: SideBarComponent;
@@ -60,13 +62,13 @@ export const pageObjectTest = baseTest.extend<Pages>({
     const geofencesPage = new GeofencesPage(page);
     await use(geofencesPage);
   },
-  beaconsPage: async ({ page }, use) => {
-    const beaconsPage = new BeaconsPage(page);
-    await use(beaconsPage);
-  },
   campaignsPage: async ({ page }, use) => {
     const campaignsPage = new CampaignsPage(page);
     await use(campaignsPage);
+  },
+  campaignBuilderPage: async ({ page }, use) => {
+    const campaignBuilderPage = new CampaignBuilderPage(page);
+    await use(campaignBuilderPage);
   },
   journeysPage: async ({ page }, use) => {
     const journeysPage = new JourneysPage(page);
@@ -83,5 +85,9 @@ export const pageObjectTest = baseTest.extend<Pages>({
   mainNavigationComponent: async ({ page }, use) => {
     const mainNavigationComponent = new MainNavigationComponent(page);
     await use(mainNavigationComponent);
+  },
+  accountSettingsPage: async ({ page }, use) => {
+    const accountSettingsPage = new AccountSettingsPage(page);
+    await use(accountSettingsPage);
   }
 });

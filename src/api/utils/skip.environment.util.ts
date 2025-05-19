@@ -6,7 +6,7 @@ function detectCurrentEnvironment(): string {
   }
 
   if (BASE_URL) {
-    const environmentPatterns = ['tiger', 'lion', 'sealion'];
+    const environmentPatterns = ['tiger', 'puma', 'sealion'];
 
     for (const env of environmentPatterns) {
       if (BASE_URL.toLowerCase().includes(env.toLowerCase())) {

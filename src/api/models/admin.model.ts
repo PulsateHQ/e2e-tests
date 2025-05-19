@@ -2,6 +2,7 @@ export interface APIE2ELoginUserModel {
   apiE2EAccessTokenAdmin: string;
   apiE2EAccessTokenSuperAdmin?: string;
   apiE2EAppId: string;
+  apiE2EFrontEndAccessToken?: string;
 }
 
 export interface APIE2ETokenSDKModel {

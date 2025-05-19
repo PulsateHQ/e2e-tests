@@ -39,8 +39,24 @@ export default defineConfig({
     {
       name: 'api',
       testDir: './tests/api',
+      timeout: 90_000,
+      expect: {
+        timeout: 60_000
+      },
       use: {
         ...devices['Desktop Firefox']
+      }
+    },
+    {
+      name: 'ui',
+      testDir: './tests/ui',
+      timeout: 120_000,
+      expect: {
+        timeout: 30_000
+      },
+      use: {
+        ...devices['Desktop Firefox'],
+        viewport: { width: 1920, height: 1080 }
       }
     },
     {

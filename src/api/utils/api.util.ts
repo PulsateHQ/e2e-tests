@@ -18,7 +18,11 @@ export const apiUrls = {
     v2: {
       register: `${BASE_URL}/admins/api/v2/register`,
       whoami: `${BASE_URL}/sessions/api/v2/whoami`,
-      currentAdmin: `${BASE_URL}/admins/current_admin`
+      currentAdmin: `${BASE_URL}/admins/current_admin`,
+      logout: `${BASE_URL}/admins/api/v2/logout`
+    },
+    mobile: {
+      base: `${BASE_URL}/mobile/apps`
     }
   },
 
@@ -99,6 +103,7 @@ export const apiUrls = {
   // Web SDK related endpoints
   webSdk: {
     v1: {
+      start: `${WEB_SDK_API_URL}/api/v1/session/start`,
       statistics: `${WEB_SDK_API_URL}/api/v1/statistics`
     }
   }
