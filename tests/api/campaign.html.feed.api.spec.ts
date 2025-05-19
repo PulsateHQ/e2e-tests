@@ -41,7 +41,11 @@ import {
   deleteAllUsers,
   importRandomUsers
 } from '@_src/api/utils/data.manager.util';
+import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
+
+// Define the environments where this test should run
+const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
 
 test.describe('HTML Feed Campaign', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
@@ -50,6 +54,15 @@ test.describe('HTML Feed Campaign', () => {
     apiE2EAccessTokenSuperAdmin: SUPER_ADMIN_ACCESS_TOKEN,
     apiE2EAppId: API_E2E_APP_ID
   };
+
+  // This will skip all tests in this suite if not running in a supported environment
+  test.beforeAll(() => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
+  });
 
   test.beforeAll(async ({ request }) => {
     const sdkCredentialsResponse = await getSdkCredentials(

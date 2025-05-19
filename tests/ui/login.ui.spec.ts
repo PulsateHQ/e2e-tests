@@ -8,6 +8,7 @@ import {
 import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import { superAdminsActivationCodesCreate } from '@_src/api/factories/super.admin.api.factory';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
   E2EAdminAuthDataModel,
@@ -15,6 +16,17 @@ import {
 } from '@_src/ui/models/admin.model';
 
 test.describe('Login Functionality', () => {
+  // Define the environments where this test should run
+  const SUPPORTED_ENVIRONMENTS = ['sealion'];
+
+  test.beforeEach(async ({}) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
+  });
+
   test('should reject login with incorrect password and display error messages', async ({
     loginPage
   }) => {

@@ -1,12 +1,21 @@
 import { BASE_URL } from '@_config/env.config';
+import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { CompanyRegistrationModel } from '@_src/ui/models/user.model';
+import { CompanyRegistrationModel } from '@_src/ui/models/admin.model';
 import { generateCompanyRegistrationData } from '@_src/ui/test-data/company-registration.data';
 
 test.describe('Company Registration Page', () => {
   let registrationData: CompanyRegistrationModel;
 
+  // Define the environments where this test should run
+  const SUPPORTED_ENVIRONMENTS = ['sealion'];
+
   test.beforeEach(async ({ companyRegistrationPage }) => {
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
+      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
+      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
+    );
     // Generate fresh test data for each test
     registrationData = generateCompanyRegistrationData();
 
