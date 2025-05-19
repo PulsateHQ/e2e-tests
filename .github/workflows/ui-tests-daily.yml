@@ -2,8 +2,8 @@ name: Daily UI Tests - Sealion
 
 on:
   schedule:
-    # Run at 2:00 AM UTC every day
-    - cron: '0 2 * * *'
+    # Run at 2:00 AM UTC every 2nd Monday
+    - cron: '0 2 * * 1/2'
   # Allow manual trigger
   workflow_dispatch:
 
@@ -105,7 +105,7 @@ jobs:
           mkdir -p allure-results
 
           # Run the tests
-          npx dotenv -e .env.sealion -- npx playwright test --project=ui
+          npx dotenv -e .env -- npx playwright test --project=ui
 
       - name: Set Test Outcome
         id: set-outcome
