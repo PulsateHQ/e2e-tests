@@ -2,7 +2,6 @@ import {
   AdminDetailResponse,
   AdminListResponse,
   CompanyAdminRegistrationRequest,
-  CurrentAdminResponse,
   UpdateAdminPrivilegesRequest,
   UpdateAdminPrivilegesResponse,
   WhoAmIResponse
