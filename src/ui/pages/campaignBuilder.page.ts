@@ -20,17 +20,12 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   // Content Section Locators
   // =========================================================================
-  personalMessageSection = this.page.getByText('Personal Message', {
-    exact: true
-  });
+
   imageSection = this.page.getByText('Image', { exact: true });
   headlineSection = this.page.getByText('Headline', { exact: true });
   textSection = this.page.getByText('Text', { exact: true });
   callToActionSection = this.page.getByText('Call to action');
 
-  personalMessageToggle = this.page
-    .locator('div:has-text("Personal Message") ~ div .react-switch-bg')
-    .first();
   imageToggle = this.page
     .locator('div:has-text("Image") ~ div .react-switch-bg')
     .first();
@@ -40,15 +35,6 @@ export class CampaignBuilderPage extends BasePage {
   textToggle = this.page
     .locator('div:has-text("Text") ~ div .react-switch-bg')
     .first();
-
-  personalMessageInput = this.page
-    .locator('div[data-testid="collapse"]')
-    .filter({
-      has: this.page.locator(
-        '.textarea__placeholder:has-text("Add a personal message...")'
-      )
-    })
-    .locator('div[data-testid="textarea"]');
 
   headlineInput = this.page.locator('div:nth-child(2) > .collapse > div > div');
 
@@ -156,10 +142,6 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   // Content Section Methods
   // =========================================================================
-  async enterPersonalMessage(message: string): Promise<void> {
-    await this.personalMessageInput.fill(message);
-  }
-
   async enterHeadline(headline: string): Promise<void> {
     // Reverted to simpler version based on user's previous commits
     await this.headlineInput.first().click(); // Assuming first() is needed if locator isn't unique
@@ -277,17 +259,9 @@ export class CampaignBuilderPage extends BasePage {
   // Setup Helper Methods
   // =========================================================================
   async expandCollapseSection(
-    section:
-      | 'Personal Message'
-      | 'Image'
-      | 'Headline'
-      | 'Text'
-      | 'Call to Action'
+    section: 'Image' | 'Headline' | 'Text' | 'Call to Action'
   ): Promise<void> {
     switch (section) {
-      case 'Personal Message':
-        await this.personalMessageSection.click();
-        break;
       case 'Image':
         await this.imageSection.click();
         break;
@@ -304,13 +278,10 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   async toggleSectionSwitch(
-    section: 'Personal Message' | 'Image' | 'Headline' | 'Text'
+    section: 'Image' | 'Headline' | 'Text'
   ): Promise<void> {
     let sectionToggle: Locator;
     switch (section) {
-      case 'Personal Message':
-        sectionToggle = this.personalMessageToggle;
-        break;
       case 'Image':
         sectionToggle = this.imageToggle;
         break;
