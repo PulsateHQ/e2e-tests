@@ -59,14 +59,27 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: |
-          # Ensure Firefox is installed
-          if [ ! -d ~/.cache/ms-playwright/firefox-* ] || [ ! -f ~/.cache/ms-playwright/firefox-*/firefox/firefox ]; then
-            echo "Installing Playwright browsers"
-            npx playwright install --with-deps firefox
+          # Always ensure Firefox is properly installed
+          echo "Installing/verifying Playwright Firefox browser..."
+          npx playwright install --with-deps firefox
+
+          # Verify installation with more robust check
+          FIREFOX_FOUND=$(find ~/.cache/ms-playwright -name "firefox" -type f -executable 2>/dev/null | head -1)
+          if [ -z "$FIREFOX_FOUND" ]; then
+            echo "Firefox installation failed, retrying..."
+            npx playwright install firefox
+            
+            # Final verification
+            FIREFOX_FOUND=$(find ~/.cache/ms-playwright -name "firefox" -type f -executable 2>/dev/null | head -1)
+            if [ -z "$FIREFOX_FOUND" ]; then
+              echo "ERROR: Firefox installation failed completely"
+              exit 1
+            fi
           fi
+          echo "Firefox successfully installed at: $FIREFOX_FOUND"
   test:
     needs: [prepare-env]
-    timeout-minutes: 30 # Increased timeout for UI tests
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     environment: sealion
     outputs:
@@ -79,6 +92,20 @@ jobs:
           node-version: '20'
           cache: 'npm'
           registry-url: 'https://npm.pkg.github.com'
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test --json | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4)
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Cache node_modules
         uses: actions/cache@v4
         id: node-cache
