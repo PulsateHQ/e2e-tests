@@ -142,14 +142,12 @@ test.describe('In-App Campaign Creation', () => {
     await campaignBuilderPage.enterCampaignName(campaignName);
     await campaignBuilderPage.clickSaveAndContinue();
 
-    await expect(campaignBuilderPage.personalMessageSection).toBeVisible();
     await expect(campaignBuilderPage.imageSection).toBeVisible();
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
     // await expect(campaignsPage.callToActionSection).toBeVisible();
 
-    // Toggle of Personal Message and Image sections
-    await campaignBuilderPage.toggleSectionSwitch('Personal Message');
+    // Toggle of Image section
     await campaignBuilderPage.toggleSectionSwitch('Image');
 
     // Enter Headline and Text
