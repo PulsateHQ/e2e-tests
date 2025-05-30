@@ -34,7 +34,6 @@ import {
   deleteAllUsers,
   importRandomUsers
 } from '@_src/api/utils/data.manager.util';
-import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Geofence Feed Campaign', () => {
@@ -46,15 +45,7 @@ test.describe('Geofence Feed Campaign', () => {
     apiE2EAppId: `${API_E2E_APP_ID}`
   };
 
-  // Define the environments where this test should run
-  const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
-
   test.beforeAll(async ({ request }) => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
-      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
-    );
     const sdkCredentialsResponse = await getSdkCredentials(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
