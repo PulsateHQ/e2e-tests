@@ -2,8 +2,8 @@ name: Daily UI Tests - Sealion
 
 on:
   schedule:
-    # Run at 2:00 AM UTC every 2nd Monday
-    - cron: '0 2 * * 1/2'
+    # Run at 8:00 AM UTC every morning
+    - cron: '0 8 * * *'
   # Allow manual trigger
   workflow_dispatch:
 
