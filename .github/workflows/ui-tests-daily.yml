@@ -82,6 +82,8 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     environment: sealion
+    env:
+      TZ: 'Europe/Warsaw'
     outputs:
       test_outcome: ${{ steps.set-outcome.outputs.test_outcome }}
     steps:
