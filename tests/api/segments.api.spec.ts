@@ -212,11 +212,13 @@ test.describe('Segment Management', () => {
     const firstAliasUser = getUsersResponseJson.data[0].alias;
     const secondAliasUser = getUsersResponseJson.data[1].alias;
 
+    const segmentAllUsersPayload = createSegmentAllUsersPayload();
+
     // Act
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      segmentAllUsersPayload
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
@@ -302,7 +304,7 @@ test.describe('Segment Management', () => {
     expect(duplicateSegmentWithApiResponse.status()).toBe(200);
     expect(duplicateSegmentWithApiResponseJson).toHaveProperty(
       'name',
-      `${createSegmentAllUsersPayload().name} copy01`
+      `${segmentAllUsersPayload.name} copy01`
     );
 
     expect(estimateSegmentsWithApiResponse.status()).toBe(200);
