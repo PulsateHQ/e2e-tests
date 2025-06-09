@@ -35,7 +35,7 @@ export interface UpdateMobileUserPayload {
 }
 export interface UserAction {
   guid: string;
-  key: InAppEvents;
+  key: string;
   occurred_at_array: string[];
   type: string;
 }

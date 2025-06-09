@@ -46,21 +46,9 @@ import {
   deleteAllUsers,
   importRandomUsers
 } from '@_src/api/utils/data.manager.util';
-import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-// Define the environments where this test should run
-const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
-
 test.describe('In-App Campaign with Feed', () => {
-  // This will skip all tests in this suite if not running in a supported environment
-  test.beforeEach(() => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
-      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
-    );
-  });
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
 
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
@@ -116,21 +104,23 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Feed Campaign
-    createCampaignFeedOneButtonToUrl.segment_ids = [
+    const createCampaignFeedOneButtonToUrlPayload =
+      createCampaignFeedOneButtonToUrl();
+    createCampaignFeedOneButtonToUrlPayload.segment_ids = [
       createSegmentResponseJson.segment.id
     ];
 
     const createFeedCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonToUrl
+      createCampaignFeedOneButtonToUrlPayload
     );
     const createFeedCampaignResponseJson =
       await createFeedCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createFeedCampaignResponseJson.name).toBe(
-      createCampaignFeedOneButtonToUrl.name
+      createCampaignFeedOneButtonToUrlPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
