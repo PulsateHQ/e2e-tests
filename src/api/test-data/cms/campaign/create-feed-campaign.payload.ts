@@ -1,7 +1,7 @@
 import { CreateCampaignPayload } from '@_src/api/models/campaign.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-export const createCampaignFeedOneButtonToUrl: CreateCampaignPayload = {
+export const createCampaignFeedOneButtonToUrl = (): CreateCampaignPayload => ({
   state_machine_notifications_state: 'initial',
   duplication_source_id: '',
   type: 'CardInboxCampaign',
@@ -57,7 +57,9 @@ export const createCampaignFeedOneButtonToUrl: CreateCampaignPayload = {
             destination_type: 'url',
             destination: 'https://google.com',
             txt_color: '',
-            btn_color: ''
+            btn_color: '',
+            in_app_events: null,
+            order_number: 0
           }
         ],
         side: 'front'
@@ -83,7 +85,7 @@ export const createCampaignFeedOneButtonToUrl: CreateCampaignPayload = {
   delivery: 'current',
   campaign_limits: false,
   campaign_expiry: false
-};
+});
 
 export const createCampaignFeedOneButtonWithDeeplink: CreateCampaignPayload = {
   state_machine_notifications_state: 'initial',
@@ -141,7 +143,9 @@ export const createCampaignFeedOneButtonWithDeeplink: CreateCampaignPayload = {
             destination_type: 'deeplink',
             destination: '',
             txt_color: '',
-            btn_color: ''
+            btn_color: '',
+            in_app_events: null,
+            order_number: 0
           }
         ],
         side: 'front',
@@ -226,7 +230,9 @@ export const createCampaignFeedOneButtonBackWithDismiss: CreateCampaignPayload =
               label: `Button_Card_Back_${faker.lorem.word()}`,
               destination_type: 'card_back',
               txt_color: '',
-              btn_color: ''
+              btn_color: '',
+              in_app_events: null,
+              order_number: 0
             }
           ],
           side: 'front'
@@ -271,7 +277,9 @@ export const createCampaignFeedOneButtonBackWithDismiss: CreateCampaignPayload =
               label: `Button_Dismiss_${faker.lorem.word()}`,
               destination_type: 'dismiss',
               txt_color: '',
-              btn_color: ''
+              btn_color: '',
+              in_app_events: null,
+              order_number: 0
             }
           ],
           side: 'back'
@@ -358,13 +366,17 @@ export const createCampaignFeedTwoButtonsWithBackAndDeeplink: CreateCampaignPayl
               destination_type: 'url',
               destination: 'https://google.com',
               txt_color: '',
-              btn_color: ''
+              btn_color: '',
+              in_app_events: null,
+              order_number: 0
             },
             {
               label: `Button_Card_Back_${faker.lorem.word()}`,
               destination_type: 'card_back',
               txt_color: '',
-              btn_color: ''
+              btn_color: '',
+              in_app_events: null,
+              order_number: 0
             }
           ],
           side: 'front'
@@ -405,14 +417,18 @@ export const createCampaignFeedTwoButtonsWithBackAndDeeplink: CreateCampaignPayl
               destination_type: 'deeplink',
               destination: '',
               txt_color: '',
-              btn_color: ''
+              btn_color: '',
+              in_app_events: null,
+              order_number: 0
             },
             {
               label: `Button_URL_${faker.lorem.word()}`,
               destination_type: 'url',
               destination: 'https://google.com',
               txt_color: '',
-              btn_color: ''
+              btn_color: '',
+              in_app_events: null,
+              order_number: 0
             }
           ],
           side: 'back'

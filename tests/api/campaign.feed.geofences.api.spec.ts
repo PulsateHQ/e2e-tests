@@ -96,12 +96,10 @@ test.describe('Geofence Feed Campaign', () => {
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
-    // Prepare Campaign Payload
-
-    createCampaignFeedOneButtonToUrl.geofence_ids = [
-      createGeofenceResponseJson.id
-    ];
-    createCampaignFeedOneButtonToUrl.geofence_events = {
+    // Prepare Campaign Payload - Get fresh instance from function
+    const campaignPayload = createCampaignFeedOneButtonToUrl();
+    campaignPayload.geofence_ids = [createGeofenceResponseJson.id];
+    campaignPayload.geofence_events = {
       [createGeofenceResponseJson.id]: 'enter'
     };
 
@@ -109,14 +107,12 @@ test.describe('Geofence Feed Campaign', () => {
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonToUrl
+      campaignPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
-    expect(createCampaignResponseJson.name).toBe(
-      createCampaignFeedOneButtonToUrl.name
-    );
+    expect(createCampaignResponseJson.name).toBe(campaignPayload.name);
 
     const getCampaignDetailsResponse = await getCampaignDetailsWithApi(
       request,
