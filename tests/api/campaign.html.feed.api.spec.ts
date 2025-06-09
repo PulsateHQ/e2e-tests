@@ -94,7 +94,7 @@ test.describe('HTML Feed Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -270,7 +270,7 @@ test.describe('HTML Feed Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -498,7 +498,7 @@ test.describe('HTML Feed Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -816,7 +816,7 @@ test.describe('HTML Feed Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -1168,7 +1168,7 @@ test.describe('HTML Feed Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -1344,7 +1344,7 @@ test.describe('HTML Feed Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -1581,7 +1581,7 @@ test.describe('HTML Feed Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 

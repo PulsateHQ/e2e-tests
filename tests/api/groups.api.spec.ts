@@ -61,7 +61,7 @@ test.describe('Groups Management', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
@@ -77,7 +77,7 @@ test.describe('Groups Management', () => {
     expect(getAllGroupsResponseJson.data).toHaveLength(0);
 
     // Store the payload before making the API call
-    const groupPayload = createGroupSegmentsPayload;
+    const groupPayload = createGroupSegmentsPayload();
 
     const createGroupResponse = await createGroupForSegmentWithApi(
       request,

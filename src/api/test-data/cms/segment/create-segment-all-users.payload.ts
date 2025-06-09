@@ -1,7 +1,7 @@
 import { CreateSegmentPayload } from '@_src/api/models/segment.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-export const createSegmentAllUsersPayload: CreateSegmentPayload = {
+export const createSegmentAllUsersPayload = (): CreateSegmentPayload => ({
   name: faker.lorem.word(),
   groups: [
     {
@@ -15,4 +15,4 @@ export const createSegmentAllUsersPayload: CreateSegmentPayload = {
       ]
     }
   ]
-};
+});

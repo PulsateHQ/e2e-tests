@@ -91,7 +91,7 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -220,7 +220,7 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -375,7 +375,7 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -504,7 +504,7 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 

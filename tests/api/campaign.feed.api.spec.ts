@@ -79,7 +79,7 @@ test.describe('Feed Post Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 

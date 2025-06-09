@@ -100,7 +100,7 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -352,7 +352,7 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -551,7 +551,7 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 

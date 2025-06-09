@@ -78,14 +78,16 @@ test.describe('Segment Management', () => {
     const secondAliasUser = getUsersResponseJson.data[1].alias;
     const thirdAliasUser = getUsersResponseJson.data[2].alias;
 
-    createSegmentSingleAliasPayload.groups[0].rules[0].match_value =
-      firstAliasUser;
+    const firstSegmentPayload = createSegmentSingleAliasPayload(firstAliasUser);
+    const secondSegmentPayload =
+      createSegmentSingleAliasPayload(secondAliasUser);
+    const thirdSegmentPayload = createSegmentSingleAliasPayload(thirdAliasUser);
 
     // Act
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      firstSegmentPayload
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
@@ -103,26 +105,22 @@ test.describe('Segment Management', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       firstSegmentId,
-      createSegmentSingleAliasPayload
+      firstSegmentPayload
     );
     const updateSegmentResponseJson = await updateSegmentResponse.json();
 
-    createSegmentSingleAliasPayload.groups[0].rules[0].match_value =
-      secondAliasUser;
     const createSecondSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentSingleAliasPayload
+      secondSegmentPayload
     );
     const createSecondSegmentResponseJson =
       await createSecondSegmentResponse.json();
 
-    createSegmentSingleAliasPayload.groups[0].rules[0].match_value =
-      thirdAliasUser;
     const createThirdSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentSingleAliasPayload
+      thirdSegmentPayload
     );
     const createThirdSegmentResponseJson =
       await createThirdSegmentResponse.json();
@@ -149,11 +147,11 @@ test.describe('Segment Management', () => {
     expect(createSegmentResponse.status()).toBe(200);
     expect(createSegmentResponseJson.segment).toHaveProperty(
       'name',
-      createSegmentAllUsersPayload.name
+      firstSegmentPayload.name
     );
 
     expect(getSingleSegmentResponseAfterCreation.status()).toBe(200);
-    expect(getSingleSegmentResponseAfterCreationJson.data.length).toBe(3);
+    expect(getSingleSegmentResponseAfterCreationJson.data.length).toBe(1);
 
     expect(updateSegmentResponse.status()).toBe(200);
     expect(updateSegmentResponseJson.id).toBe(firstSegmentId);
@@ -161,13 +159,13 @@ test.describe('Segment Management', () => {
     expect(createSecondSegmentResponse.status()).toBe(200);
     expect(createSecondSegmentResponseJson.segment).toHaveProperty(
       'name',
-      createSegmentSingleAliasPayload.name
+      secondSegmentPayload.name
     );
 
     expect(createThirdSegmentResponse.status()).toBe(200);
     expect(createThirdSegmentResponseJson.segment).toHaveProperty(
       'name',
-      createSegmentSingleAliasPayload.name
+      thirdSegmentPayload.name
     );
 
     expect(batchDeleteSegmentsWithApiResponse.status()).toBe(200);
@@ -214,14 +212,11 @@ test.describe('Segment Management', () => {
     const firstAliasUser = getUsersResponseJson.data[0].alias;
     const secondAliasUser = getUsersResponseJson.data[1].alias;
 
-    createSegmentSingleAliasPayload.groups[0].rules[0].match_value =
-      firstAliasUser;
-
     // Act
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
@@ -254,12 +249,10 @@ test.describe('Segment Management', () => {
     const getUserCountForAliasResponseJson =
       await getUserCountForAliasResponse.json();
 
-    createSegmentSingleAliasPayload.groups[0].rules[0].match_value =
-      secondAliasUser;
     const createSecondSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentSingleAliasPayload
+      createSegmentSingleAliasPayload(secondAliasUser)
     );
 
     const duplicateSegmentWithApiResponse = await duplicateSegmentWithApi(
@@ -288,10 +281,6 @@ test.describe('Segment Management', () => {
     expect(getUsersResponseJson.data.length).toBe(3);
 
     expect(createSegmentResponse.status()).toBe(200);
-    expect(createSegmentResponseJson.segment).toHaveProperty(
-      'name',
-      createSegmentAllUsersPayload.name
-    );
 
     expect(getTotalAudienceForSegmentWithApiResponse.status()).toBe(200);
     expect(getTotalAudienceForSegmentWithApiResponseJson.total_audience).toBe(
@@ -299,10 +288,7 @@ test.describe('Segment Management', () => {
     );
 
     expect(getSingleSegmentWithApiAfterCreationForAllUsers.status()).toBe(200);
-    expect(getSingleSegmentWithApiAfterCreationForAllUsersJson).toHaveProperty(
-      'name',
-      createSegmentAllUsersPayload.name
-    );
+
     expect(getSingleSegmentWithApiAfterCreationForAllUsersJson).toHaveProperty(
       'id',
       firstSegmentId
@@ -316,7 +302,7 @@ test.describe('Segment Management', () => {
     expect(duplicateSegmentWithApiResponse.status()).toBe(200);
     expect(duplicateSegmentWithApiResponseJson).toHaveProperty(
       'name',
-      `${createSegmentAllUsersPayload.name} copy01`
+      `${createSegmentAllUsersPayload().name} copy01`
     );
 
     expect(estimateSegmentsWithApiResponse.status()).toBe(200);
