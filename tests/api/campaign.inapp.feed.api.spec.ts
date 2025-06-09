@@ -46,21 +46,9 @@ import {
   deleteAllUsers,
   importRandomUsers
 } from '@_src/api/utils/data.manager.util';
-import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-// Define the environments where this test should run
-const SUPPORTED_ENVIRONMENTS = ['tiger', 'puma'];
-
 test.describe('In-App Campaign with Feed', () => {
-  // This will skip all tests in this suite if not running in a supported environment
-  test.beforeEach(() => {
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      !isRunningInEnvironment(SUPPORTED_ENVIRONMENTS),
-      `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
-    );
-  });
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
 
   const APIE2ELoginUserModel: APIE2ELoginUserModel = {
@@ -95,204 +83,6 @@ test.describe('In-App Campaign with Feed', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
   });
-  test('should create an In-App Large campaign with button to open feed inbox', async ({
-    request
-  }) => {
-    const numberOfUsers = 1;
-
-    await importRandomUsers(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      APIE2ELoginUserModel.apiE2EAppId,
-      numberOfUsers
-    );
-
-    // Create Segment
-    const createSegmentResponse = await createSegmentWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
-    );
-    const createSegmentResponseJson = await createSegmentResponse.json();
-
-    // Create Feed Campaign
-    createCampaignFeedOneButtonToUrl.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-
-    const createFeedCampaignResponse = await createCampaignWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonToUrl
-    );
-    const createFeedCampaignResponseJson =
-      await createFeedCampaignResponse.json();
-
-    // Assert Campaign Created
-    expect(createFeedCampaignResponseJson.name).toBe(
-      createCampaignFeedOneButtonToUrl.name
-    );
-
-    const getUsersResponse = await getAllUsersWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    const getUsersResponseJson = await getUsersResponse.json();
-
-    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
-
-    // First user - will perform actions
-    const firstUser = getUsersResponseJson.data[0];
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
-    const alias = getUsersResponseJson.data[0].alias;
-
-    // Start Mobile Session
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
-    );
-
-    await getInboxMessagesWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      1
-    );
-
-    const getCardWithApiResponse = await getCardWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      createFeedCampaignResponseJson.guid
-    );
-
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
-
-    // Validate card matches campaign configuration
-    expect(getCardWithApiResponseJson.campaign_guid).toBe(
-      createFeedCampaignResponseJson.guid
-    );
-
-    // Create InApp Campaign
-    createCampaignInAppLargeWithOpenFeed.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    const createInAppCampaignResponse = await createCampaignWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeWithOpenFeed
-    );
-    const createInAppCampaignResponseJson =
-      await createInAppCampaignResponse.json();
-
-    // Assert Campaign Created
-    expect(createInAppCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeWithOpenFeed.name
-    );
-
-    // Start session for first user
-    const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
-      alias: firstUser.alias
-    };
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      firstUserSessionPayload
-    );
-
-    // First user performs actions
-    const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
-      alias: firstUser.alias,
-      user_actions: [
-        {
-          ...userActions[InAppEvents.IN_APP_DELIVERY],
-          guid: createInAppCampaignResponseJson.guid
-        },
-        {
-          ...userActions[InAppEvents.IN_APP_IMPRESSION],
-          guid: createInAppCampaignResponseJson.guid
-        },
-        {
-          ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE],
-          guid: createInAppCampaignResponseJson.guid
-        }
-      ]
-    };
-
-    await updateMobileUserWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      firstUserUpdatePayload
-    );
-
-    await getInboxMessagesWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      1
-    );
-
-    const getCardWithApiAfterInAppResponse = await getCardWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      createFeedCampaignResponseJson.guid
-    );
-
-    const getCardWithApiAfterInAppResponseJson =
-      await getCardWithApiAfterInAppResponse.json();
-
-    // Validate card matches campaign configuration
-    expect(getCardWithApiAfterInAppResponseJson.campaign_guid).toBe(
-      createFeedCampaignResponseJson.guid
-    );
-
-    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createInAppCampaignResponseJson.id,
-      1
-    );
-
-    const getCampaignStatsWithWaitResponseJson =
-      await getCampaignStatsWithWaitResponse.json();
-
-    // Assert Validate Response Body
-    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('in_app');
-    expect(getCampaignStatsWithWaitResponseJson.in_app.send).toHaveProperty(
-      'total_uniq',
-      1
-    );
-    expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
-      'total_uniq',
-      1
-    );
-    expect(getCampaignStatsWithWaitResponseJson.in_app.bounce).toHaveProperty(
-      'total_uniq',
-      0
-    );
-    expect(getCampaignStatsWithWaitResponseJson.in_app.error).toHaveProperty(
-      'total_uniq',
-      0
-    );
-    expect(getCampaignStatsWithWaitResponseJson.in_app.dismiss).toHaveProperty(
-      'total_uniq',
-      0
-    );
-    expect(
-      getCampaignStatsWithWaitResponseJson.in_app.button_click_one
-    ).toHaveProperty('total_uniq', 1);
-    expect(getCampaignStatsWithWaitResponseJson.in_app.clicks).toHaveProperty(
-      'total_uniq',
-      1
-    );
-    expect(
-      getCampaignStatsWithWaitResponseJson.in_app.impression
-    ).toHaveProperty('total_uniq', 1);
-  });
 
   test('should create an In-App small campaign with button to open specific feed', async ({
     request
@@ -310,7 +100,7 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -340,24 +130,24 @@ test.describe('In-App Campaign with Feed', () => {
     );
 
     // Preparing payload for campaign creation
-    createCampaignSmallInAppWithCard.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    createCampaignSmallInAppWithCard.card_notification.front_parts.call_to_action.buttons[0].destination =
-      updateDeeplinkResponse.id;
+    const createCampaignSmallInAppWithCardPayload =
+      createCampaignSmallInAppWithCard(
+        [createSegmentResponseJson.segment.id],
+        updateDeeplinkResponse.id
+      );
 
     // Create InApp plus Feed Campaign
     const createInAppFeedCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignSmallInAppWithCard
+      createCampaignSmallInAppWithCardPayload
     );
     const createInAppFeedCampaignResponseJson =
       await createInAppFeedCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createInAppFeedCampaignResponseJson.name).toBe(
-      createCampaignSmallInAppWithCard.name
+      createCampaignSmallInAppWithCardPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -546,6 +336,205 @@ test.describe('In-App Campaign with Feed', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
+  test('should create an In-App Large campaign with button to open feed inbox', async ({
+    request
+  }) => {
+    const numberOfUsers = 1;
+
+    await importRandomUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      numberOfUsers
+    );
+
+    // Create Segment
+    const createSegmentResponse = await createSegmentWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSegmentAllUsersPayload()
+    );
+    const createSegmentResponseJson = await createSegmentResponse.json();
+
+    // Create Feed Campaign
+    const createCampaignFeedOneButtonToUrlPayload =
+      createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
+
+    const createFeedCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignFeedOneButtonToUrlPayload
+    );
+    const createFeedCampaignResponseJson =
+      await createFeedCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createFeedCampaignResponseJson.name).toBe(
+      createCampaignFeedOneButtonToUrlPayload.name
+    );
+
+    const getUsersResponse = await getAllUsersWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+    );
+    const getUsersResponseJson = await getUsersResponse.json();
+
+    expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
+
+    // First user - will perform actions
+    const firstUser = getUsersResponseJson.data[0];
+    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const alias = getUsersResponseJson.data[0].alias;
+
+    // Start Mobile Session
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      startMobileSessionFeedPayload
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      1
+    );
+
+    const getCardWithApiResponse = await getCardWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      createFeedCampaignResponseJson.guid
+    );
+
+    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+
+    // Validate card matches campaign configuration
+    expect(getCardWithApiResponseJson.campaign_guid).toBe(
+      createFeedCampaignResponseJson.guid
+    );
+
+    // Create InApp Campaign
+    const createCampaignInAppLargeWithOpenFeedPayload =
+      createCampaignInAppLargeWithOpenFeed([
+        createSegmentResponseJson.segment.id
+      ]);
+    const createInAppCampaignResponse = await createCampaignWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignInAppLargeWithOpenFeedPayload
+    );
+    const createInAppCampaignResponseJson =
+      await createInAppCampaignResponse.json();
+
+    // Assert Campaign Created
+    expect(createInAppCampaignResponseJson.name).toBe(
+      createCampaignInAppLargeWithOpenFeedPayload.name
+    );
+
+    // Start session for first user
+    const firstUserSessionPayload = {
+      ...startMobileSessionInAppPayload,
+      alias: firstUser.alias
+    };
+    await startMobileSessionsWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      firstUserSessionPayload
+    );
+
+    // First user performs actions
+    const firstUserUpdatePayload = {
+      ...updateMobileInAppUserPayload,
+      alias: firstUser.alias,
+      user_actions: [
+        {
+          ...userActions[InAppEvents.IN_APP_DELIVERY],
+          guid: createInAppCampaignResponseJson.guid
+        },
+        {
+          ...userActions[InAppEvents.IN_APP_IMPRESSION],
+          guid: createInAppCampaignResponseJson.guid
+        },
+        {
+          ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE],
+          guid: createInAppCampaignResponseJson.guid
+        }
+      ]
+    };
+
+    await updateMobileUserWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      firstUserUpdatePayload
+    );
+
+    await getInboxMessagesWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      1
+    );
+
+    const getCardWithApiAfterInAppResponse = await getCardWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+      alias,
+      createFeedCampaignResponseJson.guid
+    );
+
+    const getCardWithApiAfterInAppResponseJson =
+      await getCardWithApiAfterInAppResponse.json();
+
+    // Validate card matches campaign configuration
+    expect(getCardWithApiAfterInAppResponseJson.campaign_guid).toBe(
+      createFeedCampaignResponseJson.guid
+    );
+
+    const getCampaignStatsWithWaitResponse = await getCardCampaignStatsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createInAppCampaignResponseJson.id,
+      1
+    );
+
+    const getCampaignStatsWithWaitResponseJson =
+      await getCampaignStatsWithWaitResponse.json();
+
+    // Assert Validate Response Body
+    expect(getCampaignStatsWithWaitResponseJson).toHaveProperty('in_app');
+    expect(getCampaignStatsWithWaitResponseJson.in_app.send).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.delivery).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.bounce).toHaveProperty(
+      'total_uniq',
+      0
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.error).toHaveProperty(
+      'total_uniq',
+      0
+    );
+    expect(getCampaignStatsWithWaitResponseJson.in_app.dismiss).toHaveProperty(
+      'total_uniq',
+      0
+    );
+    expect(
+      getCampaignStatsWithWaitResponseJson.in_app.button_click_one
+    ).toHaveProperty('total_uniq', 1);
+    expect(getCampaignStatsWithWaitResponseJson.in_app.clicks).toHaveProperty(
+      'total_uniq',
+      1
+    );
+    expect(
+      getCampaignStatsWithWaitResponseJson.in_app.impression
+    ).toHaveProperty('total_uniq', 1);
+  });
+
   test('should create a Large In-App campaign with button to open feed card with front and back sides', async ({
     request
   }) => {
@@ -562,7 +551,7 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -582,25 +571,24 @@ test.describe('In-App Campaign with Feed', () => {
     );
 
     // Preparing payload for campaign creation
-    createCampaignLargeInAppWithFeedCardFrontBack.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    // Set the deeplink destination on the back side button
-    createCampaignLargeInAppWithFeedCardFrontBack.card_notification.back_parts.call_to_action.buttons[0].destination =
-      createDeeplinkResponse.id;
+    const createCampaignLargeInAppWithFeedCardFrontBackPayload =
+      createCampaignLargeInAppWithFeedCardFrontBack(
+        [createSegmentResponseJson.segment.id],
+        createDeeplinkResponse.id
+      );
 
     // Create Large InApp plus Feed Campaign with front/back
     const createInAppFeedCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignLargeInAppWithFeedCardFrontBack
+      createCampaignLargeInAppWithFeedCardFrontBackPayload
     );
     const createInAppFeedCampaignResponseJson =
       await createInAppFeedCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createInAppFeedCampaignResponseJson.name).toBe(
-      createCampaignLargeInAppWithFeedCardFrontBack.name
+      createCampaignLargeInAppWithFeedCardFrontBackPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(

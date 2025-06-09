@@ -1,7 +1,9 @@
 import { CreateSegmentPayload } from '@_src/api/models/segment.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-export const createSegmentSingleAliasPayload: CreateSegmentPayload = {
+export const createSegmentSingleAliasPayload = (
+  alias: string
+): CreateSegmentPayload => ({
   name: faker.lorem.word(),
   groups: [
     {
@@ -10,9 +12,9 @@ export const createSegmentSingleAliasPayload: CreateSegmentPayload = {
         {
           type: 'alias',
           match_type: 'equal',
-          match_value: ''
+          match_value: alias
         }
       ]
     }
   ]
-};
+});

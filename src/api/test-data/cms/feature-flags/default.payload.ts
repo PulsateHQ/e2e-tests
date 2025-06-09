@@ -1,6 +1,6 @@
 import { FeatureFlagsRequest } from '@_src/api/models/feature-flag.model';
 
-export const featureFlagsTestData: FeatureFlagsRequest = {
+export const featureFlagsDefault = (): FeatureFlagsRequest => ({
   feature_flags: [
     {
       app_id: '',
@@ -49,4 +49,4 @@ export const featureFlagsTestData: FeatureFlagsRequest = {
       }
     }
   ]
-};
+});

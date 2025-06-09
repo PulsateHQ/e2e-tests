@@ -79,25 +79,23 @@ test.describe('Feed Post Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload
+      createSegmentAllUsersPayload()
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignFeedOneButtonToUrl.segment_ids = [
+    const campaignPayload = createCampaignFeedOneButtonToUrl([
       createSegmentResponseJson.segment.id
-    ];
+    ]);
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonToUrl
+      campaignPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
-    expect(createCampaignResponseJson.name).toBe(
-      createCampaignFeedOneButtonToUrl.name
-    );
+    expect(createCampaignResponseJson.name).toBe(campaignPayload.name);
 
     const getUsersResponse = await getAllUsersWithApi(
       request,

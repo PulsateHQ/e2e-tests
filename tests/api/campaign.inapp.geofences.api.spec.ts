@@ -94,31 +94,33 @@ test.describe('Geofence InApp Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload
+      geofencePayload()
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
     // Prepare Campaign Payload
 
-    createCampaignInAppLargeButtonWithUrl.geofence_ids = [
-      createGeofenceResponseJson.id
-    ];
-    createCampaignInAppLargeButtonWithUrl.geofence_events = {
-      [createGeofenceResponseJson.id]: 'enter'
-    };
+    const createCampaignInAppLargeButtonWithUrlPayload =
+      createCampaignInAppLargeButtonWithUrl(
+        [],
+        [createGeofenceResponseJson.id],
+        {
+          [createGeofenceResponseJson.id]: 'enter'
+        }
+      );
 
     // Create Campaign
 
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeButtonWithUrl
+      createCampaignInAppLargeButtonWithUrlPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeButtonWithUrl.name
+      createCampaignInAppLargeButtonWithUrlPayload.name
     );
 
     const getCampaignDetailsResponse = await getCampaignDetailsWithApi(
@@ -274,7 +276,7 @@ test.describe('Geofence InApp Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload
+      geofencePayload()
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
@@ -293,24 +295,22 @@ test.describe('Geofence InApp Campaign', () => {
     const secondUser = getUsersResponseJson.data[1];
 
     // Create Campaign
-    createCampaignInAppSmallTopWithUrl.geofence_ids = [
-      createGeofenceResponseJson.id
-    ];
-    createCampaignInAppSmallTopWithUrl.geofence_events = {
-      [createGeofenceResponseJson.id]: 'exit'
-    };
+    const createCampaignInAppSmallTopWithUrlPayload =
+      createCampaignInAppSmallTopWithUrl([], [createGeofenceResponseJson.id], {
+        [createGeofenceResponseJson.id]: 'exit'
+      });
 
     // Create campaign
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallTopWithUrl
+      createCampaignInAppSmallTopWithUrlPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppSmallTopWithUrl.name
+      createCampaignInAppSmallTopWithUrlPayload.name
     );
 
     const getCampaignDetailsResponse = await getCampaignDetailsWithApi(
