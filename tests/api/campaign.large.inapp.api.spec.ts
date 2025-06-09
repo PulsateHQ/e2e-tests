@@ -18,6 +18,7 @@ import {
 } from '@_src/api/models/admin.model';
 import { InAppEvents } from '@_src/api/models/mobile.users.model';
 import {
+  createCampaignInAppLargeButtonWithDeeplink,
   createCampaignInAppLargeButtonWithDismiss,
   createCampaignInAppLargeButtonWithUrl,
   createCampaignInAppLargeWithTwoButtons
@@ -96,19 +97,20 @@ test.describe('Large In-App Campaign', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignInAppLargeButtonWithUrl.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+    const createCampaignInAppLargeButtonWithUrlPayload =
+      createCampaignInAppLargeButtonWithUrl([
+        createSegmentResponseJson.segment.id
+      ]);
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeButtonWithUrl
+      createCampaignInAppLargeButtonWithUrlPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeButtonWithUrl.name
+      createCampaignInAppLargeButtonWithUrlPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -248,22 +250,22 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // Preparing payload for campaign creation
-    createCampaignInAppLargeButtonWithUrl.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    createCampaignInAppLargeButtonWithUrl.in_app_notification.large.call_to_action.buttons[0].destination =
-      updateDeeplinkResponse.id;
+    const createCampaignInAppLargeButtonWithDeeplinkPayload =
+      createCampaignInAppLargeButtonWithDeeplink(
+        [createSegmentResponseJson.segment.id],
+        updateDeeplinkResponse.id
+      );
 
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeButtonWithUrl
+      createCampaignInAppLargeButtonWithDeeplinkPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeButtonWithUrl.name
+      createCampaignInAppLargeButtonWithDeeplinkPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -379,19 +381,20 @@ test.describe('Large In-App Campaign', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignInAppLargeButtonWithDismiss.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+    const createCampaignInAppLargeButtonWithDismissPayload =
+      createCampaignInAppLargeButtonWithDismiss([
+        createSegmentResponseJson.segment.id
+      ]);
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeButtonWithDismiss
+      createCampaignInAppLargeButtonWithDismissPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeButtonWithDismiss.name
+      createCampaignInAppLargeButtonWithDismissPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -537,21 +540,24 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // Create Campaign
-    createCampaignInAppLargeButtonWithUrl.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+    const createCampaignInAppLargeButtonWithUrlPayload =
+      createCampaignInAppLargeButtonWithUrl(
+        [createSegmentResponseJson.segment.id],
+        [],
+        {}
+      );
 
     // Create campaign
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeButtonWithUrl
+      createCampaignInAppLargeButtonWithUrlPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeButtonWithUrl.name
+      createCampaignInAppLargeButtonWithUrlPayload.name
     );
 
     // Start session for first user
@@ -702,23 +708,23 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // Prepare the campaign with the segment and deeplink
-    createCampaignInAppLargeWithTwoButtons.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    createCampaignInAppLargeWithTwoButtons.in_app_notification.large.call_to_action.buttons[0].destination =
-      createDeeplinkResponse.id;
+    const createCampaignInAppLargeWithTwoButtonsPayload =
+      createCampaignInAppLargeWithTwoButtons(
+        [createSegmentResponseJson.segment.id],
+        createDeeplinkResponse.id
+      );
 
     // Create the campaign
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeWithTwoButtons
+      createCampaignInAppLargeWithTwoButtonsPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeWithTwoButtons.name
+      createCampaignInAppLargeWithTwoButtonsPayload.name
     );
 
     // Get users

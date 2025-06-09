@@ -96,19 +96,20 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignInAppSmallTopWithUrl.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+    const createCampaignInAppSmallTopWithUrlPayload =
+      createCampaignInAppSmallTopWithUrl([
+        createSegmentResponseJson.segment.id
+      ]);
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallTopWithUrl
+      createCampaignInAppSmallTopWithUrlPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppSmallTopWithUrl.name
+      createCampaignInAppSmallTopWithUrlPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -248,22 +249,22 @@ test.describe('Small In-App Campaign', () => {
     );
 
     // Preparing payload for campaign creation
-    createCampaignInAppSmallBottomWithDeeplink.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    createCampaignInAppSmallBottomWithDeeplink.in_app_notification.small.call_to_action.buttons[0].destination =
-      updateDeeplinkResponse.id;
+    const createCampaignInAppSmallBottomWithDeeplinkPayload =
+      createCampaignInAppSmallBottomWithDeeplink(
+        [createSegmentResponseJson.segment.id],
+        updateDeeplinkResponse.id
+      );
 
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallBottomWithDeeplink
+      createCampaignInAppSmallBottomWithDeeplinkPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppSmallBottomWithDeeplink.name
+      createCampaignInAppSmallBottomWithDeeplinkPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -379,19 +380,20 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Create Campaign
-    createCampaignInAppSmallTopWithDismiss.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+    const createCampaignInAppSmallTopWithDismissPayload =
+      createCampaignInAppSmallTopWithDismiss([
+        createSegmentResponseJson.segment.id
+      ]);
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallTopWithDismiss
+      createCampaignInAppSmallTopWithDismissPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppSmallTopWithDismiss.name
+      createCampaignInAppSmallTopWithDismissPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -537,21 +539,22 @@ test.describe('Small In-App Campaign', () => {
     );
 
     // Create Campaign
-    createCampaignInAppSmallTopWithUrl.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+    const createCampaignInAppSmallTopWithUrlPayload =
+      createCampaignInAppSmallTopWithUrl([
+        createSegmentResponseJson.segment.id
+      ]);
 
     // Create campaign
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallTopWithUrl
+      createCampaignInAppSmallTopWithUrlPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignInAppSmallTopWithUrl.name
+      createCampaignInAppSmallTopWithUrlPayload.name
     );
 
     // Start session for first user

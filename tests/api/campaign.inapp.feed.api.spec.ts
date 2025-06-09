@@ -162,20 +162,21 @@ test.describe('In-App Campaign with Feed', () => {
     );
 
     // Create InApp Campaign
-    createCampaignInAppLargeWithOpenFeed.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+    const createCampaignInAppLargeWithOpenFeedPayload =
+      createCampaignInAppLargeWithOpenFeed([
+        createSegmentResponseJson.segment.id
+      ]);
     const createInAppCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeWithOpenFeed
+      createCampaignInAppLargeWithOpenFeedPayload
     );
     const createInAppCampaignResponseJson =
       await createInAppCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createInAppCampaignResponseJson.name).toBe(
-      createCampaignInAppLargeWithOpenFeed.name
+      createCampaignInAppLargeWithOpenFeedPayload.name
     );
 
     // Start session for first user
