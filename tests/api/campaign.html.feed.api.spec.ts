@@ -100,10 +100,7 @@ test.describe('HTML Feed Campaign', () => {
 
     // Create Campaign
     const createCampaignFeedOneButtonToUrlPayload =
-      createCampaignFeedOneButtonToUrl();
-    createCampaignFeedOneButtonToUrlPayload.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+      createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -303,24 +300,24 @@ test.describe('HTML Feed Campaign', () => {
     );
 
     // Preparing payload for campaign creation
-    createCampaignFeedOneButtonWithDeeplink.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
-    createCampaignFeedOneButtonWithDeeplink.card_notification.front_parts.call_to_action.buttons[0].destination =
-      updateDeeplinkResponse.id;
+    const createCampaignFeedOneButtonWithDeeplinkPayload =
+      createCampaignFeedOneButtonWithDeeplink(
+        [createSegmentResponseJson.segment.id],
+        updateDeeplinkResponse.id
+      );
 
     // Create Campaign
 
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonWithDeeplink
+      createCampaignFeedOneButtonWithDeeplinkPayload
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
-      createCampaignFeedOneButtonWithDeeplink.name
+      createCampaignFeedOneButtonWithDeeplinkPayload.name
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -1176,10 +1173,7 @@ test.describe('HTML Feed Campaign', () => {
 
     // Create Campaign
     const createCampaignFeedOneButtonToUrlPayload =
-      createCampaignFeedOneButtonToUrl();
-    createCampaignFeedOneButtonToUrlPayload.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+      createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -1592,10 +1586,7 @@ test.describe('HTML Feed Campaign', () => {
 
     // Create Campaign
     const createCampaignFeedOneButtonToUrlPayload =
-      createCampaignFeedOneButtonToUrl();
-    createCampaignFeedOneButtonToUrlPayload.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+      createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
     const createFirstCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,

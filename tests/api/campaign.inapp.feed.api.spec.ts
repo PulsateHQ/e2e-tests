@@ -105,10 +105,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // Create Feed Campaign
     const createCampaignFeedOneButtonToUrlPayload =
-      createCampaignFeedOneButtonToUrl();
-    createCampaignFeedOneButtonToUrlPayload.segment_ids = [
-      createSegmentResponseJson.segment.id
-    ];
+      createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
 
     const createFeedCampaignResponse = await createCampaignWithApi(
       request,

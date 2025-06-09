@@ -1,7 +1,11 @@
 import { CreateCampaignPayload } from '@_src/api/models/campaign.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-export const createCampaignFeedOneButtonToUrl = (): CreateCampaignPayload => ({
+export const createCampaignFeedOneButtonToUrl = (
+  segmentIds: string[] = [],
+  geofenceIds: string[] = [],
+  geofence_events: Record<string, string> = {}
+): CreateCampaignPayload => ({
   state_machine_notifications_state: 'initial',
   duplication_source_id: '',
   type: 'CardInboxCampaign',
@@ -68,12 +72,12 @@ export const createCampaignFeedOneButtonToUrl = (): CreateCampaignPayload => ({
     type: 'card',
     goals: []
   },
-  segment_ids: [],
+  segment_ids: segmentIds,
   beacon_ids: [],
-  geofence_ids: [],
+  geofence_ids: geofenceIds,
   in_app_event_names: [],
   beacon_events: {},
-  geofence_events: {},
+  geofence_events: geofence_events,
   geofence_dwelling_times: {},
   start_now: true,
   start_at: new Date().toISOString().slice(0, 19),
@@ -87,7 +91,10 @@ export const createCampaignFeedOneButtonToUrl = (): CreateCampaignPayload => ({
   campaign_expiry: false
 });
 
-export const createCampaignFeedOneButtonWithDeeplink: CreateCampaignPayload = {
+export const createCampaignFeedOneButtonWithDeeplink = (
+  segmentIds: string[] = [],
+  deeplink: string = ''
+): CreateCampaignPayload => ({
   state_machine_notifications_state: 'initial',
   duplication_source_id: '',
   type: 'CardInboxCampaign',
@@ -141,7 +148,7 @@ export const createCampaignFeedOneButtonWithDeeplink: CreateCampaignPayload = {
           {
             label: `Button_Deeplink_${faker.lorem.word()}`,
             destination_type: 'deeplink',
-            destination: '',
+            destination: deeplink,
             txt_color: '',
             btn_color: '',
             in_app_events: null,
@@ -155,7 +162,7 @@ export const createCampaignFeedOneButtonWithDeeplink: CreateCampaignPayload = {
     type: 'card',
     goals: []
   },
-  segment_ids: [],
+  segment_ids: segmentIds,
   beacon_ids: [],
   geofence_ids: [],
   in_app_event_names: [],
@@ -172,7 +179,7 @@ export const createCampaignFeedOneButtonWithDeeplink: CreateCampaignPayload = {
   delivery: 'current',
   campaign_limits: false,
   campaign_expiry: false
-};
+});
 
 export const createCampaignFeedOneButtonBackWithDismiss: CreateCampaignPayload =
   {
