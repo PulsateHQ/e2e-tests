@@ -16,13 +16,13 @@ export interface CampaignButton {
     | 'openfeed'
     | 'card';
   destination?: string;
-  in_app_events: null | Array<{
+  label?: string;
+  txt_color?: string;
+  in_app_events?: null | Array<{
     name: string;
     count: number;
   }>;
-  label: string;
-  order_number: number;
-  txt_color: string;
+  order_number?: number;
 }
 
 export interface CampaignCallToAction {

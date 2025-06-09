@@ -61,9 +61,7 @@ export const createCampaignInAppLargeButtonWithUrl = (
             destination_type: 'url',
             destination: 'https://google.com',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -148,9 +146,7 @@ export const createCampaignInAppLargeButtonWithDeeplink = (
             destination_type: 'deeplink',
             destination: deeplink,
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -233,9 +229,7 @@ export const createCampaignInAppLargeButtonWithDismiss = (
             label: `Button_Dismiss_${faker.lorem.word()}`,
             destination_type: 'dismiss',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -320,17 +314,13 @@ export const createCampaignInAppLargeWithTwoButtons = (
             destination_type: 'deeplink',
             destination: deeplink,
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           },
           {
             label: `Dismiss_Button_${faker.lorem.word()}`,
             destination_type: 'dismiss',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -413,9 +403,7 @@ export const createCampaignInAppLargeWithOpenFeed = (
             label: `OpenFeed_Button_${faker.lorem.word()}`,
             destination_type: 'openfeed',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -472,9 +460,7 @@ export const createCampaignInAppSmallTopWithUrl = (
             destination_type: 'url',
             destination: 'https://google.com',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ]
       },
@@ -534,9 +520,7 @@ export const createCampaignInAppSmallBottomWithDeeplink = (
             destination_type: 'deeplink',
             destination: deeplink,
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ]
       },
@@ -594,9 +578,7 @@ export const createCampaignInAppSmallTopWithDismiss = (
             label: `Dismiss_Button_${faker.lorem.word()}`,
             destination_type: 'dismiss',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ]
       },

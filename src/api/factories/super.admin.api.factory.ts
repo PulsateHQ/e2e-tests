@@ -3,7 +3,7 @@ import {
   FeatureFlagsRequest
 } from '@_src/api/models/feature-flag.model';
 import { Headers } from '@_src/api/models/headers.model';
-import { featureFlagsTestData } from '@_src/api/test-data/cms/feature-flags/default.payload';
+import { featureFlagsDefault } from '@_src/api/test-data/cms/feature-flags/default.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -23,7 +23,7 @@ export async function superAdminsFeatureFLagDefaultBatchUpdate(
 
   const featureFlags: FeatureFlag[] = appIds.map((app_id) => ({
     app_id,
-    flags: featureFlagsTestData.feature_flags[0].flags
+    flags: featureFlagsDefault().feature_flags[0].flags
   }));
 
   const payload: FeatureFlagsRequest = { feature_flags: featureFlags };

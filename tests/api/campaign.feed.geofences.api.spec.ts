@@ -92,7 +92,7 @@ test.describe('Geofence Feed Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload
+      geofencePayload()
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 

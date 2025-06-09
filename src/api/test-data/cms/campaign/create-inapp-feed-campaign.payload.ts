@@ -60,9 +60,7 @@ export const createCampaignSmallInAppWithCard = (
             destination_type: 'deeplink',
             destination: deeplink,
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -81,9 +79,7 @@ export const createCampaignSmallInAppWithCard = (
             label: `View_Card_${faker.lorem.word()}`,
             destination_type: 'card',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ]
       },
@@ -171,9 +167,7 @@ export const createCampaignLargeInAppWithFeedCardFrontBack = (
             label: `Button_FeedPostBack_${faker.lorem.word()}`,
             destination_type: 'card_back',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -214,9 +208,7 @@ export const createCampaignLargeInAppWithFeedCardFrontBack = (
             destination_type: 'deeplink',
             destination: deeplinkBack,
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'back'
@@ -264,9 +256,7 @@ export const createCampaignLargeInAppWithFeedCardFrontBack = (
             label: `Button_OpenFeedPost_${faker.lorem.word()}`,
             destination_type: 'card',
             txt_color: '',
-            btn_color: '',
-            in_app_events: [],
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'

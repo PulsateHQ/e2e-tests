@@ -61,9 +61,7 @@ export const createCampaignFeedOneButtonToUrl = (
             destination_type: 'url',
             destination: 'https://google.com',
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -150,9 +148,7 @@ export const createCampaignFeedOneButtonWithDeeplink = (
             destination_type: 'deeplink',
             destination: deeplink,
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front',
@@ -238,9 +234,7 @@ export const createCampaignFeedOneButtonBackWithDismiss = (
             label: `Button_Card_Back_${faker.lorem.word()}`,
             destination_type: 'card_back',
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -376,17 +370,13 @@ export const createCampaignFeedTwoButtonsWithBackAndDeeplink = (
             destination_type: 'url',
             destination: 'https://google.com',
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           },
           {
             label: `Button_Card_Back_${faker.lorem.word()}`,
             destination_type: 'card_back',
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'front'
@@ -427,18 +417,14 @@ export const createCampaignFeedTwoButtonsWithBackAndDeeplink = (
             destination_type: 'deeplink',
             destination: deeplink,
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           },
           {
             label: `Button_URL_${faker.lorem.word()}`,
             destination_type: 'url',
             destination: 'https://google.com',
             txt_color: '',
-            btn_color: '',
-            in_app_events: null,
-            order_number: 0
+            btn_color: ''
           }
         ],
         side: 'back'

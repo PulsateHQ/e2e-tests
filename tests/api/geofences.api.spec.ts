@@ -52,12 +52,18 @@ test.describe('Geofences Management', () => {
     request
   }) => {
     // Arrange
-    const firstGeofencePayload = { ...geofencePayload, name: 'First Geofence' };
+    const firstGeofencePayload = {
+      ...geofencePayload(),
+      name: 'First Geofence'
+    };
     const secondGeofencePayload = {
-      ...geofencePayload,
+      ...geofencePayload(),
       name: 'Second Geofence'
     };
-    const thirdGeofencePayload = { ...geofencePayload, name: 'Third Geofence' };
+    const thirdGeofencePayload = {
+      ...geofencePayload(),
+      name: 'Third Geofence'
+    };
 
     // Act
     const createFirstGeofenceResponse = await createGeofenceWithApi(

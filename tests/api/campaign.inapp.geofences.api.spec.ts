@@ -94,7 +94,7 @@ test.describe('Geofence InApp Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload
+      geofencePayload()
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
@@ -276,7 +276,7 @@ test.describe('Geofence InApp Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload
+      geofencePayload()
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
