@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
@@ -96,6 +99,13 @@ test.describe('Feed Post Campaign', () => {
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(campaignPayload.name);
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
 
     const getUsersResponse = await getAllUsersWithApi(
       request,

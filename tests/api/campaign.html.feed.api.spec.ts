@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import {
   createDeeplinkWithApi,
   updateDeeplinkWithApi
@@ -111,6 +114,13 @@ test.describe('HTML Feed Campaign', () => {
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
       createCampaignFeedOneButtonToUrlPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -320,6 +330,13 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonWithDeeplinkPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -520,6 +537,13 @@ test.describe('HTML Feed Campaign', () => {
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
       createCampaignFeedOneButtonBackWithDismissPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -866,6 +890,13 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedTwoButtonsWithBackAndDeeplinkPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -1187,6 +1218,13 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -1392,6 +1430,13 @@ test.describe('HTML Feed Campaign', () => {
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
       createCampaignFeedTwoButtonsWithBackAndDeeplinkPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -1601,6 +1646,13 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createFirstCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const createSecondCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -1612,6 +1664,13 @@ test.describe('HTML Feed Campaign', () => {
     // Assert Campaign Created
     expect(createSecondCampaignResponseJson.name).toBe(
       createCampaignFeedOneButtonToUrlPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSecondCampaignResponseJson.id,
+      'Delivered'
     );
 
     const getUsersResponse = await getAllUsersWithApi(

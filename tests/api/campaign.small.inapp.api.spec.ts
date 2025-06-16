@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import { createDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
 import { updateDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
@@ -110,6 +113,13 @@ test.describe('Small In-App Campaign', () => {
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
       createCampaignInAppSmallTopWithUrlPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -267,6 +277,13 @@ test.describe('Small In-App Campaign', () => {
       createCampaignInAppSmallBottomWithDeeplinkPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -394,6 +411,13 @@ test.describe('Small In-App Campaign', () => {
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
       createCampaignInAppSmallTopWithDismissPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
     );
 
     const getUsersResponse = await getAllUsersWithApi(
@@ -555,6 +579,13 @@ test.describe('Small In-App Campaign', () => {
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
       createCampaignInAppSmallTopWithUrlPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
     );
 
     // Start session for first user

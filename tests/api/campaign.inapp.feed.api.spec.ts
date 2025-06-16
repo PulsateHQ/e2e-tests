@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import { updateDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
 import { createDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
@@ -150,6 +153,13 @@ test.describe('In-App Campaign with Feed', () => {
       createCampaignSmallInAppWithCardPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createInAppFeedCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -185,10 +195,6 @@ test.describe('In-App Campaign with Feed', () => {
         },
         {
           ...userActions[InAppEvents.IN_APP_IMPRESSION],
-          guid: createInAppFeedCampaignResponseJson.guid
-        },
-        {
-          ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE],
           guid: createInAppFeedCampaignResponseJson.guid
         }
       ]
@@ -373,6 +379,13 @@ test.describe('In-App Campaign with Feed', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createFeedCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -430,6 +443,13 @@ test.describe('In-App Campaign with Feed', () => {
     // Assert Campaign Created
     expect(createInAppCampaignResponseJson.name).toBe(
       createCampaignInAppLargeWithOpenFeedPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createInAppCampaignResponseJson.id,
+      'Delivered'
     );
 
     // Start session for first user
@@ -589,6 +609,13 @@ test.describe('In-App Campaign with Feed', () => {
     // Assert Campaign Created
     expect(createInAppFeedCampaignResponseJson.name).toBe(
       createCampaignLargeInAppWithFeedCardFrontBackPayload.name
+    );
+
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createInAppFeedCampaignResponseJson.id,
+      'Delivered'
     );
 
     const getUsersResponse = await getAllUsersWithApi(
