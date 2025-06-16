@@ -762,7 +762,7 @@ test.describe('Large In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      'Delivered'
+      'Active'
     );
 
     // Get users
