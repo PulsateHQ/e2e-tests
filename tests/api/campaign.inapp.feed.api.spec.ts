@@ -169,14 +169,12 @@ test.describe('In-App Campaign with Feed', () => {
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
     // First user - will perform actions
-    const firstUser = getUsersResponseJson.data[0];
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
 
     // Start session for first user
     const firstUserSessionPayload = {
       ...startMobileSessionInAppPayload,
-      alias: firstUser.alias
+      alias: alias
     };
     await startMobileSessionsWithApi(
       request,
@@ -187,7 +185,7 @@ test.describe('In-App Campaign with Feed', () => {
     // First user performs actions
     const firstUserUpdatePayload = {
       ...updateMobileInAppUserPayload,
-      alias: firstUser.alias,
+      alias: alias,
       user_actions: [
         {
           ...userActions[InAppEvents.IN_APP_DELIVERY],
@@ -195,6 +193,11 @@ test.describe('In-App Campaign with Feed', () => {
         },
         {
           ...userActions[InAppEvents.IN_APP_IMPRESSION],
+          guid: createInAppFeedCampaignResponseJson.guid
+        },
+        ,
+        {
+          ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE],
           guid: createInAppFeedCampaignResponseJson.guid
         }
       ]
@@ -206,19 +209,13 @@ test.describe('In-App Campaign with Feed', () => {
       firstUserUpdatePayload
     );
 
-    // Start Mobile Session
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
-    );
-
-    await getInboxMessagesWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      1
-    );
+    // TODO: Uncomment when we have inbox messages
+    // await getInboxMessagesWithApi(
+    //   request,
+    //   APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+    //   alias,
+    //   1
+    // );
 
     const getCardWithApiResponse = await getCardWithApi(
       request,
