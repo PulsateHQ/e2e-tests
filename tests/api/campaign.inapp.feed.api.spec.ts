@@ -184,7 +184,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: alias,
       user_actions: [
         {
@@ -463,7 +463,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -644,7 +644,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // STEP 1: First user interacts with the large in-app notification
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {

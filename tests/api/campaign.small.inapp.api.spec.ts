@@ -142,7 +142,7 @@ test.describe('Small In-App Campaign', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -304,7 +304,7 @@ test.describe('Small In-App Campaign', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -440,7 +440,7 @@ test.describe('Small In-App Campaign', () => {
 
     // First user performs actions of dissming inApp by swipe to dismiss
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -599,7 +599,7 @@ test.describe('Small In-App Campaign', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -625,12 +625,12 @@ test.describe('Small In-App Campaign', () => {
 
     // Second user doesn't perform any actions
     const secondUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: secondUser.alias,
       user: {
-        ...updateMobileInAppUserPayload.user,
+        ...updateMobileInAppUserPayload().user,
         device: {
-          ...updateMobileInAppUserPayload.user.device,
+          ...updateMobileInAppUserPayload().user.device,
           in_app_permission: false
         }
       },

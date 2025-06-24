@@ -119,7 +119,7 @@ test.describe('Feed Post Campaign', () => {
       getUsersResponseJson.data[0].alias;
 
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -147,7 +147,7 @@ test.describe('Feed Post Campaign', () => {
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      { ...updateMobileFeedUserPayload, user_actions: userActions }
+      { ...updateMobileFeedUserPayload(), user_actions: userActions }
     );
 
     await getInboxMessagesWithApi(

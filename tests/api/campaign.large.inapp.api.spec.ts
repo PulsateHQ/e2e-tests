@@ -144,7 +144,7 @@ test.describe('Large In-App Campaign', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -306,7 +306,7 @@ test.describe('Large In-App Campaign', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -442,7 +442,7 @@ test.describe('Large In-App Campaign', () => {
 
     // First user performs actions of dissming inApp by clicking X button, but not clicking Action button
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -563,11 +563,9 @@ test.describe('Large In-App Campaign', () => {
 
     // Create Campaign
     const createCampaignInAppLargeButtonWithUrlPayload =
-      createCampaignInAppLargeButtonWithUrl(
-        [createSegmentResponseJson.segment.id],
-        [],
-        {}
-      );
+      createCampaignInAppLargeButtonWithUrl([
+        createSegmentResponseJson.segment.id
+      ]);
 
     // Create campaign
     const createCampaignResponse = await createCampaignWithApi(
@@ -602,7 +600,8 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // First user performs actions
-    const firstUserUpdatePayload = createUserUpdatePayload({
+    const firstUserUpdatePayload = {
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -618,7 +617,7 @@ test.describe('Large In-App Campaign', () => {
           guid: createCampaignResponseJson.guid
         }
       ]
-    });
+    };
 
     await updateMobileUserWithApi(
       request,
@@ -627,12 +626,13 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // Second user doesn't perform any actions
-    const secondUserUpdatePayload = createUserUpdatePayload({
+    const secondUserUpdatePayload = {
+      ...updateMobileInAppUserPayload(),
       alias: secondUser.alias,
       user: {
-        ...updateMobileInAppUserPayload.user,
+        ...updateMobileInAppUserPayload().user,
         device: {
-          ...updateMobileInAppUserPayload.user.device,
+          ...updateMobileInAppUserPayload().user.device,
           in_app_permission: false
         }
       },
@@ -646,7 +646,7 @@ test.describe('Large In-App Campaign', () => {
           guid: createCampaignResponseJson.guid
         }
       ]
-    });
+    };
 
     await updateMobileUserWithApi(
       request,
@@ -788,7 +788,8 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // First user sees and clicks the deeplink button
-    const firstUserUpdatePayload = createUserUpdatePayload({
+    const firstUserUpdatePayload = {
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -804,7 +805,7 @@ test.describe('Large In-App Campaign', () => {
           guid: createCampaignResponseJson.guid
         }
       ]
-    });
+    };
 
     await updateMobileUserWithApi(
       request,
@@ -828,7 +829,8 @@ test.describe('Large In-App Campaign', () => {
     );
 
     // Second user sees and clicks the dismiss button
-    const secondUserUpdatePayload = createUserUpdatePayload({
+    const secondUserUpdatePayload = {
+      ...updateMobileInAppUserPayload(),
       alias: secondUser.alias,
       user_actions: [
         {
@@ -844,7 +846,7 @@ test.describe('Large In-App Campaign', () => {
           guid: createCampaignResponseJson.guid
         }
       ]
-    });
+    };
 
     await updateMobileUserWithApi(
       request,

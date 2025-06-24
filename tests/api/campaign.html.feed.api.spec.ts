@@ -134,7 +134,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -351,7 +351,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -563,7 +563,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -917,7 +917,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1248,7 +1248,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1465,7 +1465,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1520,7 +1520,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[1].alias;
     const alias2 = getUsersResponseJson.data[1].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[1].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[1].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
@@ -1703,7 +1703,7 @@ test.describe('HTML Feed Campaign', () => {
     startMobileSessionFeedPayloadResponse.alias =
       getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(

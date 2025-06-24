@@ -44,25 +44,3 @@ export const startMobileSessionFeedPayload = (): StartMobileSessionPayload => ({
   occurred_at: 1740041394,
   localization_data: 'true'
 });
-
-/**
- * Creates a customized mobile session payload with unique values
- * @param overrides - Object with properties to override in the base payload
- * @param basePayload - The base payload to use (defaults to startMobileSessionInAppPayload)
- * @returns A new session payload with unique values
- */
-export const createMobileSessionPayload = (
-  overrides: Partial<StartMobileSessionPayload> = {},
-  basePayload: StartMobileSessionPayload = startMobileSessionInAppPayload()
-): StartMobileSessionPayload => {
-  return {
-    ...JSON.parse(JSON.stringify(basePayload)), // Deep clone to avoid modifying the original
-    guid: faker.string.uuid(),
-    device: {
-      ...basePayload.device,
-      token: faker.string.uuid(),
-      os_version: overrides.device?.os_version || basePayload.device.os_version
-    },
-    ...overrides
-  };
-};
