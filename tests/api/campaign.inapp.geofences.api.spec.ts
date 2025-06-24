@@ -145,7 +145,7 @@ test.describe('Geofence InApp Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias,
       current_location: createGeofenceResponseJson.location
     };
@@ -324,7 +324,7 @@ test.describe('Geofence InApp Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias,
       current_location: createGeofenceResponseJson.location
     };
@@ -385,11 +385,11 @@ test.describe('Geofence InApp Campaign', () => {
     // adjust second user action on in_app permission
     // Start session for second user
     const secondUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: secondUser.alias,
       current_location: createGeofenceResponseJson.location,
       device: {
-        ...startMobileSessionInAppPayload.device,
+        ...startMobileSessionInAppPayload().device,
         in_app_permission: false
       }
     };

@@ -26,12 +26,8 @@ import {
   createCampaignInAppSmallTopWithUrl
 } from '@_src/api/test-data/cms/campaign/create-inapp-campaign.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
+import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import {
-  createMobileSessionPayload,
-  startMobileSessionInAppPayload
-} from '@_src/api/test-data/mobile/sessions/start-session.payload';
-import {
-  createUserUpdatePayload,
   updateMobileInAppUserPayload,
   userActions
 } from '@_src/api/test-data/mobile/update/update-user.payload';
@@ -135,7 +131,7 @@ test.describe('Small In-App Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias
     };
     await startMobileSessionsWithApi(
@@ -297,7 +293,7 @@ test.describe('Small In-App Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias
     };
     await startMobileSessionsWithApi(
@@ -433,7 +429,7 @@ test.describe('Small In-App Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias
     };
     await startMobileSessionsWithApi(
@@ -548,13 +544,14 @@ test.describe('Small In-App Campaign', () => {
 
     // adjust second user action on in_app permission
     // Start session for second user
-    const secondUserSessionPayload = createMobileSessionPayload({
+    const secondUserSessionPayload = {
+      ...startMobileSessionInAppPayload(),
       alias: secondUser.alias,
       device: {
-        ...startMobileSessionInAppPayload.device,
+        ...startMobileSessionInAppPayload().device,
         in_app_permission: false
       }
-    });
+    };
 
     await startMobileSessionsWithApi(
       request,
@@ -589,12 +586,10 @@ test.describe('Small In-App Campaign', () => {
     );
 
     // Start session for first user
-    const firstUserSessionPayload = createMobileSessionPayload({
-      alias: firstUser.alias,
-      device: {
-        ...startMobileSessionInAppPayload.device
-      }
-    });
+    const firstUserSessionPayload = {
+      ...startMobileSessionInAppPayload(),
+      alias: firstUser.alias
+    };
 
     await startMobileSessionsWithApi(
       request,
@@ -603,7 +598,8 @@ test.describe('Small In-App Campaign', () => {
     );
 
     // First user performs actions
-    const firstUserUpdatePayload = createUserUpdatePayload({
+    const firstUserUpdatePayload = {
+      ...updateMobileInAppUserPayload,
       alias: firstUser.alias,
       user_actions: [
         {
@@ -619,7 +615,7 @@ test.describe('Small In-App Campaign', () => {
           guid: createCampaignResponseJson.guid
         }
       ]
-    });
+    };
 
     await updateMobileUserWithApi(
       request,
@@ -628,7 +624,8 @@ test.describe('Small In-App Campaign', () => {
     );
 
     // Second user doesn't perform any actions
-    const secondUserUpdatePayload = createUserUpdatePayload({
+    const secondUserUpdatePayload = {
+      ...updateMobileInAppUserPayload,
       alias: secondUser.alias,
       user: {
         ...updateMobileInAppUserPayload.user,
@@ -647,7 +644,7 @@ test.describe('Small In-App Campaign', () => {
           guid: createCampaignResponseJson.guid
         }
       ]
-    });
+    };
 
     await updateMobileUserWithApi(
       request,

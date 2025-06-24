@@ -173,7 +173,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: alias
     };
     await startMobileSessionsWithApi(
@@ -452,7 +452,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias
     };
     await startMobileSessionsWithApi(
@@ -633,7 +633,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias
     };
     await startMobileSessionsWithApi(
