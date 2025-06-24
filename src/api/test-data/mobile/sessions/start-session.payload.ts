@@ -22,7 +22,7 @@ export const startMobileSessionInAppPayload: StartMobileSessionPayload = {
   localization_data: 'true'
 };
 
-export const startMobileSessionFeedPayload: StartMobileSessionPayload = {
+export const startMobileSessionFeedPayload = (): StartMobileSessionPayload => ({
   alias: '',
   current_location: [51.1524919, 17.0454794],
   device: {
@@ -42,7 +42,7 @@ export const startMobileSessionFeedPayload: StartMobileSessionPayload = {
   guid: faker.string.uuid(),
   occurred_at: 1740041394,
   localization_data: 'true'
-};
+});
 
 /**
  * Creates a customized mobile session payload with unique values

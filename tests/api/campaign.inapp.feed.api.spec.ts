@@ -195,6 +195,7 @@ test.describe('In-App Campaign with Feed', () => {
           ...userActions[InAppEvents.IN_APP_IMPRESSION],
           guid: createInAppFeedCampaignResponseJson.guid
         },
+        ,
         {
           ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE],
           guid: createInAppFeedCampaignResponseJson.guid
