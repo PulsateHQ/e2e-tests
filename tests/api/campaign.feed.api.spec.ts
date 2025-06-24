@@ -131,11 +131,10 @@ test.describe('Feed Post Campaign', () => {
       1
     );
 
+    const userAction = feedPostFrontButtonClickOneAction();
+
     // Update Mobile User
-    const userActions = [
-      feedPostFrontImpressionAction,
-      feedPostFrontButtonClickOneAction
-    ];
+    const userActions = [feedPostFrontImpressionAction, userAction];
 
     userActions.forEach((action) => {
       action.guid = createCampaignResponseJson.guid;
