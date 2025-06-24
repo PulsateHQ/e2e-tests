@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import { updateDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
 import { createDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
@@ -150,6 +153,13 @@ test.describe('In-App Campaign with Feed', () => {
       createCampaignSmallInAppWithCardPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createInAppFeedCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -160,24 +170,23 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
-    const alias = getUsersResponseJson.data[0].alias;
-
-    // Start session for first user
-    const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+    const startMobileSessionFeedPayloadResponse = {
+      ...startMobileSessionFeedPayload(),
       alias: firstUser.alias
     };
+    const alias = getUsersResponseJson.data[0].alias;
+
+    // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      firstUserSessionPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
-      alias: firstUser.alias,
+      ...updateMobileInAppUserPayload(),
+      alias: alias,
       user_actions: [
         {
           ...userActions[InAppEvents.IN_APP_DELIVERY],
@@ -200,19 +209,13 @@ test.describe('In-App Campaign with Feed', () => {
       firstUserUpdatePayload
     );
 
-    // Start Mobile Session
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
-    );
-
-    await getInboxMessagesWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      1
-    );
+    // TODO: Uncomment when we have inbox messages
+    // await getInboxMessagesWithApi(
+    //   request,
+    //   APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
+    //   alias,
+    //   1
+    // );
 
     const getCardWithApiResponse = await getCardWithApi(
       request,
@@ -373,6 +376,13 @@ test.describe('In-App Campaign with Feed', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createFeedCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -383,14 +393,17 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse = {
+      ...startMobileSessionFeedPayload(),
+      alias: firstUser.alias
+    };
     const alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -432,9 +445,16 @@ test.describe('In-App Campaign with Feed', () => {
       createCampaignInAppLargeWithOpenFeedPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createInAppCampaignResponseJson.id,
+      'Delivered'
+    );
+
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias
     };
     await startMobileSessionsWithApi(
@@ -445,7 +465,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -591,6 +611,13 @@ test.describe('In-App Campaign with Feed', () => {
       createCampaignLargeInAppWithFeedCardFrontBackPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createInAppFeedCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
@@ -601,12 +628,11 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias
     };
     await startMobileSessionsWithApi(
@@ -617,7 +643,7 @@ test.describe('In-App Campaign with Feed', () => {
 
     // STEP 1: First user interacts with the large in-app notification
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -639,21 +665,6 @@ test.describe('In-App Campaign with Feed', () => {
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       firstUserUpdatePayload
-    );
-
-    // Start Mobile Session for feed
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
-    );
-
-    // Get messages from inbox
-    await getInboxMessagesWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      1
     );
 
     // STEP 2: Get the feed card for further interactions

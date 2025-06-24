@@ -145,7 +145,7 @@ test.describe('Geofence InApp Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias,
       current_location: createGeofenceResponseJson.location
     };
@@ -191,7 +191,7 @@ test.describe('Geofence InApp Campaign', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -219,7 +219,6 @@ test.describe('Geofence InApp Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      1,
       1
     );
 
@@ -324,7 +323,7 @@ test.describe('Geofence InApp Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias,
       current_location: createGeofenceResponseJson.location
     };
@@ -358,7 +357,7 @@ test.describe('Geofence InApp Campaign', () => {
 
     // First user performs actions
     const firstUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: firstUser.alias,
       user_actions: [
         {
@@ -385,11 +384,11 @@ test.describe('Geofence InApp Campaign', () => {
     // adjust second user action on in_app permission
     // Start session for second user
     const secondUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: secondUser.alias,
       current_location: createGeofenceResponseJson.location,
       device: {
-        ...startMobileSessionInAppPayload.device,
+        ...startMobileSessionInAppPayload().device,
         in_app_permission: false
       }
     };
@@ -420,12 +419,12 @@ test.describe('Geofence InApp Campaign', () => {
 
     // Second user doesn't perform any actions
     const secondUserUpdatePayload = {
-      ...updateMobileInAppUserPayload,
+      ...updateMobileInAppUserPayload(),
       alias: secondUser.alias,
       user: {
-        ...updateMobileInAppUserPayload.user,
+        ...updateMobileInAppUserPayload().user,
         device: {
-          ...updateMobileInAppUserPayload.user.device,
+          ...updateMobileInAppUserPayload().user.device,
           in_app_permission: false
         }
       },
@@ -451,8 +450,7 @@ test.describe('Geofence InApp Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      2,
-      1
+      2
     );
 
     const getCampaignStatsWithWaitResponseJson =

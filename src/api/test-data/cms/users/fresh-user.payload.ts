@@ -1,4 +1,4 @@
-import { userRequestPayload } from './create-users.payload';
+import { createUserRequestPayload } from './create-users.payload';
 import { UserRequest } from '@_src/api/models/user.model';
 import { faker } from '@faker-js/faker/locale/en';
 
@@ -15,9 +15,9 @@ export const createFreshUserPayload = (): UserRequest => {
     lastName: faker.person.lastName(),
     phone: faker.phone.number(),
     device: {
-      ...userRequestPayload.device,
+      ...createUserRequestPayload().device,
       guid: faker.string.uuid()
     },
-    custom_tags: userRequestPayload.custom_tags
+    custom_tags: createUserRequestPayload().custom_tags
   };
 };

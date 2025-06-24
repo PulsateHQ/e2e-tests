@@ -21,11 +21,8 @@ import {
   deleteUserWithApi,
   getAllUsersWithApi
 } from '@_src/api/factories/users.api.factory';
-import { UserRequest } from '@_src/api/models/user.model';
-import { userRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
 import { generateCsvContentForUsersImport } from '@_src/api/test-data/cms/users/generate-random-users.payload';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
-import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, test } from '@playwright/test';
 
 export async function deleteAllUsers(
@@ -219,26 +216,6 @@ export async function importRandomUsers(
     const csvContent = generateCsvContentForUsersImport(numberOfUsers);
     await importUsersWithApi(request, authToken, { csvContent, app_id: appId });
   });
-}
-
-export function getFreshUserPayload(): UserRequest {
-  return {
-    age: faker.number.int({ min: 18, max: 100 }),
-    alias: `${faker.internet.username({ firstName: 'playwright' }).replace(/\./g, '_')},`,
-    current_city: faker.location.city(),
-    current_country: faker.location.country(),
-    current_location: [faker.location.longitude(), faker.location.latitude()],
-    email: faker.internet.email(),
-    firstName: faker.person.firstName(),
-    gender: 'man',
-    lastName: faker.person.lastName(),
-    phone: faker.phone.number(),
-    device: {
-      ...userRequestPayload.device,
-      guid: faker.string.uuid()
-    },
-    custom_tags: userRequestPayload.custom_tags
-  };
 }
 
 export function generateCsvContentForAliases(aliases: string[]): Buffer {

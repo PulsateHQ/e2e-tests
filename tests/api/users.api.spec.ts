@@ -24,12 +24,11 @@ import {
   createCustomAttributePayload,
   generateUniqueCustomTag
 } from '@_src/api/test-data/cms/custom-attributes/custom-attribute.payload';
-import { userRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
+import { createUserRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
   deleteAllUsers,
-  getFreshUserPayload,
   importRandomUsers
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
@@ -96,13 +95,14 @@ test.describe('User Management', () => {
   }) => {
     // Arrange
     const { apiE2EAccessTokenAdmin } = APIE2ELoginUserModel;
-    const createPayload = getFreshUserPayload();
 
+    const upsertUserPayload = createUserRequestPayload();
+    const createUserPayload = createUserRequestPayload();
     // Act
     const upsertUserWithApiResponse = await upsertUserWithApi(
       request,
       apiE2EAccessTokenAdmin,
-      userRequestPayload
+      upsertUserPayload
     );
     const upsertUserWithApiResponseJson =
       await upsertUserWithApiResponse.json();
@@ -110,7 +110,7 @@ test.describe('User Management', () => {
     const createUserWithApiResponse = await createUserWithApi(
       request,
       apiE2EAccessTokenAdmin,
-      createPayload
+      createUserPayload
     );
     const createUserWithApiResponseJson =
       await createUserWithApiResponse.json();
@@ -137,10 +137,10 @@ test.describe('User Management', () => {
 
     // Assert
     expect(upsertUserWithApiResponse.status()).toBe(200);
-    expect(upsertUserWithApiResponseJson.alias).toBe(userRequestPayload.alias);
+    expect(upsertUserWithApiResponseJson.alias).toBe(upsertUserPayload.alias);
 
     expect(createUserWithApiResponse.status()).toBe(200);
-    expect(createUserWithApiResponseJson.alias).toBe(createPayload.alias);
+    expect(createUserWithApiResponseJson.alias).toBe(createUserPayload.alias);
 
     expect(getUsersResponse.status()).toBe(200);
     expect(getUsersResponseJson.data.length).toBe(2);

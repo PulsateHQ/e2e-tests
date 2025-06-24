@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import {
   createDeeplinkWithApi,
   updateDeeplinkWithApi
@@ -113,21 +116,31 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -320,21 +333,31 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonWithDeeplinkPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -522,21 +545,31 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonBackWithDismissPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -866,21 +899,31 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedTwoButtonsWithBackAndDeeplinkPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -1187,21 +1230,31 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -1394,21 +1447,31 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedTwoButtonsWithBackAndDeeplinkPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -1454,15 +1517,16 @@ test.describe('HTML Feed Campaign', () => {
       WebSdkStatisticsAction.CARD_BACK_BUTTON_CLICK_TWO
     );
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[1].alias;
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[1].alias;
     const alias2 = getUsersResponseJson.data[1].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[1].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[1].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -1601,6 +1665,13 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createFirstCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const createSecondCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -1614,21 +1685,31 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignFeedOneButtonToUrlPayload.name
     );
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createSecondCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(

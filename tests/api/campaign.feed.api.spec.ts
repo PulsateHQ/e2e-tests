@@ -4,7 +4,10 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { createCampaignWithApi } from '@_src/api/factories/campaigns.api.factory';
+import {
+  createCampaignWithApi,
+  getCampaignDetailsWithApi
+} from '@_src/api/factories/campaigns.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
@@ -97,21 +100,32 @@ test.describe('Feed Post Campaign', () => {
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(campaignPayload.name);
 
+    await getCampaignDetailsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      createCampaignResponseJson.id,
+      'Delivered'
+    );
+
     const getUsersResponse = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias =
+      getUsersResponseJson.data[0].alias;
+
     const alias = getUsersResponseJson.data[0].alias;
-    updateMobileFeedUserPayload.alias = getUsersResponseJson.data[0].alias;
+    updateMobileFeedUserPayload().alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -121,11 +135,10 @@ test.describe('Feed Post Campaign', () => {
       1
     );
 
+    const userAction = feedPostFrontButtonClickOneAction();
+
     // Update Mobile User
-    const userActions = [
-      feedPostFrontImpressionAction,
-      feedPostFrontButtonClickOneAction
-    ];
+    const userActions = [feedPostFrontImpressionAction, userAction];
 
     userActions.forEach((action) => {
       action.guid = createCampaignResponseJson.guid;
@@ -134,7 +147,11 @@ test.describe('Feed Post Campaign', () => {
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      { ...updateMobileFeedUserPayload, user_actions: userActions }
+      {
+        ...updateMobileFeedUserPayload(),
+        alias: alias,
+        user_actions: userActions
+      }
     );
 
     await getInboxMessagesWithApi(

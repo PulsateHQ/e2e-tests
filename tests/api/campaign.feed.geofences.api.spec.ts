@@ -136,7 +136,7 @@ test.describe('Geofence Feed Campaign', () => {
 
     // Start session for first user
     const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload,
+      ...startMobileSessionInAppPayload(),
       alias: firstUser.alias,
       current_location: createGeofenceResponseJson.location
     };
