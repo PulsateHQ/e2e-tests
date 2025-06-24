@@ -175,7 +175,7 @@ jobs:
           mkdir -p allure-results
 
           # Run the tests
-          npx dotenv -e .env -- npx playwright test ests/api/users.api.spec.ts  --project=api
+          npx dotenv -e .env -- npx playwright test --project=api
 
       - name: Archive test results
         if: success() || failure()
@@ -266,7 +266,7 @@ jobs:
             "type": "github",
             "buildOrder": ${{ github.run_number }},
             "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-            "reportUrl": "https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html",
+            "reportUrl": "${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html",
             "reportName": "E2E Tests - ${{ github.event.client_payload.environment }}",
             "buildName": "Run #${{ github.run_number }} - ${{ github.event.client_payload.environment }} (Push)"
           }' > allure-results/executor.json
@@ -304,7 +304,7 @@ jobs:
           echo "Uploading Allure report to S3 bucket: $AWS_S3_BUCKET_CLEAN"
           if aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/staging" --delete; then
             echo "Successfully uploaded Allure report to S3"
-            echo "Report available at: https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html"
+            echo "Report available at: ${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html"
           else
             echo "Failed to upload Allure report to S3"
             exit 1
@@ -348,7 +348,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• E2E Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <https://${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|Click here to view>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• E2E Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|Click here to view>"
                   }
                 }
               ]
