@@ -6,6 +6,13 @@ import {
 } from '@_config/env.config';
 
 export const apiUrls = {
+  // Health check endpoint
+  health: {
+    v1: {
+      check: `${BASE_URL}/api/v1/health_check`
+    }
+  },
+
   // App related endpoints
   apps: {
     v2: {
