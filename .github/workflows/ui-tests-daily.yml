@@ -11,7 +11,6 @@ env:
   ALLURE_RESULTS_DIR: allure-results
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
-  REPORT_URL: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html
   ENVIRONMENT: sealion
 
 permissions:
@@ -20,8 +19,8 @@ permissions:
   id-token: write
 
 jobs:
-  prepare-env:
-    timeout-minutes: 10
+  health-check:
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     environment: sealion
     steps:
@@ -32,21 +31,6 @@ jobs:
           node-version: '20'
           cache: 'npm'
           registry-url: 'https://npm.pkg.github.com'
-      - name: Get installed Playwright version
-        id: playwright-version
-        run: |
-          PLAYWRIGHT_VERSION=$(npm ls @playwright/test --json | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4)
-          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
-          echo "Found Playwright version: $PLAYWRIGHT_VERSION"
-      - name: Cache playwright binaries
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
       - name: Cache node_modules
         uses: actions/cache@v4
         id: node-cache
@@ -57,35 +41,36 @@ jobs:
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
-      - name: Install Playwright Browsers
+      - name: Create env file
         run: |
-          # Always ensure Firefox is properly installed
-          echo "Installing/verifying Playwright Firefox browser..."
-          npx playwright install --with-deps firefox
+          touch .env.sealion
+          echo BASE_URL=${{ vars.BASE_URL }} >> .env.sealion
+          echo WEB_SDK_API_URL=${{ vars.WEB_SDK_API_URL }} >> .env.sealion
+          echo API_E2E_APP_ID=${{ vars.API_E2E_APP_ID }} >> .env.sealion
+          echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env.sealion
+          echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
+          echo SUPER_ADMIN_ACCESS_TOKEN=${{ secrets.SUPER_ADMIN_ACCESS_TOKEN }} >> .env.sealion
+          echo UI_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.UI_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
+          echo UI_E2E_APP_ID=${{ secrets.UI_E2E_APP_ID }} >> .env.sealion
+          echo UI_E2E_LOGIN_ADMIN=${{ secrets.UI_E2E_LOGIN_ADMIN }} >> .env.sealion
+          echo UI_E2E_PASSWORD_ADMIN=${{ secrets.UI_E2E_PASSWORD_ADMIN }} >> .env.sealion
+          echo UI_E2E_WEB_SDK_KEY=${{ secrets.UI_E2E_WEB_SDK_KEY }} >> .env.sealion
+          echo ENVIRONMENT=${{ env.ENVIRONMENT }} >> .env.sealion
+      - name: Run Health Check Smoke Test
+        timeout-minutes: 3
+        env:
+          DOTENV_CONFIG_PATH: .env.sealion
+        run: |
+          npx dotenv -e .env.sealion -- npx playwright test tests/api/health-check.smoke.spec.ts --project=api --timeout=30000
 
-          # Verify installation with more robust check
-          FIREFOX_FOUND=$(find ~/.cache/ms-playwright -name "firefox" -type f -executable 2>/dev/null | head -1)
-          if [ -z "$FIREFOX_FOUND" ]; then
-            echo "Firefox installation failed, retrying..."
-            npx playwright install firefox
-            
-            # Final verification
-            FIREFOX_FOUND=$(find ~/.cache/ms-playwright -name "firefox" -type f -executable 2>/dev/null | head -1)
-            if [ -z "$FIREFOX_FOUND" ]; then
-              echo "ERROR: Firefox installation failed completely"
-              exit 1
-            fi
-          fi
-          echo "Firefox successfully installed at: $FIREFOX_FOUND"
-  test:
-    needs: [prepare-env]
-    timeout-minutes: 30
+  setup-dependencies:
+    needs: [health-check]
+    if: needs.health-check.result == 'success'
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     environment: sealion
-    env:
-      TZ: 'Europe/Warsaw'
     outputs:
-      test_outcome: ${{ steps.set-outcome.outputs.test_outcome }}
+      playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -94,10 +79,34 @@ jobs:
           node-version: '20'
           cache: 'npm'
           registry-url: 'https://npm.pkg.github.com'
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm ci
       - name: Get installed Playwright version
         id: playwright-version
         run: |
-          PLAYWRIGHT_VERSION=$(npm ls @playwright/test --json | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4)
+          # Get Playwright version using Node.js (more reliable than grep)
+          PLAYWRIGHT_VERSION=$(node -e "
+          try {
+            const pkg = require('./node_modules/@playwright/test/package.json');
+            console.log(pkg.version);
+          } catch (e) {
+            console.log('not-found');
+          }
+          ")
+          if [ "$PLAYWRIGHT_VERSION" = "not-found" ]; then
+            echo "Error: Could not determine Playwright version. Playwright may not be installed."
+            exit 1
+          fi
+          echo "Detected Playwright version: $PLAYWRIGHT_VERSION"
+          echo "version=$PLAYWRIGHT_VERSION" >> $GITHUB_OUTPUT
           echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
       - name: Cache playwright binaries
         uses: actions/cache@v4
@@ -106,8 +115,35 @@ jobs:
           path: |
             ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
+      - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "Installing Playwright browsers (Firefox with dependencies)..."
+          npx playwright install --with-deps firefox
+          echo "Playwright browser installation completed"
+  test:
+    needs: [setup-dependencies]
+    if: needs.setup-dependencies.result == 'success'
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    environment: sealion
+    env:
+      TZ: 'Europe/Warsaw'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ needs.setup-dependencies.outputs.playwright-version }}
       - name: Cache node_modules
         uses: actions/cache@v4
         id: node-cache
@@ -115,33 +151,50 @@ jobs:
           path: |
             node_modules
           key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies (if cache miss)
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Install Playwright Browsers (if cache miss)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "Installing Playwright browsers (Firefox with dependencies)..."
+          npx playwright install --with-deps firefox
+          echo "Playwright browser installation completed"
+      - name: Verify Playwright Installation
+        run: |
+          echo "Verifying Playwright installation..."
+          npx playwright --version
+          if [ -d "$HOME/.cache/ms-playwright" ]; then
+            echo "Playwright browsers directory exists"
+            ls -la "$HOME/.cache/ms-playwright" || true
+          else
+            echo "Warning: Playwright browsers directory not found"
+          fi
       - name: Create env file
         run: |
-          touch .env
-          echo BASE_URL=${{ vars.BASE_URL }} >> .env
-          echo WEB_SDK_API_URL=${{ vars.WEB_SDK_API_URL }} >> .env
-          echo API_E2E_APP_ID=${{ vars.API_E2E_APP_ID }} >> .env
-          echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env
-          echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env
-          echo SUPER_ADMIN_ACCESS_TOKEN=${{ secrets.SUPER_ADMIN_ACCESS_TOKEN }} >> .env
-          echo UI_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.UI_E2E_ACCESS_TOKEN_ADMIN }} >> .env
-          echo UI_E2E_APP_ID=${{ secrets.UI_E2E_APP_ID }} >> .env
-          echo UI_E2E_LOGIN_ADMIN=${{ secrets.UI_E2E_LOGIN_ADMIN }} >> .env
-          echo UI_E2E_PASSWORD_ADMIN=${{ secrets.UI_E2E_PASSWORD_ADMIN }} >> .env
-          echo UI_E2E_WEB_SDK_KEY=${{ secrets.UI_E2E_WEB_SDK_KEY }} >> .env
-          echo ENVIRONMENT=sealion >> .env
+          touch .env.sealion
+          echo BASE_URL=${{ vars.BASE_URL }} >> .env.sealion
+          echo WEB_SDK_API_URL=${{ vars.WEB_SDK_API_URL }} >> .env.sealion
+          echo API_E2E_APP_ID=${{ vars.API_E2E_APP_ID }} >> .env.sealion
+          echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env.sealion
+          echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
+          echo SUPER_ADMIN_ACCESS_TOKEN=${{ secrets.SUPER_ADMIN_ACCESS_TOKEN }} >> .env.sealion
+          echo UI_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.UI_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
+          echo UI_E2E_APP_ID=${{ secrets.UI_E2E_APP_ID }} >> .env.sealion
+          echo UI_E2E_LOGIN_ADMIN=${{ secrets.UI_E2E_LOGIN_ADMIN }} >> .env.sealion
+          echo UI_E2E_PASSWORD_ADMIN=${{ secrets.UI_E2E_PASSWORD_ADMIN }} >> .env.sealion
+          echo UI_E2E_WEB_SDK_KEY=${{ secrets.UI_E2E_WEB_SDK_KEY }} >> .env.sealion
+          echo ENVIRONMENT=${{ env.ENVIRONMENT }} >> .env.sealion
       - name: Run Playwright UI tests
         id: run-tests
+        env:
+          DOTENV_CONFIG_PATH: .env.sealion
         run: |
           # Create allure-results directory
           mkdir -p allure-results
 
           # Run the tests
-          npx dotenv -e .env -- npx playwright test --project=ui
-
-      - name: Set Test Outcome
-        id: set-outcome
-        run: echo "test_outcome=${{ steps.run-tests.outcome }}" >> "$GITHUB_OUTPUT"
+          npx dotenv -e .env.sealion -- npx playwright test --project=ui
 
       - name: Archive test results
         if: success() || failure()
@@ -149,14 +202,14 @@ jobs:
         with:
           name: ui-test-results
           path: |
-            playwright-report/**/*.*
-            test-results/**/*.*
-            allure-results/**/*.*
+            playwright-report/
+            test-results/
+            allure-results/
 
   reports:
-    needs: [test]
+    needs: [test, setup-dependencies]
+    if: always() && needs.test.result != 'skipped'
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
@@ -172,6 +225,9 @@ jobs:
           path: |
             node_modules
           key: node_modules-${{ hashFiles('package-lock.json') }}
+      - name: Install dependencies (if cache miss)
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm ci
       - name: Download test results
         uses: actions/download-artifact@v4
         with:
@@ -183,15 +239,26 @@ jobs:
           # Create required directories
           mkdir -p allure-results allure-report playwright-report test-results
 
-          # Move files to their correct locations
-          if [ -d "downloaded-artifacts/allure-results" ]; then
+          # Move files to their correct locations with better error handling
+          if [ -d "downloaded-artifacts/allure-results" ] && [ "$(ls -A downloaded-artifacts/allure-results)" ]; then
             cp -r downloaded-artifacts/allure-results/* allure-results/
+            echo "Restored allure-results artifacts"
+          else
+            echo "No allure-results artifacts found"
           fi
-          if [ -d "downloaded-artifacts/playwright-report" ]; then
+
+          if [ -d "downloaded-artifacts/playwright-report" ] && [ "$(ls -A downloaded-artifacts/playwright-report)" ]; then
             cp -r downloaded-artifacts/playwright-report/* playwright-report/
+            echo "Restored playwright-report artifacts"
+          else
+            echo "No playwright-report artifacts found"
           fi
-          if [ -d "downloaded-artifacts/test-results" ]; then
+
+          if [ -d "downloaded-artifacts/test-results" ] && [ "$(ls -A downloaded-artifacts/test-results)" ]; then
             cp -r downloaded-artifacts/test-results/* test-results/
+            echo "Restored test-results artifacts"
+          else
+            echo "No test-results artifacts found"
           fi
 
       - name: Configure AWS credentials
@@ -204,7 +271,12 @@ jobs:
       - name: Download previous history
         run: |
           AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
-          aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/ui-daily/history" "allure-results/history" --recursive || true
+          echo "Attempting to download previous Allure history from S3..."
+          if aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/ui-daily/history" "allure-results/history" --recursive; then
+            echo "Successfully downloaded previous Allure history"
+          else
+            echo "No previous history found or download failed - continuing without history"
+          fi
 
       - name: Create Allure executor configuration
         run: |
@@ -213,31 +285,69 @@ jobs:
             "type": "github",
             "buildOrder": ${{ github.run_number }},
             "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-            "reportUrl": "https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html",
-            "reportName": "Daily UI Tests - Sealion",
-            "buildName": "Run #${{ github.run_number }} - Sealion UI Daily"
+            "reportUrl": "${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html",
+            "reportName": "Daily UI Tests - ${{ env.ENVIRONMENT }}",
+            "buildName": "Run #${{ github.run_number }} - ${{ env.ENVIRONMENT }} UI Daily"
           }' > allure-results/executor.json
 
       - name: Create Allure environment properties
         run: |
-          echo "Environment=sealion
+          echo "Environment=${{ env.ENVIRONMENT }}
           Browser=Firefox
           Node_Version=$(node -v)
           Playwright_Version=$(npx playwright --version)" > allure-results/environment.properties
 
       - name: Generate Allure report
-        run: npx allure generate allure-results --clean -o allure-report
+        run: |
+          echo "Generating Allure report..."
+          npx allure generate allure-results --clean -o allure-report
+
+          # Verify report was generated
+          if [ -f "allure-report/index.html" ]; then
+            echo "Allure report generated successfully"
+            echo "Report size: $(du -sh allure-report | cut -f1)"
+          else
+            echo "Error: Allure report generation failed - index.html not found"
+            exit 1
+          fi
 
       - name: Upload report to S3 bucket
         run: |
           AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
-          aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/ui-daily" --delete
+          echo "Uploading Allure report to S3 bucket: $AWS_S3_BUCKET_CLEAN"
+          if aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/ui-daily" --delete; then
+            echo "Successfully uploaded Allure report to S3"
+            echo "Report available at: ${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html"
+          else
+            echo "Failed to upload Allure report to S3"
+            exit 1
+          fi
 
   notify:
-    needs: [test, reports]
+    needs: [health-check, test, reports]
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Slack Notification - Health Check Results
+        if: needs.health-check.result != 'success'
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook-type: webhook-trigger
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "text": "🚨 Health Check Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Health Check Failed for ${{ env.ENVIRONMENT }} Daily UI Tests*\n• Repository: *Smokesignals*\n• Environment: ${{ env.ENVIRONMENT }}\n• Trigger: Scheduled Daily Run\n• Status: ❌ Health Check Failed\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• The API health check endpoint is not responding correctly. Please investigate the API service status."
+                  }
+                }
+              ]
+            }
+
       - name: Slack Notification - Daily UI Test Results
         uses: slackapi/slack-github-action@v2.0.0
         with:
@@ -251,7 +361,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Daily UI Test Results for Sealion*\n• Repository: *Smokesignals*\n• Status: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ env.REPORT_URL }}|Click here to view>"
+                    "text": "*Daily UI Test Results for ${{ env.ENVIRONMENT }}*\n• Repository: *Smokesignals*\n• Environment: ${{ env.ENVIRONMENT }}\n• Trigger: Scheduled Daily Run\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• UI Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html|Click here to view>"
                   }
                 }
               ]
