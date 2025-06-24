@@ -169,17 +169,18 @@ test.describe('In-App Campaign with Feed', () => {
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
     // First user - will perform actions
+    const firstUser = getUsersResponseJson.data[0];
+    const startMobileSessionFeedPayloadResponse = {
+      ...startMobileSessionFeedPayload(),
+      alias: firstUser.alias
+    };
     const alias = getUsersResponseJson.data[0].alias;
 
-    // Start session for first user
-    const firstUserSessionPayload = {
-      ...startMobileSessionInAppPayload(),
-      alias: alias
-    };
+    // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      firstUserSessionPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     // First user performs actions
@@ -392,9 +393,10 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    const startMobileSessionFeedPayloadResponse =
-      startMobileSessionFeedPayload();
-    startMobileSessionFeedPayloadResponse.alias = firstUser.alias;
+    const startMobileSessionFeedPayloadResponse = {
+      ...startMobileSessionFeedPayload(),
+      alias: firstUser.alias
+    };
     const alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
@@ -626,9 +628,6 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    const startMobileSessionFeedPayloadResponse =
-      startMobileSessionFeedPayload();
-    startMobileSessionFeedPayloadResponse.alias = firstUser.alias;
     const alias = getUsersResponseJson.data[0].alias;
 
     // Start session for first user
@@ -666,21 +665,6 @@ test.describe('In-App Campaign with Feed', () => {
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
       firstUserUpdatePayload
-    );
-
-    // Start Mobile Session for feed
-    await startMobileSessionsWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayloadResponse
-    );
-
-    // Get messages from inbox
-    await getInboxMessagesWithApi(
-      request,
-      APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      alias,
-      1
     );
 
     // STEP 2: Get the feed card for further interactions
