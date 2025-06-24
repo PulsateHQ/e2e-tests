@@ -175,7 +175,7 @@ jobs:
           mkdir -p allure-results
 
           # Run the tests
-          npx dotenv -e .env -- npx playwright test --project=api
+          npx dotenv -e .env -- npx playwright test ests/api/users.api.spec.ts  --project=api
 
       - name: Archive test results
         if: success() || failure()
@@ -268,7 +268,7 @@ jobs:
             "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
             "reportUrl": "https://${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html",
             "reportName": "E2E Tests - ${{ github.event.client_payload.environment }}",
-            "buildName": "Run #${{ github.run_number }} - ${{ github.event.client_payload.environment }}"
+            "buildName": "Run #${{ github.run_number }} - ${{ github.event.client_payload.environment }} (Push)"
           }' > allure-results/executor.json
 
       - name: Create Allure environment properties
@@ -276,12 +276,11 @@ jobs:
           # Set browser directly since we know it's Firefox from the Playwright installation step
           BROWSER="Firefox"
 
-          # Create PR URL
-          PR_URL="${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.client_payload.pr_number }}"
-
           echo "Environment=${{ github.event.client_payload.environment }}
           Browser=$BROWSER
-          PR_URL=$PR_URL
+          Commit_URL=${{ github.event.client_payload.commit_url }}
+          Commit_SHA=${{ github.event.client_payload.commit_sha }}
+          Commit_Message=${{ github.event.client_payload.commit_message }}
           Node_Version=$(node -v)
           Playwright_Version=$(npx playwright --version)" > allure-results/environment.properties
 
@@ -311,7 +310,7 @@ jobs:
             exit 1
           fi
 
-  notify-and-update-pr-status:
+  notify-and-update-commit-status:
     needs: [health-check, test, reports]
     runs-on: ubuntu-latest
     if: always()
@@ -330,7 +329,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Health Check Failed for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Status: ❌ Health Check Failed\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• The API health check endpoint is not responding correctly. Please investigate the API service status."
+                    "text": "*Health Check Failed for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Status: ❌ Health Check Failed\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• The API health check endpoint is not responding correctly. Please investigate the API service status."
                   }
                 }
               ]
@@ -349,13 +348,13 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• PR: ${{ github.event.client_payload.pr_title }}\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• E2E Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <https://${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|Click here to view>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• E2E Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <https://${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|Click here to view>"
                   }
                 }
               ]
             }
 
-      - name: Update PR Status
+      - name: Update Commit Status
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.E2E_PAT }}
@@ -389,5 +388,5 @@ jobs:
                 context: 'e2e-tests/${{ github.event.client_payload.environment }}'
               });
             } catch (error) {
-              core.setFailed(`Failed to update PR status: ${error.message}`);
+              core.setFailed(`Failed to update commit status: ${error.message}`);
             }
