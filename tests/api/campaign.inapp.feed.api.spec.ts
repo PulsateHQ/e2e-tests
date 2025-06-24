@@ -195,7 +195,6 @@ test.describe('In-App Campaign with Feed', () => {
           ...userActions[InAppEvents.IN_APP_IMPRESSION],
           guid: createInAppFeedCampaignResponseJson.guid
         },
-        ,
         {
           ...userActions[InAppEvents.IN_APP_BUTTON_CLICK_ONE],
           guid: createInAppFeedCampaignResponseJson.guid
@@ -393,14 +392,16 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias = firstUser.alias;
     const alias = getUsersResponseJson.data[0].alias;
 
     // Start Mobile Session
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     await getInboxMessagesWithApi(
@@ -625,7 +626,9 @@ test.describe('In-App Campaign with Feed', () => {
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
-    startMobileSessionFeedPayload.alias = getUsersResponseJson.data[0].alias;
+    const startMobileSessionFeedPayloadResponse =
+      startMobileSessionFeedPayload();
+    startMobileSessionFeedPayloadResponse.alias = firstUser.alias;
     const alias = getUsersResponseJson.data[0].alias;
 
     // Start session for first user
@@ -669,7 +672,7 @@ test.describe('In-App Campaign with Feed', () => {
     await startMobileSessionsWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      startMobileSessionFeedPayload
+      startMobileSessionFeedPayloadResponse
     );
 
     // Get messages from inbox
