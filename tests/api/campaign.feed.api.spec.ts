@@ -147,7 +147,11 @@ test.describe('Feed Post Campaign', () => {
     await updateMobileUserWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk,
-      { ...updateMobileFeedUserPayload(), user_actions: userActions }
+      {
+        ...updateMobileFeedUserPayload(),
+        alias: alias,
+        user_actions: userActions
+      }
     );
 
     await getInboxMessagesWithApi(

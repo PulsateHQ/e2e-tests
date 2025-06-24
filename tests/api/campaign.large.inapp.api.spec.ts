@@ -29,7 +29,6 @@ import {
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import {
-  createUserUpdatePayload,
   updateMobileInAppUserPayload,
   userActions
 } from '@_src/api/test-data/mobile/update/update-user.payload';
