@@ -16,7 +16,21 @@ permissions:
   id-token: write
 
 jobs:
+  wait-for-environment:
+    timeout-minutes: 50
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.client_payload.environment }}
+    steps:
+      - name: Wait for environment to be ready
+        run: |
+          echo "Waiting 45 minutes for ${{ github.event.client_payload.environment }} environment to be built and ready..."
+          echo "Start time: $(date)"
+          sleep 2700  # 45 minutes = 2700 seconds
+          echo "End time: $(date)"
+          echo "Environment should now be ready for testing"
+
   health-check:
+    needs: [wait-for-environment]
     timeout-minutes: 5
     runs-on: ubuntu-latest
     environment: ${{ github.event.client_payload.environment }}
@@ -54,7 +68,7 @@ jobs:
           npx dotenv -e .env -- npx playwright test tests/api/health-check.smoke.spec.ts --project=api --timeout=30000
 
   setup-dependencies:
-    needs: [health-check]
+    needs: [wait-for-environment, health-check]
     if: needs.health-check.result == 'success'
     timeout-minutes: 15
     runs-on: ubuntu-latest
@@ -311,7 +325,7 @@ jobs:
           fi
 
   notify-and-update-commit-status:
-    needs: [health-check, test, reports]
+    needs: [wait-for-environment, health-check, test, reports]
     runs-on: ubuntu-latest
     if: always()
     steps:
