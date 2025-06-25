@@ -6,6 +6,11 @@ on:
   repository_dispatch:
     types: [run-e2e-tests]
 
+# Use GitHub's built-in concurrency control for environment-specific queuing
+concurrency:
+  group: e2e-tests-${{ github.event.client_payload.environment }}
+  cancel-in-progress: false
+
 env:
   ALLURE_RESULTS_DIR: allure-results
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
@@ -22,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       queue-position: ${{ steps.queue-check.outputs.position }}
-      total-queued: ${{ steps.queue-check.outputs.total-queued }}
+      environment: ${{ github.event.client_payload.environment }}
     steps:
       - name: Check Queue Position
         id: queue-check
@@ -30,42 +35,35 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            // Get all workflow runs for this workflow
+            // Get workflow runs for this environment
             const { data: runs } = await github.rest.actions.listWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'tests.yml',
               event: 'repository_dispatch',
               status: 'in_progress',
-              per_page: 100
+              per_page: 50
             });
 
             const environment = '${{ github.event.client_payload.environment }}';
             const currentRunId = ${{ github.run_id }};
-            const currentRunCreated = new Date();
 
-            // Filter runs for the same environment by checking if the display_title contains both 'run-e2e-tests' and the environment
+            // Count same-environment runs (GitHub concurrency will handle the actual queuing)
             const sameEnvRuns = runs.workflow_runs.filter(run => {
-              const runCreated = new Date(run.created_at);
               return run.id !== currentRunId && 
-                     runCreated < currentRunCreated &&
-                     (run.status === 'in_progress' || run.status === 'queued') &&
                      run.display_title && 
                      run.display_title.includes('run-e2e-tests') &&
                      run.display_title.includes(environment);
             });
 
             const position = sameEnvRuns.length + 1;
-            const totalQueued = sameEnvRuns.length;
 
             console.log(`Environment: ${environment}`);
-            console.log(`Event type: repository_dispatch (run-e2e-tests)`);
-            console.log(`Queue position: ${position}`);
-            console.log(`Total queued ahead: ${totalQueued}`);
-            console.log(`Same environment runs found: ${sameEnvRuns.map(r => r.display_title).join(', ')}`);
+            console.log(`Concurrency Group: e2e-tests-${environment}`);
+            console.log(`Estimated Queue Position: ${position}`);
+            console.log(`Note: GitHub's concurrency control handles the actual queuing`);
 
             core.setOutput('position', position);
-            core.setOutput('total-queued', totalQueued);
 
       - name: Queue Status Notification
         if: steps.queue-check.outputs.position > 1
@@ -81,7 +79,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Tests Queued for ${{ github.event.client_payload.environment }}*\n• Queue Position: #${{ steps.queue-check.outputs.position }}\n• Waiting behind: ${{ steps.queue-check.outputs.total-queued }} other ${{ github.event.client_payload.environment }} run(s)\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Status: ⏳ Waiting for previous ${{ github.event.client_payload.environment }} tests to complete\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Queue Status>"
+                    "text": "*E2E Tests Queued for ${{ github.event.client_payload.environment }}*\n• Queue Position: ~#${{ steps.queue-check.outputs.position }}\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Status: ⏳ Waiting for previous ${{ github.event.client_payload.environment }} tests to complete\n• Concurrency Group: e2e-tests-${{ github.event.client_payload.environment }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Status>"
                   }
                 }
               ]
@@ -90,20 +88,14 @@ jobs:
       - name: Log Queue Information
         run: |
           echo "🚀 E2E Tests triggered for environment: ${{ github.event.client_payload.environment }}"
-          echo "📍 Queue Position: #${{ steps.queue-check.outputs.position }}"
+          echo "📍 Estimated Queue Position: #${{ steps.queue-check.outputs.position }}"
+          echo "🔒 Concurrency Group: e2e-tests-${{ github.event.client_payload.environment }}"
           echo "📦 Commit: ${{ github.event.client_payload.commit_sha }}"
           echo "💬 Message: ${{ github.event.client_payload.commit_message }}"
           echo "⏱️ Started at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
           echo "🔄 Run ID: ${{ github.run_id }}"
-
-          if [ "${{ steps.queue-check.outputs.position }}" -gt "1" ]; then
-            echo ""
-            echo "⏳ This workflow is queued behind ${{ steps.queue-check.outputs.total-queued }} other ${{ github.event.client_payload.environment }} run(s)"
-            echo "   It will start automatically when the previous ${{ github.event.client_payload.environment }} tests complete."
-          else
-            echo ""
-            echo "✅ No queue detected for ${{ github.event.client_payload.environment }} - this workflow will start immediately"
-          fi
+          echo ""
+          echo "ℹ️  GitHub's concurrency control will automatically handle queuing for this environment"
 
   wait-for-environment:
     needs: [queue-info]
@@ -175,7 +167,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Tests Now Running for ${{ github.event.client_payload.environment }}*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Health Check: ✅ Passed\n• Queue Position: Was #${{ needs.queue-info.outputs.queue-position }}\n• Status: 🧪 Tests are now running\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>"
+                    "text": "*E2E Tests Now Running for ${{ github.event.client_payload.environment }}*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Health Check: ✅ Passed\n• Queue Position: Was ~#${{ needs.queue-info.outputs.queue-position }}\n• Status: 🧪 Tests are now running\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>"
                   }
                 }
               ]
@@ -476,7 +468,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Queue Position: Was #${{ needs.queue-info.outputs.queue-position }}\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• E2E Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|Click here to view>"
+                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Queue Position: Was ~#${{ needs.queue-info.outputs.queue-position }}\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• E2E Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|Click here to view>"
                   }
                 }
               ]
