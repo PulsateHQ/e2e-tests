@@ -2,8 +2,8 @@ name: Daily UI Tests - Sealion
 
 on:
   schedule:
-    # Run at 8:00 AM UTC every morning
-    - cron: '0 8 * * *'
+    # Run at 6:00 AM UTC every morning
+    - cron: '0 6 * * *'
   # Allow manual trigger
   workflow_dispatch:
 
@@ -342,7 +342,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Health Check Failed for ${{ env.ENVIRONMENT }} Daily UI Tests*\n• Repository: *Smokesignals*\n• Environment: ${{ env.ENVIRONMENT }}\n• Trigger: Scheduled Daily Run\n• Status: ❌ Health Check Failed\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• The API health check endpoint is not responding correctly. Please investigate the API service status."
+                    "text": "🚨 *Daily UI Tests - Health Check Failed*\n\n📋 *Status*: ❌ Health validation failed\n🌍 *Environment*: `${{ env.ENVIRONMENT }}`\n🏥 *Issue*: API health check endpoint not responding correctly\n📅 *Trigger*: Scheduled Daily Run\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n\n⚠️ *Action Required*: Please investigate the API service status for `${{ env.ENVIRONMENT }}`"
                   }
                 }
               ]
@@ -361,7 +361,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Daily UI Test Results for ${{ env.ENVIRONMENT }}*\n• Repository: *Smokesignals*\n• Environment: ${{ env.ENVIRONMENT }}\n• Trigger: Scheduled Daily Run\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• UI Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html|Click here to view>"
+                    "text": "📊 *Daily UI Test Results - ${{ env.ENVIRONMENT }}*\n\n🌍 *Environment*: `${{ env.ENVIRONMENT }}`\n📅 *Trigger*: Scheduled Daily Run\n\n*Step Results:*\n🏥 *Health Check*: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n🧪 *UI Tests*: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n📋 *Reports*: ${{ needs.reports.result == 'success' && '✅ Generated' || '❌ Failed' }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\n📈 *Allure Report*: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html|View Test Report>"
                   }
                 }
               ]

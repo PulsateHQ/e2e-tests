@@ -6,11 +6,6 @@ on:
   repository_dispatch:
     types: [run-e2e-tests]
 
-# Use GitHub's built-in concurrency control for environment-specific queuing
-concurrency:
-  group: e2e-tests-${{ github.event.client_payload.environment }}
-  cancel-in-progress: false
-
 env:
   ALLURE_RESULTS_DIR: allure-results
   AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
@@ -26,82 +21,48 @@ jobs:
   queue-info:
     runs-on: ubuntu-latest
     outputs:
-      queue-position: ${{ steps.queue-check.outputs.position }}
       environment: ${{ github.event.client_payload.environment }}
     steps:
-      - name: Check Queue Position
-        id: queue-check
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            // Get workflow runs for this environment
-            const { data: runs } = await github.rest.actions.listWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'tests.yml',
-              event: 'repository_dispatch',
-              status: 'in_progress',
-              per_page: 50
-            });
-
-            const environment = '${{ github.event.client_payload.environment }}';
-            const currentRunId = ${{ github.run_id }};
-
-            // Count same-environment runs (GitHub concurrency will handle the actual queuing)
-            const sameEnvRuns = runs.workflow_runs.filter(run => {
-              return run.id !== currentRunId && 
-                     run.display_title && 
-                     run.display_title.includes('run-e2e-tests') &&
-                     run.display_title.includes(environment);
-            });
-
-            const position = sameEnvRuns.length + 1;
-
-            console.log(`Environment: ${environment}`);
-            console.log(`Concurrency Group: e2e-tests-${environment}`);
-            console.log(`Estimated Queue Position: ${position}`);
-            console.log(`Note: GitHub's concurrency control handles the actual queuing`);
-
-            core.setOutput('position', position);
-
-      - name: Queue Status Notification
-        if: steps.queue-check.outputs.position > 1
+      - name: Test Triggered Notification
         uses: slackapi/slack-github-action@v2.0.0
         with:
           webhook-type: webhook-trigger
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "⏳ E2E Tests Queued",
+              "text": "🚀 E2E Tests Triggered",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Tests Queued for ${{ github.event.client_payload.environment }}*\n• Queue Position: ~#${{ steps.queue-check.outputs.position }}\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Status: ⏳ Waiting for previous ${{ github.event.client_payload.environment }} tests to complete\n• Concurrency Group: e2e-tests-${{ github.event.client_payload.environment }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Status>"
+                    "text": "🚀 *E2E Tests Triggered for ${{ github.event.client_payload.environment }}*\n\n📋 *Status*: Workflow started\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n🔒 *Concurrency Group*: `e2e-tests-${{ github.event.client_payload.environment }}`\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>\n\nℹ️ *Note*: If other ${{ github.event.client_payload.environment }} tests are running, this will queue automatically"
                   }
                 }
               ]
             }
 
-      - name: Log Queue Information
+      - name: Log Trigger Information
         run: |
           echo "🚀 E2E Tests triggered for environment: ${{ github.event.client_payload.environment }}"
-          echo "📍 Estimated Queue Position: #${{ steps.queue-check.outputs.position }}"
+          echo "🌍 Environment: ${{ github.event.client_payload.environment }}"
           echo "🔒 Concurrency Group: e2e-tests-${{ github.event.client_payload.environment }}"
           echo "📦 Commit: ${{ github.event.client_payload.commit_sha }}"
           echo "💬 Message: ${{ github.event.client_payload.commit_message }}"
           echo "⏱️ Started at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
           echo "🔄 Run ID: ${{ github.run_id }}"
           echo ""
-          echo "ℹ️  GitHub's concurrency control will automatically handle queuing for this environment"
+          echo "ℹ️  GitHub's concurrency control will handle queuing automatically at the environment wait stage"
 
   wait-for-environment:
     needs: [queue-info]
     timeout-minutes: 50
     runs-on: ubuntu-latest
     environment: ${{ github.event.client_payload.environment }}
+    # Move concurrency control to job level for better control
+    concurrency:
+      group: e2e-tests-${{ github.event.client_payload.environment }}
+      cancel-in-progress: false
     steps:
       - name: Wait for environment to be ready
         run: |
@@ -149,10 +110,14 @@ jobs:
         run: |
           npx dotenv -e .env -- npx playwright test tests/api/health-check.smoke.spec.ts --project=api --timeout=30000
 
-  test-started-notification:
-    needs: [queue-info, health-check]
+  setup-dependencies:
+    needs: [wait-for-environment, health-check]
     if: needs.health-check.result == 'success'
+    timeout-minutes: 15
     runs-on: ubuntu-latest
+    environment: ${{ github.event.client_payload.environment }}
+    outputs:
+      playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
       - name: Test Started Notification
         uses: slackapi/slack-github-action@v2.0.0
@@ -161,27 +126,18 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "🧪 E2E Tests Started",
+              "text": "🧪 E2E Tests - Now Running",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Tests Now Running for ${{ github.event.client_payload.environment }}*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Health Check: ✅ Passed\n• Queue Position: Was ~#${{ needs.queue-info.outputs.queue-position }}\n• Status: 🧪 Tests are now running\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>"
+                    "text": "🧪 *E2E Tests - Now Running*\n\n📋 *Status*: Tests are now executing\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n✅ *Health Check*: Passed\n⏱️ *Timeout*: 30 minutes\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>"
                   }
                 }
               ]
             }
 
-  setup-dependencies:
-    needs: [test-started-notification]
-    if: needs.test-started-notification.result == 'success'
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
-    environment: ${{ github.event.client_payload.environment }}
-    outputs:
-      playwright-version: ${{ steps.playwright-version.outputs.version }}
-    steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -431,7 +387,7 @@ jobs:
           fi
 
   notify-and-update-commit-status:
-    needs: [queue-info, wait-for-environment, health-check, test, reports]
+    needs: [wait-for-environment, health-check, test, reports]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -443,13 +399,13 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "🚨 Health Check Failed",
+              "text": "🚨 E2E Tests - Health Check Failed",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Health Check Failed for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Status: ❌ Health Check Failed\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• The API health check endpoint is not responding correctly. Please investigate the API service status."
+                    "text": "🚨 *E2E Tests - Health Check Failed*\n\n📋 *Status*: ❌ Health validation failed\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n🏥 *Issue*: API health check endpoint not responding correctly\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n\n⚠️ *Action Required*: Please investigate the API service status for `${{ github.event.client_payload.environment }}`"
                   }
                 }
               ]
@@ -462,13 +418,13 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "E2E Test Results 🧪",
+              "text": "📊 E2E Test Results",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*E2E Test Results for ${{ github.event.client_payload.environment }}*\n• Repository: *Smokesignals*\n• Commit: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n• Message: ${{ github.event.client_payload.commit_message }}\n• Queue Position: Was ~#${{ needs.queue-info.outputs.queue-position }}\n• Health Check: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n• E2E Tests: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n• Run: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n• Allure Report: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|Click here to view>"
+                    "text": "📊 *E2E Test Results - ${{ github.event.client_payload.environment }}*\n\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n\n*Step Results:*\n🏥 *Health Check*: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n🧪 *E2E Tests*: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n📋 *Reports*: ${{ needs.reports.result == 'success' && '✅ Generated' || '❌ Failed' }}\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\n📈 *Allure Report*: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|View Test Report>"
                   }
                 }
               ]
