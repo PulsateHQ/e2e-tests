@@ -11,7 +11,7 @@ export class LoginPage extends BasePage {
     name: 'Username or Email'
   });
   userPasswordInput = this.page.getByRole('textbox', {
-    name: 'Password Forgot your password?'
+    name: 'Password'
   });
   loginButton = this.page.getByRole('button', {
     name: 'Sign in'
