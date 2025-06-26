@@ -127,7 +127,6 @@ jobs:
           payload: |
             {
               "text": "🧪 E2E Tests - Now Running",
-              "text": "🧪 E2E Tests - Now Running",
               "blocks": [
                 {
                   "type": "section",
@@ -401,7 +400,6 @@ jobs:
           payload: |
             {
               "text": "🚨 E2E Tests - Health Check Failed",
-              "text": "🚨 E2E Tests - Health Check Failed",
               "blocks": [
                 {
                   "type": "section",
@@ -420,7 +418,6 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "📊 E2E Test Results",
               "text": "📊 E2E Test Results",
               "blocks": [
                 {
