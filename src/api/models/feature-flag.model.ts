@@ -29,8 +29,6 @@ export interface Flags {
   ff_segment_delivery: boolean;
   ff_web_sdk: boolean;
   ff_csv_users_upload: boolean;
-  ff_pulsate_beta: boolean;
-  ff_dashboard_beta: boolean;
   sms_delivery: boolean;
   ff_push: boolean;
   ff_send_to_report_service: boolean;
@@ -45,7 +43,6 @@ export interface Flags {
   ff_core_member_id_upload: boolean;
   ff_restrict_badge_for_mobile_push: boolean;
   ff_demo_mode: boolean;
-  ff_old_app_and_device_stats: boolean;
   ff_opportunities_dashboard: boolean;
   ff_opportunities_stats: boolean;
   ff_small_in_app: boolean;

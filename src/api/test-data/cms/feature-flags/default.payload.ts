@@ -26,8 +26,6 @@ export const featureFlagsDefault = (): FeatureFlagsRequest => ({
         ff_segment_delivery: false,
         ff_web_sdk: true,
         ff_csv_users_upload: true,
-        ff_pulsate_beta: true,
-        ff_dashboard_beta: true,
         sms_delivery: false,
         ff_push: true,
         ff_send_to_report_service: false,
@@ -42,7 +40,6 @@ export const featureFlagsDefault = (): FeatureFlagsRequest => ({
         ff_core_member_id_upload: false,
         ff_restrict_badge_for_mobile_push: false,
         ff_demo_mode: false,
-        ff_old_app_and_device_stats: false,
         ff_opportunities_dashboard: false,
         ff_opportunities_stats: false,
         ff_small_in_app: true

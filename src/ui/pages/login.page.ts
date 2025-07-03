@@ -67,7 +67,7 @@ export class LoginPage extends BasePage {
     ]);
 
     // Navigate to dashboard directly and wait for load
-    await this.page.goto(`${baseUrl}/mobile/apps/${appId}/dashboard_beta`);
+    await this.page.goto(`${baseUrl}/mobile/apps/${appId}/dashboard`);
 
     return new DashboardPage(this.page, appId);
   }
