@@ -127,7 +127,7 @@ test.describe('Login Functionality', () => {
     // Act
     await loginPage.loginWithToken(adminFrontendAccessToken, appId);
 
-    const expectedURL = `${BASE_URL}/mobile/apps/${appId}/dashboard`;
+    const expectedURL = `${BASE_URL}/mobile/apps/${appId}/dashboards`;
     const dashboardURL = await dashboardPage.validateUrl();
 
     // Assert
