@@ -31,10 +31,9 @@ export async function getAllUsersWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
   const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
+  // Optimize: Use response.json() directly instead of manual parsing
+  const responseJson = await response.json();
 
   expect(
     response.status(),

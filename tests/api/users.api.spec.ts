@@ -40,15 +40,12 @@ test.describe('User Management', () => {
   };
 
   test.beforeEach(async ({ request }) => {
-    await deleteAllCampaigns(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
-    await deleteAllSegments(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
+    // Optimize: Run cleanup operations in parallel for better performance
+    await Promise.all([
+      deleteAllCampaigns(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin),
+      deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin),
+      deleteAllSegments(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin)
+    ]);
   });
 
   test('should import a single user and validate the user details', async ({

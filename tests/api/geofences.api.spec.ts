@@ -33,19 +33,13 @@ test.describe('Geofences Management', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
       [API_E2E_APP_ID]
     );
-    await deleteAllCampaigns(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
-    await deleteAllSegments(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    await deleteAllGeofences(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
+    // Optimize: Run cleanup operations in parallel for better performance
+    await Promise.all([
+      deleteAllCampaigns(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin),
+      deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin),
+      deleteAllSegments(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin),
+      deleteAllGeofences(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin)
+    ]);
   });
 
   test('should create multiple geofences, update one, remove a single one, and validate the total number of geofences in the end', async ({

@@ -6,7 +6,7 @@ async function globalSetup(): Promise<void> {
     fs.unlinkSync(STORAGE_STATE);
   }
 
-  // console.log('⚠️ Global setup');
+
 }
 
 export default globalSetup;

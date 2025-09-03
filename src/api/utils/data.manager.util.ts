@@ -2,8 +2,10 @@ import {
   deleteDeeplinksWithApi,
   getAllDeeplinksWithApi
 } from '../factories/deeplinks.api.factory';
-import { deleteGroupWithApi } from '../factories/groups.api.factory';
-import { getAllGroupsWithApi } from '../factories/groups.api.factory';
+import { 
+  deleteGroupWithApi,
+  getAllGroupsWithApi 
+} from '../factories/groups.api.factory';
 import {
   batchDeleteCampaignsWithApi,
   getCampaignsWithApi
@@ -25,6 +27,40 @@ import { generateCsvContentForUsersImport } from '@_src/api/test-data/cms/users/
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, test } from '@playwright/test';
 
+/**
+ * Optimized cleanup function that runs all cleanup operations in parallel
+ * This significantly improves performance by reducing sequential API calls
+ */
+export async function cleanupAllTestData(
+  request: APIRequestContext,
+  token: string,
+  options: {
+    includeGeofences?: boolean;
+    includeGroups?: boolean;
+    includeDeeplinks?: boolean;
+  } = {}
+): Promise<void> {
+  await test.step('Cleaning up all test data in parallel', async () => {
+    const cleanupPromises = [
+      deleteAllCampaigns(request, token),
+      deleteAllUsers(request, token),
+      deleteAllSegments(request, token)
+    ];
+
+    if (options.includeGeofences) {
+      cleanupPromises.push(deleteAllGeofences(request, token));
+    }
+    if (options.includeGroups) {
+      cleanupPromises.push(deleteAllGroups(request, token));
+    }
+    if (options.includeDeeplinks) {
+      cleanupPromises.push(deleteAllDeeplinks(request, token));
+    }
+
+    await Promise.all(cleanupPromises);
+  });
+}
+
 export async function deleteAllUsers(
   request: APIRequestContext,
   token: string
@@ -34,9 +70,11 @@ export async function deleteAllUsers(
     const getUsersResponseJson = await getUsersResponse.json();
     const initialUserCount = getUsersResponseJson.data.length;
 
-    for (const user of getUsersResponseJson.data) {
-      await deleteUserWithApi(request, token, user.id);
-    }
+    // Optimize: Use Promise.all for parallel deletion instead of sequential
+    const deletePromises = getUsersResponseJson.data.map((user: { id: string }) =>
+      deleteUserWithApi(request, token, user.id)
+    );
+    await Promise.all(deletePromises);
 
     const getUsersResponseAfterDeletion = await getAllUsersWithApi(
       request,
@@ -158,9 +196,11 @@ export async function deleteAllGroups(
     const getGroupsResponseJson = await getGroupsResponse.json();
     const initialGroupCount = getGroupsResponseJson.data.length;
 
-    for (const group of getGroupsResponseJson.data) {
-      await deleteGroupWithApi(request, token, group.id);
-    }
+    // Optimize: Use Promise.all for parallel deletion instead of sequential
+    const deletePromises = getGroupsResponseJson.data.map((group: { id: string }) =>
+      deleteGroupWithApi(request, token, group.id)
+    );
+    await Promise.all(deletePromises);
 
     const getGroupsResponseAfterDeletion = await getAllGroupsWithApi(
       request,
@@ -186,9 +226,11 @@ export async function deleteAllDeeplinks(
     const getDeeplinksResponseJson = await getDeeplinksResponse.json();
     const initialDeeplinkCount = getDeeplinksResponseJson.data.length;
 
-    for (const deeplink of getDeeplinksResponseJson.data) {
-      await deleteDeeplinksWithApi(request, token, [deeplink.id]);
-    }
+    // Optimize: Use Promise.all for parallel deletion instead of sequential
+    const deletePromises = getDeeplinksResponseJson.data.map((deeplink: { id: string }) =>
+      deleteDeeplinksWithApi(request, token, [deeplink.id])
+    );
+    await Promise.all(deletePromises);
 
     const getDeeplinksResponseAfterDeletion = await getAllDeeplinksWithApi(
       request,

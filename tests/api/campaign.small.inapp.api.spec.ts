@@ -64,15 +64,12 @@ test.describe('Small In-App Campaign', () => {
   });
 
   test.beforeEach(async ({ request }) => {
-    await deleteAllCampaigns(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
-    await deleteAllSegments(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
-    );
+    // Optimize: Run cleanup operations in parallel for better performance
+    await Promise.all([
+      deleteAllCampaigns(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin),
+      deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin),
+      deleteAllSegments(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin)
+    ]);
   });
   test('should create an In-App Small Top campaign with a URL banner and click it', async ({
     request

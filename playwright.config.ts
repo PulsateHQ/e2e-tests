@@ -11,9 +11,9 @@ export default defineConfig({
   expect: {
     timeout: 60_000
   },
-  fullyParallel: false,
+  fullyParallel: true,
   retries: 1,
-  workers: 1,
+  workers: process.env.CI ? 2 : 4, // Optimize: Use more workers for better performance
   reporter: [
     ['html'],
     ['github'],
@@ -31,9 +31,13 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     actionTimeout: 0,
-    trace: 'on',
+    trace: 'retain-on-failure', // Optimize: Only trace on failure to reduce overhead
     video: 'retain-on-failure',
-    screenshot: 'only-on-failure'
+    screenshot: 'only-on-failure',
+    // Optimize: Add performance settings
+    launchOptions: {
+      args: ['--disable-dev-shm-usage', '--disable-web-security']
+    }
   },
   projects: [
     {
