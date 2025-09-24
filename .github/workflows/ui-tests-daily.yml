@@ -35,9 +35,8 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -83,9 +82,8 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -112,8 +110,7 @@ jobs:
         uses: actions/cache@v4
         id: playwright-cache
         with:
-          path: |
-            ~/.cache/ms-playwright
+          path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
@@ -141,16 +138,14 @@ jobs:
         uses: actions/cache@v4
         id: playwright-cache
         with:
-          path: |
-            ~/.cache/ms-playwright
+          path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ needs.setup-dependencies.outputs.playwright-version }}
       - name: Cache node_modules
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies (if cache miss)
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -222,9 +217,8 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies (if cache miss)
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -328,41 +322,32 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Slack Notification - Health Check Results
-        if: needs.health-check.result != 'success'
+      - name: Daily UI Test Results
         uses: slackapi/slack-github-action@v2.0.0
         with:
           webhook-type: webhook-trigger
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "🚨 Health Check Failed",
+              "text": "${{ needs.health-check.result != 'success' && '🚨 Daily UI - Health Failed' || (needs.test.result == 'success' && '📊 Daily UI - Passed' || '❌ Daily UI - Failed') }}",
               "blocks": [
+                {
+                  "type": "header",
+                  "text": {"type": "plain_text", "text": "📊 Daily UI Tests • ${{ env.ENVIRONMENT }}"}
+                },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚨 *Daily UI Tests - Health Check Failed*\n\n📋 *Status*: ❌ Health validation failed\n🌍 *Environment*: `${{ env.ENVIRONMENT }}`\n🏥 *Issue*: API health check endpoint not responding correctly\n📅 *Trigger*: Scheduled Daily Run\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n\n⚠️ *Action Required*: Please investigate the API service status for `${{ env.ENVIRONMENT }}`"
+                    "text": "*Results:* 🏥 ${{ needs.health-check.result == 'success' && 'Health ✅' || 'Health ❌' }} • 🧪 ${{ needs.test.result == 'success' && 'UI Tests ✅' || needs.test.result == 'skipped' && 'UI Tests ⏭️' || 'UI Tests ❌' }} • 📋 ${{ needs.reports.result == 'success' && 'Reports ✅' || 'Reports ❌' }}"
                   }
-                }
-              ]
-            }
-
-      - name: Slack Notification - Daily UI Test Results
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook-type: webhook-trigger
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          payload: |
-            {
-              "text": "Daily UI Test Results 🧪",
-              "blocks": [
+                },
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "📊 *Daily UI Test Results - ${{ env.ENVIRONMENT }}*\n\n🌍 *Environment*: `${{ env.ENVIRONMENT }}`\n📅 *Trigger*: Scheduled Daily Run\n\n*Step Results:*\n🏥 *Health Check*: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n🧪 *UI Tests*: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n📋 *Reports*: ${{ needs.reports.result == 'success' && '✅ Generated' || '❌ Failed' }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\n📈 *Allure Report*: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html|View Test Report>"
-                  }
+                  "type": "actions",
+                  "elements": [
+                    {"type": "button", "text": {"type": "plain_text", "text": "View Run"}, "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+                    {"type": "button", "text": {"type": "plain_text", "text": "UI Report"}, "url": "${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html"}
+                  ]
                 }
               ]
             }

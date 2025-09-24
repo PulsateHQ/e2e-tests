@@ -22,37 +22,31 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ github.event.client_payload.environment }}
+      thread_ts: ${{ steps.slack-start.outputs.ts }}
     steps:
-      - name: Test Triggered Notification
+      - name: Start Notification
+        id: slack-start
         uses: slackapi/slack-github-action@v2.0.0
         with:
           webhook-type: webhook-trigger
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "🚀 E2E Tests Triggered",
+              "text": "🚀 E2E Tests Started - ${{ github.event.client_payload.environment }}",
               "blocks": [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "🚀 *E2E Tests Triggered for ${{ github.event.client_payload.environment }}*\n\n📋 *Status*: Workflow started\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n🔒 *Concurrency Group*: `e2e-tests-${{ github.event.client_payload.environment }}`\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>\n\nℹ️ *Note*: If other ${{ github.event.client_payload.environment }} tests are running, this will queue automatically"
-                  }
+                  "type": "header",
+                  "text": {"type": "plain_text", "text": "🚀 E2E Tests • ${{ github.event.client_payload.environment }}"}
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {"type": "mrkdwn", "text": "*Commit:* <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>"},
+                    {"type": "mrkdwn", "text": "*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>"}
+                  ]
                 }
               ]
             }
-
-      - name: Log Trigger Information
-        run: |
-          echo "🚀 E2E Tests triggered for environment: ${{ github.event.client_payload.environment }}"
-          echo "🌍 Environment: ${{ github.event.client_payload.environment }}"
-          echo "🔒 Concurrency Group: e2e-tests-${{ github.event.client_payload.environment }}"
-          echo "📦 Commit: ${{ github.event.client_payload.commit_sha }}"
-          echo "💬 Message: ${{ github.event.client_payload.commit_message }}"
-          echo "⏱️ Started at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          echo "🔄 Run ID: ${{ github.run_id }}"
-          echo ""
-          echo "ℹ️  GitHub's concurrency control will handle queuing automatically at the environment wait stage"
 
   wait-for-environment:
     needs: [queue-info]
@@ -89,9 +83,8 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -119,25 +112,6 @@ jobs:
     outputs:
       playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
-      - name: Test Started Notification
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook-type: webhook-trigger
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          payload: |
-            {
-              "text": "🧪 E2E Tests - Now Running",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "🧪 *E2E Tests - Now Running*\n\n📋 *Status*: Tests are now executing\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n✅ *Health Check*: Passed\n⏱️ *Timeout*: 30 minutes\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Progress>"
-                  }
-                }
-              ]
-            }
-
       - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -149,9 +123,8 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -178,8 +151,7 @@ jobs:
         uses: actions/cache@v4
         id: playwright-cache
         with:
-          path: |
-            ~/.cache/ms-playwright
+          path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
@@ -206,16 +178,14 @@ jobs:
         uses: actions/cache@v4
         id: playwright-cache
         with:
-          path: |
-            ~/.cache/ms-playwright
+          path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ needs.setup-dependencies.outputs.playwright-version }}
       - name: Cache node_modules
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies (if cache miss)
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -279,9 +249,8 @@ jobs:
         uses: actions/cache@v4
         id: node-cache
         with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install dependencies (if cache miss)
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -387,45 +356,33 @@ jobs:
           fi
 
   notify-and-update-commit-status:
-    needs: [wait-for-environment, health-check, test, reports]
+    needs: [queue-info, wait-for-environment, health-check, test, reports]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Slack Notification - Health Check Results
-        if: needs.health-check.result != 'success'
+      - name: Final Results Notification
         uses: slackapi/slack-github-action@v2.0.0
         with:
           webhook-type: webhook-trigger
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "🚨 E2E Tests - Health Check Failed",
+              "text": "${{ needs.health-check.result != 'success' && '🚨 Health Check Failed' || (needs.test.result == 'success' && '✅ Tests Passed' || '❌ Tests Failed') }}",
+              "thread_ts": "${{ needs.queue-info.outputs.thread_ts }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚨 *E2E Tests - Health Check Failed*\n\n📋 *Status*: ❌ Health validation failed\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n🏥 *Issue*: API health check endpoint not responding correctly\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run Details>\n\n⚠️ *Action Required*: Please investigate the API service status for `${{ github.event.client_payload.environment }}`"
+                    "text": "*Results:* 🏥 ${{ needs.health-check.result == 'success' && 'Health ✅' || 'Health ❌' }} • 🧪 ${{ needs.test.result == 'success' && 'Tests ✅' || needs.test.result == 'skipped' && 'Tests ⏭️' || 'Tests ❌' }} • 📋 ${{ needs.reports.result == 'success' && 'Reports ✅' || 'Reports ❌' }}"
                   }
-                }
-              ]
-            }
-
-      - name: Slack Notification - E2E Test Results
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook-type: webhook-trigger
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          payload: |
-            {
-              "text": "📊 E2E Test Results",
-              "blocks": [
+                },
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "📊 *E2E Test Results - ${{ github.event.client_payload.environment }}*\n\n🌍 *Environment*: `${{ github.event.client_payload.environment }}`\n\n*Step Results:*\n🏥 *Health Check*: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n🧪 *E2E Tests*: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n📋 *Reports*: ${{ needs.reports.result == 'success' && '✅ Generated' || '❌ Failed' }}\n\n📦 *Commit*: <${{ github.event.client_payload.commit_url }}|${{ github.event.client_payload.commit_sha }}>\n💬 *Message*: ${{ github.event.client_payload.commit_message }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\n📈 *Allure Report*: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html|View Test Report>"
-                  }
+                  "type": "actions",
+                  "elements": [
+                    {"type": "button", "text": {"type": "plain_text", "text": "View Run"}, "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},
+                    {"type": "button", "text": {"type": "plain_text", "text": "Allure Report"}, "url": "${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/staging/index.html"}
+                  ]
                 }
               ]
             }
