@@ -1,0 +1,12 @@
+{
+  "blocks": [
+    { "type": "header", "text": { "type": "plain_text", "text": "Daily E2E Digest" } },
+    { "type": "section", "text": { "type": "mrkdwn", "text": "*Summary by Environment*\n${envBreakdown}" }},
+    { "type": "section", "text": { "type": "mrkdwn", "text": "*Flakes in last 7 days*\n${flakes}" }},
+    { "type": "actions", "elements": [
+      { "type": "button", "text": { "type": "plain_text", "text": "Latest Run" }, "url": "${runUrl}" },
+      { "type": "button", "text": { "type": "plain_text", "text": "Allure Dashboard" }, "url": "${allureUrl}" }
+    ]}
+  ]
+}
+

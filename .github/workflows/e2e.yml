@@ -1,0 +1,184 @@
+name: e2e
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      thread_ts: ${{ steps.slack_start.outputs.thread_ts }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Install Playwright browsers
+        uses: microsoft/playwright-github-action@v1
+
+      - name: Post Slack (start)
+        id: slack_start
+        if: ${{ env.SLACK_BOT_TOKEN != '' && env.SLACK_CHANNEL_ID != '' }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          node scripts/ci/slack-post.js --template on_trigger --run-url "$GITHUB_RUN_URL" --ref "${{ github.ref_name }}" --repo "${{ github.repository }}" --workflow "${{ github.workflow }}" --concurrency "e2e-${{ github.ref_name }}" --output $GITHUB_OUTPUT
+
+  test:
+    name: Test (${{ matrix.env }})
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [sealion, leopard, jaguar]
+    env:
+      DOTENV_CONFIG_PATH: .env.${{ matrix.env }}
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Install Playwright browsers
+        uses: microsoft/playwright-github-action@v1
+
+      - name: Health check
+        run: npx playwright test tests/api/health-check.smoke.spec.ts --project=api --reporter=line | cat
+
+      - name: Run E2E (sealion: api+ui; others: api only)
+        id: run_e2e
+        run: |
+          if [ "${{ matrix.env }}" = "sealion" ]; then
+            npx playwright test --reporter=json,line
+          else
+            npx playwright test --project=api --reporter=json,line
+          fi
+
+      - name: Summarize results
+        if: always()
+        env:
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          mkdir -p artifacts
+          node scripts/ci/summarize-e2e.js --env "${{ matrix.env }}" --results "playwright-report/results.json" --allure "allure-results" --run-url "$GITHUB_RUN_URL" --output "artifacts/summary-${{ matrix.env }}.json"
+
+      - name: Upload artifacts (allure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-${{ matrix.env }}
+          path: |
+            allure-results
+          retention-days: 14
+
+      - name: Upload artifacts (playwright-report)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.env }}
+          path: |
+            playwright-report
+          retention-days: 14
+
+      - name: Upload artifacts (test-results: traces, screenshots, videos)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.env }}
+          path: |
+            test-results
+          retention-days: 14
+
+      - name: Upload summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: summary-${{ matrix.env }}
+          path: artifacts/summary-${{ matrix.env }}.json
+          retention-days: 7
+
+  report:
+    name: Report
+    needs: [test, prepare]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download summaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: summary-*
+          merge-multiple: true
+          path: summaries
+
+      - name: Merge and detect flakes
+        run: |
+          node scripts/ci/detect-flakes.js --summaries "summaries/*.json" --json reports/flaky-tests.json --md reports/flaky-tests.md
+
+      - name: Upload flaky reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flaky-reports
+          path: |
+            reports/flaky-tests.json
+            reports/flaky-tests.md
+          retention-days: 14
+
+      - name: Post Slack (result)
+        if: ${{ env.SLACK_BOT_TOKEN != '' && env.SLACK_CHANNEL_ID != '' }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          THREAD_TS: ${{ needs.prepare.outputs.thread_ts }}
+        run: |
+          # Determine overall status
+          STATUS=success
+          if ls summaries/*.json >/dev/null 2>&1; then
+            if grep -q '"failed"\s*:\s*[1-9]' summaries/*.json; then STATUS=failure; fi
+          fi
+          TEMPLATE=on_result_success
+          if [ "$STATUS" != "success" ]; then TEMPLATE=on_result_failure; fi
+          node scripts/ci/slack-post.js --template "$TEMPLATE" --thread "$THREAD_TS" --summaries "summaries/*.json"
+

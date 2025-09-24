@@ -185,14 +185,14 @@ For a complete list of dependencies and their versions, please refer to the `pac
 
 ### GitHub Actions Workflow
 
-The workflow (`tests.yml`) includes optimized job execution with dependency caching:
+Workflows under `.github/workflows/`:
 
-1. **Health Check**: Verifies API availability with 3-minute timeout
-2. **Setup Dependencies**: Caches `node_modules` and Playwright browsers for performance
-3. **Test Execution**: Runs E2E test suite with cached dependencies
-4. **Report Generation**: Creates and validates Allure reports
-5. **Artifact Upload**: Stores test results in S3 with proper error handling
-6. **Notifications**: Slack alerts and PR status updates
+- `e2e.yml`: prepare → test (matrix: `sealion`, `leopard`, `jaguar`) → report
+  - Caching via Node lockfile, Playwright browsers via action
+  - Health check runs before E2E
+  - Artifacts: Allure results, Playwright report JSON, traces/screenshots/videos
+  - Slack: threaded start and final result using Block Kit
+- `daily-digest.yml`: scheduled digest with recent flake summary
 
 ### Performance Optimizations
 

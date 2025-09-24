@@ -1,0 +1,27 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "E2E Tests Started • ${ref}" }
+    },
+    {
+      "type": "context",
+      "elements": [
+        { "type": "mrkdwn", "text": "*Repo:* ${repo}" },
+        { "type": "mrkdwn", "text": "*Workflow:* ${workflow}" },
+        { "type": "mrkdwn", "text": "*Concurrency:* ${concurrency}" }
+      ]
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": { "type": "plain_text", "text": "Run Details" },
+          "url": "${runUrl}"
+        }
+      ]
+    }
+  ]
+}
+

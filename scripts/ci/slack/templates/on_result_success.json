@@ -1,0 +1,20 @@
+{
+  "blocks": [
+    { "type": "header", "text": { "type": "plain_text", "text": "E2E Result • ✅ Passed" } },
+    { "type": "context", "elements": [
+      { "type": "mrkdwn", "text": "*Repo:* ${repo}" },
+      { "type": "mrkdwn", "text": "*Duration:* ${duration}" }
+    ]},
+    { "type": "section", "fields": [
+      { "type": "mrkdwn", "text": "*Passed*\n${passed}" },
+      { "type": "mrkdwn", "text": "*Failed*\n${failed}" },
+      { "type": "mrkdwn", "text": "*Flaky (retried)*\n${flaky}" }
+    ]},
+    { "type": "section", "text": { "type": "mrkdwn", "text": "*Environments*\n${envSummary}" }},
+    { "type": "actions", "elements": [
+      { "type": "button", "text": { "type": "plain_text", "text": "Run Details" }, "url": "${runUrl}" },
+      { "type": "button", "text": { "type": "plain_text", "text": "Artifacts" }, "url": "${artifactsUrl}" }
+    ]}
+  ]
+}
+

@@ -1,0 +1,22 @@
+name: e2e-daily-digest
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post Slack Daily Digest
+        if: ${{ env.SLACK_BOT_TOKEN != '' && env.SLACK_CHANNEL_ID != '' }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          node scripts/ci/slack-post.js --template daily_digest --envBreakdown "- sealion: 95% pass\n- leopard: 92% pass" --flakes "- tests/login.ui.spec.ts (3)\n- tests/checkout.ui.spec.ts (2)"
+

@@ -1,0 +1,26 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "E2E Update • ${ref} • ⏳ Running" }
+    },
+    {
+      "type": "context",
+      "elements": [
+        { "type": "mrkdwn", "text": "*Elapsed:* ${elapsed}m" },
+        { "type": "mrkdwn", "text": "*Retries Started:* ${retriesStarted}" }
+      ]
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": { "type": "plain_text", "text": "Run Details" },
+          "url": "${runUrl}"
+        }
+      ]
+    }
+  ]
+}
+
