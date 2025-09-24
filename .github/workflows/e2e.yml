@@ -1,0 +1,248 @@
+name: e2e
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: cache-pw
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ env.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.cache-pw.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Print Playwright version
+        run: npx playwright --version | cat
+
+  notify_start:
+    name: Notify Start
+    runs-on: ubuntu-latest
+    needs: prepare
+    outputs:
+      slack_thread_ts: ${{ steps.slack.outputs.thread_ts }}
+      slack_channel: ${{ steps.slack.outputs.channel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Post Slack (trigger)
+        id: slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_DEFAULT_CHANNEL: ${{ secrets.SLACK_DEFAULT_CHANNEL }}
+        run: node scripts/ci/slack-post.js --template on_trigger --set-output
+
+  test:
+    name: Test (${{ matrix.env }})
+    needs: [prepare, notify_start]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [sealion, leopard, jaguar]
+    env:
+      DOTENV_CONFIG_PATH: .env.${{ matrix.env }}
+      SLACK_THREAD_TS: ${{ needs.notify_start.outputs.slack_thread_ts }}
+      SLACK_CHANNEL: ${{ needs.notify_start.outputs.slack_channel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies (prefer offline)
+        run: npm ci --prefer-offline
+
+      - name: Restore Playwright browsers cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ env.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Health check
+        id: health
+        run: npx playwright test tests/api/health-check.smoke.spec.ts --project=api --retries=0
+
+      - name: Post Slack (running update)
+        if: always() && steps.health.outcome == 'success'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_DEFAULT_CHANNEL: ${{ secrets.SLACK_DEFAULT_CHANNEL }}
+          SLACK_THREAD_TS: ${{ env.SLACK_THREAD_TS }}
+        run: node scripts/ci/slack-post.js --template on_running_update --env ${{ matrix.env }}
+
+      - name: Run E2E
+        if: steps.health.outcome == 'success'
+        run: npx playwright test --retries=2
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.env }}
+          path: allure-results
+          if-no-files-found: warn
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.env }}
+          path: playwright-report
+          if-no-files-found: warn
+
+  report:
+    name: Report
+    needs: [test, notify_start]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies (for scripts)
+        run: npm ci --prefer-offline
+
+      - name: Download Allure/Reports (sealion)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-sealion
+          path: artifacts/allure-results/sealion
+        continue-on-error: true
+
+      - name: Download Allure/Reports (leopard)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-leopard
+          path: artifacts/allure-results/leopard
+        continue-on-error: true
+
+      - name: Download Allure/Reports (jaguar)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-jaguar
+          path: artifacts/allure-results/jaguar
+        continue-on-error: true
+
+      - name: Download Playwright reports (sealion)
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report-sealion
+          path: artifacts/playwright-report/sealion
+        continue-on-error: true
+
+      - name: Download Playwright reports (leopard)
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report-leopard
+          path: artifacts/playwright-report/leopard
+        continue-on-error: true
+
+      - name: Download Playwright reports (jaguar)
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report-jaguar
+          path: artifacts/playwright-report/jaguar
+        continue-on-error: true
+
+      - name: Generate Allure report
+        timeout-minutes: 5
+        run: |
+          npx allure generate artifacts/allure-results/sealion artifacts/allure-results/leopard artifacts/allure-results/jaguar --clean -o allure-report
+
+      - name: Summarize results
+        timeout-minutes: 3
+        run: |
+          node scripts/ci/summarize-e2e.js --playwright-dir artifacts/playwright-report --allure-dir artifacts/allure-results --out summary.json --history reports/history.json --flakes-json reports/flaky-tests.json --flakes-md reports/flaky-tests.md
+
+      - name: Upload summary and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-summary
+          path: |
+            summary.json
+            reports/flaky-tests.json
+            reports/flaky-tests.md
+            reports/history.json
+            allure-report
+
+      - name: Post Slack (result)
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_DEFAULT_CHANNEL: ${{ secrets.SLACK_DEFAULT_CHANNEL }}
+          SLACK_THREAD_TS: ${{ needs.notify_start.outputs.slack_thread_ts }}
+        run: node scripts/ci/slack-post.js --template $(node -e "const s=require('./summary.json');process.stdout.write(s.overall.status==='passed'?'on_result_success':'on_result_failure')") --input summary.json
+
+  daily_digest:
+    if: github.event_name == 'schedule'
+    name: Daily Digest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Generate daily digest
+        run: |
+          node scripts/ci/summarize-e2e.js --digest --out digest.json
+
+      - name: Post Slack (daily digest)
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_DEFAULT_CHANNEL: ${{ secrets.SLACK_DIGEST_CHANNEL || secrets.SLACK_DEFAULT_CHANNEL }}
+        run: node scripts/ci/slack-post.js --template daily_digest --input digest.json
+
