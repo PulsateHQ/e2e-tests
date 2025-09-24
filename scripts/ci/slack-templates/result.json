@@ -1,0 +1,59 @@
+{
+  "text": "📊 E2E Test Results",
+  "thread_ts": "${{ needs.prepare.outputs.thread-ts }}",
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "📊 E2E Test Results • ${{ needs.aggregate-results.outputs.overall-status == 'success' && '✅ Passed' || '❌ Failed' }}"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "*Repository:* Smokesignals"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Duration:* ${{ needs.test.result != 'skipped' && '~25m' || '~5m' }}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|#${{ github.run_id }}>"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Step Results:*\n🏥 *Health Check:* ${{ contains(needs.health-check.result, 'success') && '✅ Passed' || '❌ Failed' }}\n🧪 *E2E Tests:* ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n📋 *Reports:* ${{ needs.aggregate-results.result == 'success' && '✅ Generated' || '❌ Failed' }}"
+      }
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "Run Details"
+          },
+          "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        },
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "Allure Report"
+          },
+          "url": "${{ needs.aggregate-results.outputs.report-url }}",
+          "style": "primary"
+        }
+      ]
+    }
+  ]
+}

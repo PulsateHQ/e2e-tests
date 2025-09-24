@@ -1,0 +1,80 @@
+{
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "runId": "123456789",
+  "criteria": {
+    "historyDays": 7,
+    "minRuns": 3,
+    "flakyThreshold": 0.2
+  },
+  "flakyTests": [
+    {
+      "title": "should create campaign successfully",
+      "file": "tests/api/campaign.feed.api.spec.ts",
+      "type": "historical",
+      "failureRate": 0.4,
+      "totalRuns": 10,
+      "failures": 4,
+      "passes": 6,
+      "hasIntermittentFailures": true,
+      "hasRecentFailures": true,
+      "avgRetries": 1.2,
+      "severity": "high",
+      "lastSeen": "2025-01-15T09:15:00.000Z",
+      "detectionMethods": ["historical"],
+      "owner": "campaigns-team",
+      "recommendations": [
+        "Review test data setup and cleanup",
+        "Consider breaking into smaller, more focused tests",
+        "Check for external dependencies or async operations"
+      ],
+      "quarantineCandidate": true
+    },
+    {
+      "title": "should login with valid credentials",
+      "file": "tests/ui/login.ui.spec.ts",
+      "type": "immediate",
+      "retryCount": 3,
+      "error": "Timeout 30000ms exceeded waiting for element to be visible",
+      "lastSeen": "2025-01-15T10:30:00.000Z",
+      "detectionMethods": ["immediate"],
+      "owner": "frontend-team",
+      "recommendations": [
+        "Add explicit waits or improve element selectors",
+        "Investigate timing issues and race conditions"
+      ],
+      "quarantineCandidate": false,
+      "severity": "medium"
+    },
+    {
+      "title": "should update user attributes",
+      "file": "tests/api/users.api.spec.ts",
+      "type": "historical",
+      "failureRate": 0.25,
+      "totalRuns": 8,
+      "failures": 2,
+      "passes": 6,
+      "hasIntermittentFailures": false,
+      "hasRecentFailures": false,
+      "avgRetries": 0.5,
+      "severity": "low",
+      "lastSeen": "2025-01-14T15:20:00.000Z",
+      "detectionMethods": ["historical"],
+      "owner": "users-team",
+      "recommendations": [
+        "Review test environment stability"
+      ],
+      "quarantineCandidate": false
+    }
+  ],
+  "summary": {
+    "totalTests": 45,
+    "flakyTests": 3,
+    "flakyRate": 6.7,
+    "quarantineCandidates": 1,
+    "severityBreakdown": {
+      "high": 1,
+      "medium": 1,
+      "low": 1
+    }
+  }
+}
