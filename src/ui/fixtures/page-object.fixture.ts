@@ -6,6 +6,7 @@ import { CampaignStatsPage } from '@_src/ui/pages/campaignStats.page';
 import { CampaignsPage } from '@_src/ui/pages/campaigns.page';
 import { CompanyRegistrationPage } from '@_src/ui/pages/companyRegistration.page';
 import { DashboardPage } from '@_src/ui/pages/dashboard.page';
+import { FeedPage } from '@_src/ui/pages/feed.page';
 import { ForgotPasswordPage } from '@_src/ui/pages/forgotPassword.page';
 import { GeofencesPage } from '@_src/ui/pages/geofences.page';
 import { JourneysPage } from '@_src/ui/pages/journeys.page';
@@ -29,6 +30,7 @@ interface Pages {
   usersPage: UsersPage;
   sideBarComponent: SideBarComponent;
   mainNavigationComponent: MainNavigationComponent;
+  feedPage: FeedPage;
 }
 
 export const pageObjectTest = baseTest.extend<Pages>({
@@ -89,5 +91,9 @@ export const pageObjectTest = baseTest.extend<Pages>({
   accountSettingsPage: async ({ page }, use) => {
     const accountSettingsPage = new AccountSettingsPage(page);
     await use(accountSettingsPage);
+  },
+  feedPage: async ({ page }, use) => {
+    const feedPage = new FeedPage(page);
+    await use(feedPage);
   }
 });

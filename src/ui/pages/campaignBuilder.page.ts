@@ -10,6 +10,7 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   inAppCampaignTile = this.page.getByTestId('in_app');
   inAppLargeLayoutOption = this.page.getByTestId('inapp-large');
+  feedPostTile = this.page.getByTestId('card');
 
   saveAndContinueButton = this.page.getByRole('button', {
     name: 'Save & Continue'
@@ -21,11 +22,15 @@ export class CampaignBuilderPage extends BasePage {
   // Content Section Locators
   // =========================================================================
 
+  mediaSection = this.page.getByText('Media');
   imageSection = this.page.getByText('Image', { exact: true });
   headlineSection = this.page.getByText('Headline', { exact: true });
   textSection = this.page.getByText('Text', { exact: true });
   callToActionSection = this.page.getByText('Call to action');
 
+  mediaToggle = this.page
+    .locator('div:has-text("Media") ~ div .react-switch-bg')
+    .first();
   imageToggle = this.page
     .locator('div:has-text("Image") ~ div .react-switch-bg')
     .first();
@@ -125,6 +130,10 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   async selectInAppCampaignType(): Promise<void> {
     await this.inAppCampaignTile.click();
+  }
+
+  async selectFeedPostCampaignType(): Promise<void> {
+    await this.feedPostTile.click();
   }
 
   async selectInAppLargeLayout(): Promise<void> {
@@ -278,7 +287,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   async toggleSectionSwitch(
-    section: 'Image' | 'Headline' | 'Text'
+    section: 'Image' | 'Headline' | 'Text' | 'Media'
   ): Promise<void> {
     let sectionToggle: Locator;
     switch (section) {
@@ -290,6 +299,9 @@ export class CampaignBuilderPage extends BasePage {
         break;
       case 'Text':
         sectionToggle = this.textToggle;
+        break;
+      case 'Media':
+        sectionToggle = this.mediaToggle;
         break;
     }
     await sectionToggle.click();

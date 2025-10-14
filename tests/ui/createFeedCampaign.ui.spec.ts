@@ -20,7 +20,7 @@ import {
 } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-test.describe('In-App Campaign Creation', () => {
+test.describe('Feed Campaign Creation', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
 
@@ -97,13 +97,14 @@ test.describe('In-App Campaign Creation', () => {
     );
   });
 
-  test('should create a new in-app full-screen campaign with URL button', async ({
+  test('should create a new feed campaign with URL button', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
     segmentsPage,
     dashboardPage,
-    accountSettingsPage
+    accountSettingsPage,
+    feedPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
@@ -126,14 +127,11 @@ test.describe('In-App Campaign Creation', () => {
     // Create new campaign
     await campaignsPage.createNewCampaign();
 
-    // Select In-App campaign type
-    await campaignBuilderPage.selectInAppCampaignType();
-
-    // Select Full-Screen layout
-    await campaignBuilderPage.selectInAppLargeLayout();
+    // Select Feed campaign type
+    await campaignBuilderPage.selectFeedPostCampaignType();
 
     // Create campaign with required details
-    const campaignName = `InApp Large Campaign ${Date.now()}`;
+    const campaignName = `Feed Post Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
     const buttonText = `URL_${faker.lorem.word()}`;
@@ -145,7 +143,7 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignBuilderPage.imageSection).toBeVisible();
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
-    // await expect(campaignsPage.callToActionSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
     // Toggle of Image section
     await campaignBuilderPage.toggleSectionSwitch('Image');
@@ -158,7 +156,7 @@ test.describe('In-App Campaign Creation', () => {
 
     // Configure call to action
     await campaignBuilderPage.openCallToActionSection();
-    await campaignBuilderPage.selectButtonCount(1);
+    // await campaignBuilderPage.selectButtonCount(1);
     await campaignBuilderPage.enterButtonText(buttonText);
     await campaignBuilderPage.selectCTAButtonType('URL');
     await campaignBuilderPage.enterButtonUrl(buttonUrl);
@@ -210,16 +208,19 @@ test.describe('In-App Campaign Creation', () => {
 
     await loginPage.login(loginCredentialsForReceiver);
 
-    await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
+    await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedWithPolling(buttonText, 30_000);
   });
 
-  test('should create a new in-app full-screen campaign with dismiss button', async ({
+  test('should create a new feed campaign with Deeplink', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
     segmentsPage,
     dashboardPage,
-    accountSettingsPage
+    accountSettingsPage,
+    feedPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
@@ -242,17 +243,14 @@ test.describe('In-App Campaign Creation', () => {
     // Create new campaign
     await campaignsPage.createNewCampaign();
 
-    // Select In-App campaign type
-    await campaignBuilderPage.selectInAppCampaignType();
-
-    // Select Full-Screen layout
-    await campaignBuilderPage.selectInAppLargeLayout();
+    // Select Feed campaign type
+    await campaignBuilderPage.selectFeedPostCampaignType();
 
     // Create campaign with required details
-    const campaignName = `InApp Large Campaign ${Date.now()}`;
+    const campaignName = `Feed Post Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
-    const buttonText = `Dismiss_${faker.lorem.word()}`;
+    const buttonText = `URL_${faker.lorem.word()}`;
     const buttonUrl = `https://www.google.com`;
 
     await campaignBuilderPage.enterCampaignName(campaignName);
@@ -261,7 +259,7 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignBuilderPage.imageSection).toBeVisible();
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
-    // await expect(campaignsPage.callToActionSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
     // Toggle of Image section
     await campaignBuilderPage.toggleSectionSwitch('Image');
@@ -274,7 +272,7 @@ test.describe('In-App Campaign Creation', () => {
 
     // Configure call to action
     await campaignBuilderPage.openCallToActionSection();
-    await campaignBuilderPage.selectButtonCount(1);
+    // await campaignBuilderPage.selectButtonCount(1);
     await campaignBuilderPage.enterButtonText(buttonText);
     await campaignBuilderPage.selectCTAButtonType('Dismiss');
     // await campaignBuilderPage.enterButtonUrl(buttonUrl);
@@ -326,6 +324,8 @@ test.describe('In-App Campaign Creation', () => {
 
     await loginPage.login(loginCredentialsForReceiver);
 
-    await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText, 30_000);
+    await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedWithPolling(buttonText, 30_000);
   });
 });
