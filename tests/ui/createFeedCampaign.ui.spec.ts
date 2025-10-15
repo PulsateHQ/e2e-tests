@@ -7,6 +7,10 @@ import {
 } from '@_config/env.config';
 import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import {
+  createDeeplinkWithApiForUi,
+  deleteDeeplinksWithApiForUi
+} from '@_src/api/factories/deeplinks.api.factory';
+import {
   superAdminsActivationCodesCreate,
   superAdminsFeatureFLagDefaultBatchUpdate
 } from '@_src/api/factories/super.admin.api.factory';
@@ -47,6 +51,8 @@ test.describe('Feed Campaign Creation', () => {
   let appIdForCampaignReciver: string;
   let adminUserNameForCampaignReciver: string;
   let adminPasswordForCampaignReciver: string;
+  let deeplinkNickname: string;
+  let deeplinkId: string;
 
   test.beforeEach(async ({ request }) => {
     // Arrange
@@ -220,8 +226,21 @@ test.describe('Feed Campaign Creation', () => {
     segmentsPage,
     dashboardPage,
     accountSettingsPage,
-    feedPage
+    feedPage,
+    request
   }) => {
+    const deeplinkResponse = await createDeeplinkWithApiForUi(
+      request,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      {
+        nickname: `Deeplink_${faker.lorem.word()}`,
+        target: `https://www.${faker.internet.domainName()}`
+      }
+    );
+
+    deeplinkNickname = deeplinkResponse.nickname;
+    deeplinkId = deeplinkResponse.id;
+
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
     // Create segment with required details
@@ -250,8 +269,6 @@ test.describe('Feed Campaign Creation', () => {
     const campaignName = `Feed Post Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
-    const buttonText = `URL_${faker.lorem.word()}`;
-    const buttonUrl = `https://www.google.com`;
 
     await campaignBuilderPage.enterCampaignName(campaignName);
     await campaignBuilderPage.clickSaveAndContinue();
@@ -271,11 +288,10 @@ test.describe('Feed Campaign Creation', () => {
     await campaignBuilderPage.enterText(campaignText);
 
     // Configure call to action
-    await campaignBuilderPage.openCallToActionSection();
-    // await campaignBuilderPage.selectButtonCount(1);
-    await campaignBuilderPage.enterButtonText(buttonText);
-    await campaignBuilderPage.selectCTAButtonType('Dismiss');
-    // await campaignBuilderPage.enterButtonUrl(buttonUrl);
+    await campaignBuilderPage.setupDeeplinkButton(
+      deeplinkNickname,
+      deeplinkNickname
+    );
 
     // Save and continue
     await campaignBuilderPage.clickSaveAndContinue();
@@ -326,6 +342,12 @@ test.describe('Feed Campaign Creation', () => {
 
     await dashboardPage.clickNotificationButton();
 
-    await feedPage.verifyFeedWithPolling(buttonText, 30_000);
+    await feedPage.verifyFeedWithPolling(deeplinkNickname, 30_000);
+
+    await deleteDeeplinksWithApiForUi(
+      request,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      [deeplinkId]
+    );
   });
 });

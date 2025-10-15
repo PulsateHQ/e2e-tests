@@ -81,7 +81,9 @@ export class CampaignBuilderPage extends BasePage {
 
   segmentsSectionLabel = this.page.getByText('segments', { exact: true });
   getSegmentTargetingOption(segmentName: string): Locator {
-    return this.page.getByRole('button', { name: segmentName, exact: true });
+    return this.page
+      .getByRole('button', { name: segmentName, exact: true })
+      .first();
   }
 
   // =========================================================================

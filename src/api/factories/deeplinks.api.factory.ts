@@ -125,3 +125,60 @@ export async function deleteDeeplinksWithApi(
 
   return response;
 }
+
+export async function createDeeplinkWithApiForUi(
+  request: APIRequestContext,
+  authToken: string,
+  payload: DeeplinkPayload
+): Promise<DeeplinkResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  const response = await request.post(apiUrls.deeplinks.ui, {
+    headers,
+    data: JSON.stringify(payload)
+  });
+
+  const responseBody = await response.text();
+  const expectedStatusCode = 201;
+
+  const responseJson = JSON.parse(responseBody);
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+  expect(responseJson).toHaveProperty('id');
+  expect(responseJson).toHaveProperty('nickname', payload.nickname);
+  expect(responseJson).toHaveProperty('target', payload.target);
+  expect(responseJson).toHaveProperty('created_at');
+
+  return responseJson;
+}
+
+export async function deleteDeeplinksWithApiForUi(
+  request: APIRequestContext,
+  authToken: string,
+  deeplinkIds: string[]
+): Promise<APIResponse> {
+  const headers: Headers = {
+    Authorization: `Token token=${authToken}`,
+    Accept: 'application/json'
+  };
+
+  const url = `${apiUrls.deeplinks.ui}/${deeplinkIds}`;
+
+  const response = await request.delete(url, { headers });
+
+  const expectedStatusCode = 200;
+
+  expect(
+    response.status(),
+    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
+  ).toBe(expectedStatusCode);
+
+  return response;
+}

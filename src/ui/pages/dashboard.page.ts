@@ -24,6 +24,16 @@ export class DashboardPage extends BasePage {
     await this.notificationButton.click();
   }
 
+  async clickInAppButton(buttonText: string): Promise<void> {
+    const buttonLocator = this.page.getByRole('button', { name: buttonText });
+    await buttonLocator.click();
+  }
+
+  async clickInAppButtonUrl(buttonText: string): Promise<void> {
+    const buttonLocator = this.page.getByRole('link', { name: buttonText });
+    await buttonLocator.click();
+  }
+
   /**
    * Validates that an in-app headline and text are visible
    * @param expectedHeadline The expected headline text

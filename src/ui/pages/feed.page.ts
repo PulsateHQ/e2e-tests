@@ -16,6 +16,10 @@ export class FeedPage extends BasePage {
     this.sideBar = new SideBarComponent(page);
   }
 
+  async verifyFeedPage(): Promise<void> {
+    await expect(this.page).toHaveURL(/feed/);
+  }
+
   /**
    * Validates that feed with specified text is visible
    * @param buttonText The expected button text
