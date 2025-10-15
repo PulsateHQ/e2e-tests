@@ -5,6 +5,7 @@ import { Page, expect } from '@playwright/test';
 
 export class DashboardPage extends BasePage {
   sideBar: SideBarComponent;
+  notificationButton = this.page.getByRole('link', { name: 'Notifications' });
 
   constructor(page: Page, appId: string = UI_E2E_APP_ID) {
     super(page, appId);
@@ -17,6 +18,20 @@ export class DashboardPage extends BasePage {
 
   async clickSidebarItemDashboard(): Promise<void> {
     await this.sideBar.clickSidebarItemDashboard();
+  }
+
+  async clickNotificationButton(): Promise<void> {
+    await this.notificationButton.click();
+  }
+
+  async clickInAppButton(buttonText: string): Promise<void> {
+    const buttonLocator = this.page.getByRole('button', { name: buttonText });
+    await buttonLocator.click();
+  }
+
+  async clickInAppButtonUrl(buttonText: string): Promise<void> {
+    const buttonLocator = this.page.getByRole('link', { name: buttonText });
+    await buttonLocator.click();
   }
 
   /**
@@ -95,6 +110,31 @@ export class DashboardPage extends BasePage {
           // First check if the button is visible
           const isVisible = await buttonLocator.isVisible();
           return isVisible;
+        },
+        {
+          message: `Button with text "${buttonText}" should be visible`,
+          timeout: timeoutMs
+        }
+      )
+      .toBeTruthy();
+  }
+
+  /**
+   * Validates that an in-app button with specified text is visible
+   * @param buttonText The expected button text
+   * @param timeoutMs Optional timeout in milliseconds (default: 60000)
+   */
+  async verifyInAppDismissButtonWithPolling(
+    buttonText: string,
+    timeoutMs: number = 60000
+  ): Promise<void> {
+    // Use polling to repeatedly check until the button appears or times out
+    await expect
+      .poll(
+        async () => {
+          return await this.page
+            .getByRole('button', { name: buttonText })
+            .isVisible();
         },
         {
           message: `Button with text "${buttonText}" should be visible`,
