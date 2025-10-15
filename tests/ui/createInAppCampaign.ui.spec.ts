@@ -259,7 +259,6 @@ test.describe('In-App Campaign Creation', () => {
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
     const buttonText = `Dismiss_${faker.lorem.word()}`;
-    const buttonUrl = `https://www.google.com`;
 
     await campaignBuilderPage.enterCampaignName(campaignName);
     await campaignBuilderPage.clickSaveAndContinue();
@@ -474,8 +473,8 @@ test.describe('In-App Campaign Creation', () => {
     campaignBuilderPage,
     segmentsPage,
     dashboardPage,
-    accountSettingsPage,
-    feedPage
+    accountSettingsPage
+    // feedPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
 

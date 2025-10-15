@@ -1,7 +1,7 @@
 import { UI_E2E_APP_ID } from '@_config/env.config';
 import { SideBarComponent } from '@_src/ui/components/sideBar.component';
 import { BasePage } from '@_src/ui/pages/base.page';
-import { Locator, Page, expect } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 export class FeedPage extends BasePage {
   url = `/mobile/apps/${UI_E2E_APP_ID}/feed`;
