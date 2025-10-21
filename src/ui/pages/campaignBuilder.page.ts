@@ -2,7 +2,12 @@ import { BasePage } from '@_src/ui/pages/base.page';
 import { Locator, Page } from '@playwright/test';
 
 // Type for CTA (Call to Action) button types
-export type CTAButtonType = 'Deeplink' | 'URL' | 'Open Feed' | 'Dismiss';
+export type CTAButtonType =
+  | 'Deeplink'
+  | 'URL'
+  | 'Open Feed'
+  | 'Dismiss'
+  | 'Feed Post (Back)';
 
 export class CampaignBuilderPage extends BasePage {
   // =========================================================================
@@ -10,6 +15,7 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   inAppCampaignTile = this.page.getByTestId('in_app');
   inAppLargeLayoutOption = this.page.getByTestId('inapp-large');
+  feedPostTile = this.page.getByTestId('card');
 
   saveAndContinueButton = this.page.getByRole('button', {
     name: 'Save & Continue'
@@ -21,11 +27,16 @@ export class CampaignBuilderPage extends BasePage {
   // Content Section Locators
   // =========================================================================
 
+  mediaSection = this.page.getByText('Media');
   imageSection = this.page.getByText('Image', { exact: true });
   headlineSection = this.page.getByText('Headline', { exact: true });
   textSection = this.page.getByText('Text', { exact: true });
+  tableSection = this.page.getByText('Table', { exact: true });
   callToActionSection = this.page.getByText('Call to action');
 
+  mediaToggle = this.page
+    .locator('div:has-text("Media") ~ div .react-switch-bg')
+    .first();
   imageToggle = this.page
     .locator('div:has-text("Image") ~ div .react-switch-bg')
     .first();
@@ -34,6 +45,11 @@ export class CampaignBuilderPage extends BasePage {
     .first();
   textToggle = this.page
     .locator('div:has-text("Text") ~ div .react-switch-bg')
+    .first();
+  tableToggle = this.page
+    .locator(
+      'div[data-testid="collapseDrag"]:has-text("Table") ~ div .react-switch-bg'
+    )
     .first();
 
   headlineInput = this.page.locator('div:nth-child(2) > .collapse > div > div');
@@ -47,7 +63,7 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   buttonCountDropdown = this.page
     .locator('.dropdown-toggle')
-    .filter({ hasText: /1 Button|2 Buttons/ })
+    .filter({ hasText: /1 Button|2 Buttons|Select Button Categories/ })
     .first();
   oneButtonOption = this.page.getByRole('menuitem', { name: '1 Button' });
   twoButtonsOption = this.page.getByRole('menuitem', { name: '2 Buttons' });
@@ -62,6 +78,9 @@ export class CampaignBuilderPage extends BasePage {
   dismissButton = this.page
     .getByTestId('cta-button')
     .filter({ hasText: 'Dismiss' });
+  feedPostBackButton = this.page
+    .getByTestId('cta-button')
+    .filter({ hasText: 'Feed Post (Back)' });
 
   buttonTextInput = this.page.getByRole('textbox', { name: 'Button Text' });
   urlInput = this.page.getByRole('textbox', {
@@ -76,7 +95,9 @@ export class CampaignBuilderPage extends BasePage {
 
   segmentsSectionLabel = this.page.getByText('segments', { exact: true });
   getSegmentTargetingOption(segmentName: string): Locator {
-    return this.page.getByRole('button', { name: segmentName, exact: true });
+    return this.page
+      .getByRole('button', { name: segmentName, exact: true })
+      .first();
   }
 
   // =========================================================================
@@ -125,6 +146,10 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   async selectInAppCampaignType(): Promise<void> {
     await this.inAppCampaignTile.click();
+  }
+
+  async selectFeedPostCampaignType(): Promise<void> {
+    await this.feedPostTile.click();
   }
 
   async selectInAppLargeLayout(): Promise<void> {
@@ -181,6 +206,8 @@ export class CampaignBuilderPage extends BasePage {
         return this.openFeedButton.nth(buttonIndex);
       case 'Dismiss':
         return this.dismissButton.nth(buttonIndex);
+      case 'Feed Post (Back)':
+        return this.feedPostBackButton.nth(buttonIndex);
       default:
         throw new Error(`Unknown CTA button type: ${type}`);
     }
@@ -278,7 +305,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   async toggleSectionSwitch(
-    section: 'Image' | 'Headline' | 'Text'
+    section: 'Image' | 'Headline' | 'Text' | 'Media' | 'Table'
   ): Promise<void> {
     let sectionToggle: Locator;
     switch (section) {
@@ -290,6 +317,12 @@ export class CampaignBuilderPage extends BasePage {
         break;
       case 'Text':
         sectionToggle = this.textToggle;
+        break;
+      case 'Media':
+        sectionToggle = this.mediaToggle;
+        break;
+      case 'Table':
+        sectionToggle = this.tableToggle;
         break;
     }
     await sectionToggle.click();
