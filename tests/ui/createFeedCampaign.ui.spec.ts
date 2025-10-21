@@ -358,8 +358,7 @@ test.describe('Feed Campaign Creation', () => {
     segmentsPage,
     dashboardPage,
     accountSettingsPage,
-    feedPage,
-    request
+    feedPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
@@ -498,8 +497,7 @@ test.describe('Feed Campaign Creation', () => {
     segmentsPage,
     dashboardPage,
     accountSettingsPage,
-    feedPage,
-    request
+    feedPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
