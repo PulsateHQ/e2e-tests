@@ -350,4 +350,447 @@ test.describe('Feed Campaign Creation', () => {
       [deeplinkId]
     );
   });
+
+  test('should create a new feed campaign with feed post (back) and a dismiss button', async ({
+    loginPage,
+    campaignsPage,
+    campaignBuilderPage,
+    segmentsPage,
+    dashboardPage,
+    accountSettingsPage,
+    feedPage,
+    request
+  }) => {
+    await loginPage.login(E2EAdminLoginCredentialsModel);
+
+    // Create segment with required details
+    const segmentName = `Segment_${faker.lorem.word()}`;
+    const aliasValue = `${adminAliasForCampaignReciver}`;
+
+    // Navigate to Targeting section
+    await segmentsPage.clickSidebarCategoryTargeting();
+
+    // Navigate to Segments section
+    await segmentsPage.clickSidebarItemSegments();
+
+    // Create new segment
+    await segmentsPage.createSegmentWithAlias(aliasValue, segmentName);
+
+    // Navigate to campaigns section
+    await campaignsPage.navigateToCampaignsSection();
+
+    // Create new campaign
+    await campaignsPage.createNewCampaign();
+
+    // Select Feed campaign type
+    await campaignBuilderPage.selectFeedPostCampaignType();
+
+    // Create campaign with required details
+    const campaignName = `Feed Post Campaign ${Date.now()}`;
+    const campaignHeadline = `Headline_${faker.lorem.word()}`;
+    const campaignText = `Text_${faker.lorem.word()}`;
+    const buttonText = `Open Feed_${faker.lorem.word()}`;
+
+    await campaignBuilderPage.enterCampaignName(campaignName);
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
+
+    // Toggle of Image section
+    await campaignBuilderPage.toggleSectionSwitch('Image');
+
+    // Enter Headline and Text
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
+
+    // Configure call to action
+    await campaignBuilderPage.openCallToActionSection();
+    // await campaignBuilderPage.selectButtonCount(1);
+    await campaignBuilderPage.enterButtonText(buttonText);
+    await campaignBuilderPage.selectCTAButtonType('Feed Post (Back)');
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.tableSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
+
+    // Configure Feed Post (Back) button
+    await campaignBuilderPage.toggleSectionSwitch('Image');
+    await campaignBuilderPage.toggleSectionSwitch('Table');
+
+    // Enter Headline and Text for Feed Post (Back)
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
+
+    // Configure call to action for Feed Post (Back)
+    await campaignBuilderPage.openCallToActionSection();
+    await campaignBuilderPage.selectButtonCount(1);
+    await campaignBuilderPage.enterButtonText(buttonText);
+    await campaignBuilderPage.selectCTAButtonType('Dismiss');
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Target Segment
+    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
+
+    await campaignBuilderPage.selectTargetSegment(segmentName);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Delivery Settings
+    await expect(campaignBuilderPage.deliverStepHeading).toBeVisible();
+
+    await campaignBuilderPage.configureDeliverySettings();
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Review
+    await expect(campaignBuilderPage.notificationStepHeading).toBeVisible();
+
+    // Send Campaign
+    await campaignBuilderPage.sendCampaign();
+
+    // Verify that new campaign button is visible
+    await expect(campaignsPage.newCampaignButton).toBeVisible();
+
+    // Verify campaign is created
+    await campaignsPage.verifyCampaignIsCreated(campaignName);
+
+    // Verify campaign status using polling for more reliability
+    await campaignsPage.verifyCampaignStatusWithPolling(
+      campaignName,
+      'Delivered',
+      60_000
+    );
+
+    await accountSettingsPage.signOut();
+
+    const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
+      userEmail: adminUserNameForCampaignReciver,
+      userPassword: adminPasswordForCampaignReciver
+    };
+
+    await loginPage.login(loginCredentialsForReceiver);
+
+    await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedButtonWithPolling(buttonText, 30_000);
+  });
+
+  test('should create a new feed campaign with feed post (back) and a URL button', async ({
+    loginPage,
+    campaignsPage,
+    campaignBuilderPage,
+    segmentsPage,
+    dashboardPage,
+    accountSettingsPage,
+    feedPage,
+    request
+  }) => {
+    await loginPage.login(E2EAdminLoginCredentialsModel);
+
+    // Create segment with required details
+    const segmentName = `Segment_${faker.lorem.word()}`;
+    const aliasValue = `${adminAliasForCampaignReciver}`;
+
+    // Navigate to Targeting section
+    await segmentsPage.clickSidebarCategoryTargeting();
+
+    // Navigate to Segments section
+    await segmentsPage.clickSidebarItemSegments();
+
+    // Create new segment
+    await segmentsPage.createSegmentWithAlias(aliasValue, segmentName);
+
+    // Navigate to campaigns section
+    await campaignsPage.navigateToCampaignsSection();
+
+    // Create new campaign
+    await campaignsPage.createNewCampaign();
+
+    // Select Feed campaign type
+    await campaignBuilderPage.selectFeedPostCampaignType();
+
+    // Create campaign with required details
+    const campaignName = `Feed Post Campaign ${Date.now()}`;
+    const campaignHeadline = `Headline_${faker.lorem.word()}`;
+    const campaignText = `Text_${faker.lorem.word()}`;
+    const buttonText = `URL_${faker.lorem.word()}`;
+    const buttonUrl = `https://www.google.com`;
+
+    await campaignBuilderPage.enterCampaignName(campaignName);
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
+
+    // Toggle of Image section
+    await campaignBuilderPage.toggleSectionSwitch('Image');
+
+    // Enter Headline and Text
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
+
+    // Configure call to action
+    await campaignBuilderPage.openCallToActionSection();
+    // await campaignBuilderPage.selectButtonCount(1);
+    await campaignBuilderPage.enterButtonText(buttonText);
+    await campaignBuilderPage.selectCTAButtonType('Feed Post (Back)');
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.tableSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
+
+    // Configure Feed Post (Back) button
+    await campaignBuilderPage.toggleSectionSwitch('Image');
+    await campaignBuilderPage.toggleSectionSwitch('Table');
+
+    // Enter Headline and Text for Feed Post (Back)
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
+
+    // Configure call to action for Feed Post (Back)
+    await campaignBuilderPage.openCallToActionSection();
+    await campaignBuilderPage.selectButtonCount(1);
+    await campaignBuilderPage.enterButtonText(buttonText);
+    await campaignBuilderPage.selectCTAButtonType('URL');
+    await campaignBuilderPage.enterButtonUrl(buttonUrl);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Target Segment
+    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
+
+    await campaignBuilderPage.selectTargetSegment(segmentName);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Delivery Settings
+    await expect(campaignBuilderPage.deliverStepHeading).toBeVisible();
+
+    await campaignBuilderPage.configureDeliverySettings();
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Review
+    await expect(campaignBuilderPage.notificationStepHeading).toBeVisible();
+
+    // Send Campaign
+    await campaignBuilderPage.sendCampaign();
+
+    // Verify that new campaign button is visible
+    await expect(campaignsPage.newCampaignButton).toBeVisible();
+
+    // Verify campaign is created
+    await campaignsPage.verifyCampaignIsCreated(campaignName);
+
+    // Verify campaign status using polling for more reliability
+    await campaignsPage.verifyCampaignStatusWithPolling(
+      campaignName,
+      'Delivered',
+      60_000
+    );
+
+    await accountSettingsPage.signOut();
+
+    const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
+      userEmail: adminUserNameForCampaignReciver,
+      userPassword: adminPasswordForCampaignReciver
+    };
+
+    await loginPage.login(loginCredentialsForReceiver);
+
+    await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedButtonWithPolling(buttonText, 30_000);
+  });
+
+  test('should create a new feed campaign with feed post (back) and a Deeplink', async ({
+    loginPage,
+    campaignsPage,
+    campaignBuilderPage,
+    segmentsPage,
+    dashboardPage,
+    accountSettingsPage,
+    feedPage,
+    request
+  }) => {
+    const deeplinkResponse = await createDeeplinkWithApiForUi(
+      request,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      {
+        nickname: `Deeplink_${faker.lorem.word()}`,
+        target: `https://www.${faker.internet.domainName()}`
+      }
+    );
+
+    deeplinkNickname = deeplinkResponse.nickname;
+    deeplinkId = deeplinkResponse.id;
+    await loginPage.login(E2EAdminLoginCredentialsModel);
+
+    // Create segment with required details
+    const segmentName = `Segment_${faker.lorem.word()}`;
+    const aliasValue = `${adminAliasForCampaignReciver}`;
+
+    // Navigate to Targeting section
+    await segmentsPage.clickSidebarCategoryTargeting();
+
+    // Navigate to Segments section
+    await segmentsPage.clickSidebarItemSegments();
+
+    // Create new segment
+    await segmentsPage.createSegmentWithAlias(aliasValue, segmentName);
+
+    // Navigate to campaigns section
+    await campaignsPage.navigateToCampaignsSection();
+
+    // Create new campaign
+    await campaignsPage.createNewCampaign();
+
+    // Select Feed campaign type
+    await campaignBuilderPage.selectFeedPostCampaignType();
+
+    // Create campaign with required details
+    const campaignName = `Feed Post Campaign ${Date.now()}`;
+    const campaignHeadline = `Headline_${faker.lorem.word()}`;
+    const campaignText = `Text_${faker.lorem.word()}`;
+
+    await campaignBuilderPage.enterCampaignName(campaignName);
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
+
+    // Toggle of Image section
+    await campaignBuilderPage.toggleSectionSwitch('Image');
+
+    // Enter Headline and Text
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
+
+    // Configure call to action
+    await campaignBuilderPage.openCallToActionSection();
+    // await campaignBuilderPage.selectButtonCount(1);
+    await campaignBuilderPage.enterButtonText(deeplinkNickname);
+    await campaignBuilderPage.selectCTAButtonType('Feed Post (Back)');
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.tableSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
+
+    // Configure Feed Post (Back) button
+    await campaignBuilderPage.toggleSectionSwitch('Image');
+    await campaignBuilderPage.toggleSectionSwitch('Table');
+
+    // Enter Headline and Text for Feed Post (Back)
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
+
+    // Configure call to action for Feed Post (Back)
+    await campaignBuilderPage.openCallToActionSection();
+    await campaignBuilderPage.selectButtonCount(1);
+    await campaignBuilderPage.enterButtonText(deeplinkNickname);
+
+    await campaignBuilderPage.setupDeeplinkButton(
+      deeplinkNickname,
+      deeplinkNickname
+    );
+    // await campaignBuilderPage.enterButtonUrl(buttonUrl);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Target Segment
+    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
+
+    await campaignBuilderPage.selectTargetSegment(segmentName);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Delivery Settings
+    await expect(campaignBuilderPage.deliverStepHeading).toBeVisible();
+
+    await campaignBuilderPage.configureDeliverySettings();
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Review
+    await expect(campaignBuilderPage.notificationStepHeading).toBeVisible();
+
+    // Send Campaign
+    await campaignBuilderPage.sendCampaign();
+
+    // Verify that new campaign button is visible
+    await expect(campaignsPage.newCampaignButton).toBeVisible();
+
+    // Verify campaign is created
+    await campaignsPage.verifyCampaignIsCreated(campaignName);
+
+    // Verify campaign status using polling for more reliability
+    await campaignsPage.verifyCampaignStatusWithPolling(
+      campaignName,
+      'Delivered',
+      60_000
+    );
+
+    await accountSettingsPage.signOut();
+
+    const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
+      userEmail: adminUserNameForCampaignReciver,
+      userPassword: adminPasswordForCampaignReciver
+    };
+
+    await loginPage.login(loginCredentialsForReceiver);
+
+    await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedButtonWithPolling(deeplinkNickname, 30_000);
+
+    await deleteDeeplinksWithApiForUi(
+      request,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      [deeplinkId]
+    );
+  });
 });
