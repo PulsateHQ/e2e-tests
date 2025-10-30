@@ -8,7 +8,7 @@ This project contains end-to-end tests for the CMS project, implemented using Pl
 - **UI Testing**: User interface testing for web applications
 - **Health Check Monitoring**: Automated health check smoke tests to ensure API availability
 - **Test Data Management**: Sophisticated test data generation with faker.js for realistic testing scenarios
-- **Reporting**: Allure reports for detailed test results and analytics
+- **Reporting**: Playwright HTML reports for detailed test results
 - **CI/CD Integration**: GitHub Actions workflow with Slack notifications and PR status updates
 
 ## Health Check Smoke Tests
@@ -47,8 +47,7 @@ The health check endpoint verifies connectivity to critical backend services:
 1. **Health Check Job**: Runs first to verify API availability (3-minute timeout)
 2. **Setup Dependencies**: Caches and installs dependencies (only runs if health check passes)
 3. **Test Execution**: Main E2E test suite
-4. **Reports**: Allure report generation and S3 upload
-5. **Notifications**: Slack alerts and PR status updates
+4. **Notifications**: Slack alerts (failures only) and PR status updates
 
 ### Failure Handling
 
@@ -146,12 +145,10 @@ Replace `https://your-target-url.com` with the URL you want to test.
 
 - **dotenv**: v16.4.5 - Environment variable management
 - **@faker-js/faker**: Test data generation
-- **Allure**: Test reporting and analytics
 
 ### CI/CD Dependencies
 
 - **GitHub Actions**: Workflow automation
-- **AWS CLI**: S3 bucket operations for report storage
 - **Slack Integration**: Notification system
 
 For a complete list of dependencies and their versions, please refer to the `package.json` file.
@@ -190,9 +187,8 @@ The workflow (`tests.yml`) includes optimized job execution with dependency cach
 1. **Health Check**: Verifies API availability with 3-minute timeout
 2. **Setup Dependencies**: Caches `node_modules` and Playwright browsers for performance
 3. **Test Execution**: Runs E2E test suite with cached dependencies
-4. **Report Generation**: Creates and validates Allure reports
-5. **Artifact Upload**: Stores test results in S3 with proper error handling
-6. **Notifications**: Slack alerts and PR status updates
+4. **Artifact Upload**: Stores test results as GitHub artifacts
+5. **Notifications**: Slack alerts (failures only) and PR status updates
 
 ### Performance Optimizations
 
@@ -204,11 +200,11 @@ The workflow (`tests.yml`) includes optimized job execution with dependency cach
 
 ### Slack Notifications
 
+- **Failure-Only Alerts**: Notifications sent only when health checks or tests fail (reduced noise)
 - **Health Check Failures**: Immediate alerts with detailed failure information
-- **Test Results Summary**: Comprehensive status including health check and E2E test results
-- **Rich Information**: Links to GitHub Actions run, Allure reports, and PR details
+- **Test Failures**: Alerts include environment, failure details, and links to GitHub Actions run
 - **Status Indicators**: Clear visual indicators (✅ Passed, ❌ Failed, ⏭️ Skipped)
-- **Environment Context**: Includes environment information and PR details
+- **Environment Context**: Includes environment information and commit details
 
 ### PR Status Updates
 
@@ -218,24 +214,22 @@ The workflow (`tests.yml`) includes optimized job execution with dependency cach
 
 ## Reporting
 
-### Allure Reports
+### Playwright HTML Reports
 
-- **Location**: S3 bucket with CloudFront distribution for fast global access
+- **Location**: GitHub Actions artifacts (downloadable from workflow runs)
 - **Features**:
-  - Test execution history and trends
-  - Environment details and configuration
-  - Detailed failure analysis with screenshots
-  - Performance metrics and timing information
-  - Test categorization and filtering
-- **Access**: Available via web interface with proper authentication
-- **Automatic Generation**: Reports are automatically generated and uploaded after each test run
-- **History Preservation**: Previous test history is maintained for trend analysis
+  - Detailed test execution results
+  - Screenshots and videos for failed tests
+  - Trace files for debugging
+  - Step-by-step test execution logs
+- **Access**: Download artifacts from GitHub Actions workflow run page
+- **Automatic Generation**: Reports are automatically generated after each test run
 
 ### Test Results
 
 - **Artifacts**: Stored in GitHub Actions artifacts
-- **Reports**: Allure HTML reports
-- **Logs**: Detailed test execution logs
+- **Reports**: Playwright HTML reports
+- **Logs**: Detailed test execution logs with screenshots and videos
 
 ## Contributing
 
@@ -314,7 +308,7 @@ The workflow (`tests.yml`) includes optimized job execution with dependency cach
 
 - **Local Development**: Enable Playwright debug mode: `PWDEBUG=1 npx playwright test`
 - **CI/CD Debugging**: Check detailed logs in GitHub Actions workflow runs
-- **Test Analysis**: Review Allure reports for detailed failure information and trends
+- **Test Analysis**: Review Playwright HTML reports (download from GitHub Actions artifacts)
 - **Browser Debugging**: Use browser developer tools for UI test debugging
 - **Health Check**: Run health check tests locally to verify API connectivity
 - **Dependency Issues**: Check Playwright installation and browser availability
