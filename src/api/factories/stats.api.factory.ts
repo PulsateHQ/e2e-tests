@@ -49,7 +49,9 @@ export async function getCardCampaignStatsWithApi(
   authToken: string,
   campaignId: string,
   expectedSend: number,
-  expectedCardButtonClick?: number
+  expectedCardButtonClick?: number,
+  expectedFrontImpression?: number,
+  expectedFrontButtonClickOne?: number
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -78,6 +80,18 @@ export async function getCardCampaignStatsWithApi(
       expect(responseJson.card.clicks).toHaveProperty(
         'total_uniq',
         expectedCardButtonClick
+      );
+    }
+    if (expectedFrontImpression !== undefined) {
+      expect(responseJson.card.front.front_impression).toHaveProperty(
+        'total_uniq',
+        expectedFrontImpression
+      );
+    }
+    if (expectedFrontButtonClickOne !== undefined) {
+      expect(responseJson.card.front.front_button_click_one).toHaveProperty(
+        'total_uniq',
+        expectedFrontButtonClickOne
       );
     }
   }).toPass({ timeout: 60_000 });

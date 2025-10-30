@@ -239,6 +239,9 @@ test.describe('HTML Feed Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
+      1,
+      1,
+      1,
       1
     );
 
@@ -255,16 +258,6 @@ test.describe('HTML Feed Campaign', () => {
       'total_uniq',
       1
     );
-    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
-      'total_uniq',
-      1
-    );
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
   });
 
   test('should create an HTML Feed campaign with a Deeplink button and click it', async ({

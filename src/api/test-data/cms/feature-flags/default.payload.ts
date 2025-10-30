@@ -19,6 +19,7 @@ export const featureFlagsDefault = (): FeatureFlagsRequest => ({
         ff_external_goal_file_upload_section: false,
         ff_excluded_from_cron_jobs: false,
         ff_change_notification_button_colors: true,
+        ff_branding: true,
         ff_notifications_extra_buttons_enabled: true,
         ff_q2_in_app: false,
         ff_campaigns_goals: false,

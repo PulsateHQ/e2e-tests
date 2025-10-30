@@ -22,6 +22,7 @@ export interface Flags {
   ff_external_goal_file_upload_section: boolean;
   ff_excluded_from_cron_jobs: boolean;
   ff_change_notification_button_colors: boolean;
+  ff_branding: boolean;
   ff_notifications_extra_buttons_enabled: boolean;
   ff_q2_in_app: boolean;
   ff_campaigns_goals: boolean;
