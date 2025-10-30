@@ -271,7 +271,7 @@ export async function updateSegmentWithApi(
   expect(responseJson).toHaveProperty('name', payload.name);
   expect(responseJson).toHaveProperty('groups');
   expect(responseJson).toHaveProperty('id');
-  expect(responseJson).toHaveProperty('users_count');
+  expect(responseJson).toHaveProperty('cached_users_count');
 
   return response;
 }
@@ -305,7 +305,7 @@ export async function duplicateSegmentWithApi(
   expect(responseJson).toHaveProperty('name');
   expect(responseJson).toHaveProperty('groups');
   expect(responseJson).toHaveProperty('id');
-  expect(responseJson).toHaveProperty('users_count');
+  expect(responseJson).toHaveProperty('cached_users_count');
 
   return response;
 }
