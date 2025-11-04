@@ -39,7 +39,7 @@ export async function getInAppCampaignStatsWithApi(
         expectedInAppButtonClick
       );
     }
-  }).toPass({ timeout: 60_000 });
+  }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;
 }
@@ -94,7 +94,7 @@ export async function getCardCampaignStatsWithApi(
         expectedFrontButtonClickOne
       );
     }
-  }).toPass({ timeout: 60_000 });
+  }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;
 }
@@ -142,7 +142,7 @@ export async function getInAppCardCampaignStatsWithApi(
         expectedCardButtonClick
       );
     }
-  }).toPass({ timeout: 60_000 });
+  }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;
 }
@@ -197,7 +197,7 @@ export async function getCampaignBackCardStatsWithApi(
         expectedBackButtonClicksTwo
       );
     }
-  }).toPass({ timeout: 60_000 });
+  }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;
 }
