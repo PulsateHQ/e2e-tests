@@ -470,6 +470,9 @@ test.describe('HTML Feed Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
+      1,
+      1,
+      1,
       1
     );
 
@@ -490,12 +493,7 @@ test.describe('HTML Feed Campaign', () => {
       'total_uniq',
       1
     );
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: front_impression and front_button_click_one are now validated in the factory with retry logic
   });
 
   test('should create HTML Feed campaign with expiration one hour time, verify Back Feed button visibility, and validate dismiss functionality', async ({
@@ -1741,6 +1739,9 @@ test.describe('HTML Feed Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createFirstCampaignResponseJson.id,
+      1,
+      1,
+      1,
       1
     );
 
@@ -1761,11 +1762,6 @@ test.describe('HTML Feed Campaign', () => {
       'total_uniq',
       1
     );
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: front_impression and front_button_click_one are now validated in the factory with retry logic
   });
 });
