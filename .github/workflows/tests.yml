@@ -242,22 +242,23 @@ jobs:
           script: |
             try {
               // Determine overall status based on health check and test results
+              const environment = '${{ github.event.client_payload.environment }}';
               const healthCheckPassed = '${{ needs.health-check.result }}' === 'success';
               const testsPassed = '${{ needs.test.result }}' === 'success';
               const testsSkipped = '${{ needs.test.result }}' === 'skipped';
               
               let state = 'success';
-              let description = 'All checks passed';
+              let description = `All checks passed (${environment})`;
               
               if (!healthCheckPassed) {
                 state = 'failure';
-                description = 'Health check failed';
+                description = `Health check failed (${environment})`;
               } else if (testsSkipped) {
                 state = 'success';
-                description = 'Health check passed, tests skipped';
+                description = `Health check passed, tests skipped (${environment})`;
               } else if (!testsPassed) {
                 state = 'failure';
-                description = 'E2E tests failed';
+                description = `E2E tests failed (${environment})`;
               }
               
               await github.rest.repos.createCommitStatus({
@@ -266,7 +267,7 @@ jobs:
                 sha: '${{ github.event.client_payload.commit_sha }}',
                 state: state,
                 description: description,
-                context: 'e2e-tests/${{ github.event.client_payload.environment }}'
+                context: 'e2e-tests/pr-gate'
               });
             } catch (error) {
               core.setFailed(`Failed to update commit status: ${error.message}`);
