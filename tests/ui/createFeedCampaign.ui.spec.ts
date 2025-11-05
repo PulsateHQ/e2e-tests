@@ -24,7 +24,7 @@ import {
 } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-test.describe('In-App Campaign Creation', () => {
+test.describe('Feed Campaign Creation', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
 
@@ -103,13 +103,14 @@ test.describe('In-App Campaign Creation', () => {
     );
   });
 
-  test('should create a new in-app full-screen campaign with URL button', async ({
+  test('should create a new feed campaign with URL button', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
     segmentsPage,
     dashboardPage,
-    accountSettingsPage
+    accountSettingsPage,
+    feedPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
@@ -132,14 +133,11 @@ test.describe('In-App Campaign Creation', () => {
     // Create new campaign
     await campaignsPage.createNewCampaign();
 
-    // Select In-App campaign type
-    await campaignBuilderPage.selectInAppCampaignType();
-
-    // Select Full-Screen layout
-    await campaignBuilderPage.selectInAppLargeLayout();
+    // Select Feed campaign type
+    await campaignBuilderPage.selectFeedPostCampaignType();
 
     // Create campaign with required details
-    const campaignName = `InApp Large Campaign ${Date.now()}`;
+    const campaignName = `Feed Post Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
     const buttonText = `URL_${faker.lorem.word()}`;
@@ -151,7 +149,7 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignBuilderPage.imageSection).toBeVisible();
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
-    // await expect(campaignsPage.callToActionSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
     // Toggle of Image section
     await campaignBuilderPage.toggleSectionSwitch('Image');
@@ -164,7 +162,7 @@ test.describe('In-App Campaign Creation', () => {
 
     // Configure call to action
     await campaignBuilderPage.openCallToActionSection();
-    await campaignBuilderPage.selectButtonCount(1);
+    // await campaignBuilderPage.selectButtonCount(1);
     await campaignBuilderPage.enterButtonText(buttonText);
     await campaignBuilderPage.selectCTAButtonType('URL');
     await campaignBuilderPage.enterButtonUrl(buttonUrl);
@@ -216,129 +214,19 @@ test.describe('In-App Campaign Creation', () => {
 
     await loginPage.login(loginCredentialsForReceiver);
 
-    await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
+    await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedWithPolling(buttonText, 30_000);
   });
 
-  test('should create a new in-app full-screen campaign with dismiss button', async ({
-    loginPage,
-    campaignsPage,
-    campaignBuilderPage,
-    segmentsPage,
-    dashboardPage,
-    accountSettingsPage
-  }) => {
-    await loginPage.login(E2EAdminLoginCredentialsModel);
-
-    // Create segment with required details
-    const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
-
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
-
-    // Navigate to Segments section
-    await segmentsPage.clickSidebarItemSegments();
-
-    // Create new segment
-    await segmentsPage.createSegmentWithAlias(aliasValue, segmentName);
-
-    // Navigate to campaigns section
-    await campaignsPage.navigateToCampaignsSection();
-
-    // Create new campaign
-    await campaignsPage.createNewCampaign();
-
-    // Select In-App campaign type
-    await campaignBuilderPage.selectInAppCampaignType();
-
-    // Select Full-Screen layout
-    await campaignBuilderPage.selectInAppLargeLayout();
-
-    // Create campaign with required details
-    const campaignName = `InApp Large Campaign ${Date.now()}`;
-    const campaignHeadline = `Headline_${faker.lorem.word()}`;
-    const campaignText = `Text_${faker.lorem.word()}`;
-    const buttonText = `Dismiss_${faker.lorem.word()}`;
-
-    await campaignBuilderPage.enterCampaignName(campaignName);
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    await expect(campaignBuilderPage.imageSection).toBeVisible();
-    await expect(campaignBuilderPage.headlineSection).toBeVisible();
-    await expect(campaignBuilderPage.textSection).toBeVisible();
-
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
-
-    // Enter Headline and Text
-    await campaignBuilderPage.expandCollapseSection('Headline');
-    await campaignBuilderPage.enterHeadline(campaignHeadline);
-    await campaignBuilderPage.expandCollapseSection('Text');
-    await campaignBuilderPage.enterText(campaignText);
-
-    // Configure call to action
-    await campaignBuilderPage.openCallToActionSection();
-    await campaignBuilderPage.selectButtonCount(1);
-    await campaignBuilderPage.enterButtonText(buttonText);
-    await campaignBuilderPage.selectCTAButtonType('Dismiss');
-
-    // Save and continue
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    // Select Target Segment
-    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
-
-    await campaignBuilderPage.selectTargetSegment(segmentName);
-
-    // Save and continue
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    // Select Delivery Settings
-    await expect(campaignBuilderPage.deliverStepHeading).toBeVisible();
-
-    await campaignBuilderPage.configureDeliverySettings();
-
-    // Save and continue
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    // Select Review
-    await expect(campaignBuilderPage.notificationStepHeading).toBeVisible();
-
-    // Send Campaign
-    await campaignBuilderPage.sendCampaign();
-
-    // Verify that new campaign button is visible
-    await expect(campaignsPage.newCampaignButton).toBeVisible();
-
-    // Verify campaign is created
-    await campaignsPage.verifyCampaignIsCreated(campaignName);
-
-    // Verify campaign status using polling for more reliability
-    await campaignsPage.verifyCampaignStatusWithPolling(
-      campaignName,
-      'Delivered',
-      60_000
-    );
-
-    await accountSettingsPage.signOut();
-
-    const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
-    };
-
-    await loginPage.login(loginCredentialsForReceiver);
-
-    await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText, 30_000);
-  });
-
-  test('should create a new in-app full-screen campaign with deeeplink', async ({
+  test('should create a new feed campaign with Deeplink', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
     segmentsPage,
     dashboardPage,
     accountSettingsPage,
+    feedPage,
     request
   }) => {
     const deeplinkResponse = await createDeeplinkWithApiForUi(
@@ -374,17 +262,13 @@ test.describe('In-App Campaign Creation', () => {
     // Create new campaign
     await campaignsPage.createNewCampaign();
 
-    // Select In-App campaign type
-    await campaignBuilderPage.selectInAppCampaignType();
-
-    // Select Full-Screen layout
-    await campaignBuilderPage.selectInAppLargeLayout();
+    // Select Feed campaign type
+    await campaignBuilderPage.selectFeedPostCampaignType();
 
     // Create campaign with required details
-    const campaignName = `InApp Large Campaign ${Date.now()}`;
+    const campaignName = `Feed Post Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
-    // const buttonText = deeplinkNickname;
 
     await campaignBuilderPage.enterCampaignName(campaignName);
     await campaignBuilderPage.clickSaveAndContinue();
@@ -392,6 +276,7 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignBuilderPage.imageSection).toBeVisible();
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
     // Toggle of Image section
     await campaignBuilderPage.toggleSectionSwitch('Image');
@@ -455,134 +340,14 @@ test.describe('In-App Campaign Creation', () => {
 
     await loginPage.login(loginCredentialsForReceiver);
 
-    await dashboardPage.verifyInAppButtonUrlWithPolling(
-      deeplinkNickname,
-      30_000
-    );
+    await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedWithPolling(deeplinkNickname, 30_000);
 
     await deleteDeeplinksWithApiForUi(
       request,
       E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       [deeplinkId]
     );
-  });
-
-  test('should create a new in-app full-screen campaign with feed', async ({
-    loginPage,
-    campaignsPage,
-    campaignBuilderPage,
-    segmentsPage,
-    dashboardPage,
-    accountSettingsPage
-    // feedPage
-  }) => {
-    await loginPage.login(E2EAdminLoginCredentialsModel);
-
-    // Create segment with required details
-    const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
-
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
-
-    // Navigate to Segments section
-    await segmentsPage.clickSidebarItemSegments();
-
-    // Create new segment
-    await segmentsPage.createSegmentWithAlias(aliasValue, segmentName);
-
-    // Navigate to campaigns section
-    await campaignsPage.navigateToCampaignsSection();
-
-    // Create new campaign
-    await campaignsPage.createNewCampaign();
-
-    // Select In-App campaign type
-    await campaignBuilderPage.selectInAppCampaignType();
-
-    // Select Full-Screen layout
-    await campaignBuilderPage.selectInAppLargeLayout();
-
-    // Create campaign with required details
-    const campaignName = `InApp Large Campaign ${Date.now()}`;
-    const campaignHeadline = `Headline_${faker.lorem.word()}`;
-    const campaignText = `Text_${faker.lorem.word()}`;
-    const buttonText = `Feed_${faker.lorem.word()}`;
-
-    await campaignBuilderPage.enterCampaignName(campaignName);
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    await expect(campaignBuilderPage.imageSection).toBeVisible();
-    await expect(campaignBuilderPage.headlineSection).toBeVisible();
-    await expect(campaignBuilderPage.textSection).toBeVisible();
-    // await expect(campaignsPage.callToActionSection).toBeVisible();
-
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
-
-    // Enter Headline and Text
-    await campaignBuilderPage.expandCollapseSection('Headline');
-    await campaignBuilderPage.enterHeadline(campaignHeadline);
-    await campaignBuilderPage.expandCollapseSection('Text');
-    await campaignBuilderPage.enterText(campaignText);
-
-    // Configure call to action
-    await campaignBuilderPage.openCallToActionSection();
-    await campaignBuilderPage.selectButtonCount(1);
-    await campaignBuilderPage.enterButtonText(buttonText);
-    await campaignBuilderPage.selectCTAButtonType('Open Feed');
-
-    // Save and continue
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    // Select Target Segment
-    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
-
-    await campaignBuilderPage.selectTargetSegment(segmentName);
-
-    // Save and continue
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    // Select Delivery Settings
-    await expect(campaignBuilderPage.deliverStepHeading).toBeVisible();
-
-    await campaignBuilderPage.configureDeliverySettings();
-
-    // Save and continue
-    await campaignBuilderPage.clickSaveAndContinue();
-
-    // Select Review
-    await expect(campaignBuilderPage.notificationStepHeading).toBeVisible();
-
-    // Send Campaign
-    await campaignBuilderPage.sendCampaign();
-
-    // Verify that new campaign button is visible
-    await expect(campaignsPage.newCampaignButton).toBeVisible();
-
-    // Verify campaign is created
-    await campaignsPage.verifyCampaignIsCreated(campaignName);
-
-    // Verify campaign status using polling for more reliability
-    await campaignsPage.verifyCampaignStatusWithPolling(
-      campaignName,
-      'Delivered',
-      60_000
-    );
-
-    await accountSettingsPage.signOut();
-
-    const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
-    };
-
-    await loginPage.login(loginCredentialsForReceiver);
-
-    await dashboardPage.verifyInAppButtonUrlWithPolling(buttonText, 30_000);
-
-    // await dashboardPage.clickInAppButtonUrl(buttonText);
-
-    // await feedPage.verifyFeedPage();
   });
 });

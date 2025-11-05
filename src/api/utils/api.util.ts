@@ -2,6 +2,7 @@ import {
   API_E2E_APP_ID,
   BASE_URL,
   SDK_API_URL,
+  UI_E2E_APP_ID,
   WEB_SDK_API_URL
 } from '@_config/env.config';
 
@@ -42,7 +43,8 @@ export const apiUrls = {
 
   // Deeplinks related endpoints
   deeplinks: {
-    v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/deeplinks`
+    v2: `${BASE_URL}/api/v2/apps/${API_E2E_APP_ID}/deeplinks`,
+    ui: `${BASE_URL}/api/v2/apps/${UI_E2E_APP_ID}/deeplinks`
   },
 
   // User related endpoints
