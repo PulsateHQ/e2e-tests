@@ -2,7 +2,6 @@ import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   addResourcesToGroupWithApi,
   createGroupForSegmentWithApi,
@@ -19,6 +18,7 @@ import {
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { createGroupSegmentsPayload } from '@_src/api/test-data/cms/group/create-group-segments.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllGroups,
@@ -232,7 +232,9 @@ test.describe('Groups Management', () => {
 
     const getAllGroupsAfterDeleteResponse = await getAllGroupsWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      undefined,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     expect(getAllGroupsAfterDeleteResponse.status()).toBe(200);
