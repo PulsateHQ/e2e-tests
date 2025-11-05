@@ -1,7 +1,4 @@
-import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  SUPER_ADMIN_ACCESS_TOKEN
-} from '@_config/env.config';
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
 import {
   batchDestroyGeofencesWithApi,
   createGeofenceWithApi,
@@ -26,8 +23,7 @@ test.describe('Geofences Management', () => {
   test.beforeAll(async ({ request }) => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
-      SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN
+      SUPER_ADMIN_ACCESS_TOKEN
     );
 
     await superAdminsFeatureFLagDefaultBatchUpdate(

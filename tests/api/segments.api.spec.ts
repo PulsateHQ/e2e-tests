@@ -1,7 +1,4 @@
-import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  SUPER_ADMIN_ACCESS_TOKEN
-} from '@_config/env.config';
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
 import {
   batchDeleteSegmentsWithApi,
   createSegmentFromFile,
@@ -36,8 +33,7 @@ test.describe('Segment Management', () => {
     // Create isolated company/app for this test file
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
-      SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN
+      SUPER_ADMIN_ACCESS_TOKEN
     );
   });
 

@@ -34,8 +34,7 @@ function generateIdentifiableNames(): {
  */
 export async function setupIsolatedCompany(
   request: APIRequestContext,
-  superAdminToken: string,
-  adminToken: string
+  superAdminToken: string
 ): Promise<APIE2ELoginUserModel> {
   // Create activation code
   const activationCodeResponse = await superAdminsActivationCodesCreate(
@@ -58,7 +57,7 @@ export async function setupIsolatedCompany(
   // Register company
   const companyRegistrationResponse = await registerCompany(
     request,
-    adminToken,
+    superAdminToken,
     registrationData
   );
   const companyRegistrationResponseJson =

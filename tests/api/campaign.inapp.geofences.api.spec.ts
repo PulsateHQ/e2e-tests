@@ -1,7 +1,4 @@
-import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  SUPER_ADMIN_ACCESS_TOKEN
-} from '@_config/env.config';
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import {
   createCampaignWithApi,
@@ -48,8 +45,7 @@ test.describe('Geofence In-App Campaign', () => {
   test.beforeAll(async ({ request }) => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
-      SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN
+      SUPER_ADMIN_ACCESS_TOKEN
     );
 
     const sdkCredentialsResponse = await getSdkCredentials(
