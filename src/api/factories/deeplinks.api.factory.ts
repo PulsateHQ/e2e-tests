@@ -26,7 +26,6 @@ export async function getAllDeeplinksWithApi(
 
   validateStatusCode(response, 200);
   const responseJson = await parseJsonResponse<DeeplinkListResponse>(response);
-
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 

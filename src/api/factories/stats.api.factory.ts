@@ -203,22 +203,23 @@ export async function getCampaignBackCardStatsWithApi(
         responseJson.card.back.back_button_click_two,
         options.backButtonClicksTwo
       );
+    // Validate optional front stats - these need retry logic for eventual consistency
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    options &&
-      validateStatWhenProvided(
-        responseJson.card.front.front_impression,
+    options?.frontImpression !== undefined &&
+      expect(responseJson.card.front.front_impression).toHaveProperty(
+        'total_uniq',
         options.frontImpression
       );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    options &&
-      validateStatWhenProvided(
-        responseJson.card.front.front_button_click_one,
+    options?.frontButtonClickOne !== undefined &&
+      expect(responseJson.card.front.front_button_click_one).toHaveProperty(
+        'total_uniq',
         options.frontButtonClickOne
       );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    options &&
-      validateStatWhenProvided(
-        responseJson.card.front.front_button_click_two,
+    options?.frontButtonClickTwo !== undefined &&
+      expect(responseJson.card.front.front_button_click_two).toHaveProperty(
+        'total_uniq',
         options.frontButtonClickTwo
       );
   }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });

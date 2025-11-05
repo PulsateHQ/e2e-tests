@@ -25,31 +25,132 @@ import { generateCsvContentForUsersImport } from '@_src/api/test-data/cms/users/
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, test } from '@playwright/test';
 
+/**
+ * Generic helper for deleting all resources using batch deletion pattern
+ * @param config Configuration object with resource-specific functions and parameters
+ */
+async function deleteAllResourcesWithBatch<T extends { id: string }>(config: {
+  resourceName: string;
+  getAllResources: (
+    request: APIRequestContext,
+    token: string,
+    appId?: string
+  ) => Promise<{ data: T[] }>;
+  batchDeleteResources: (
+    request: APIRequestContext,
+    token: string,
+    resourceIds: string[],
+    appId?: string
+  ) => Promise<unknown>;
+  request: APIRequestContext;
+  token: string;
+  appId?: string;
+}): Promise<void> {
+  const {
+    resourceName,
+    getAllResources,
+    batchDeleteResources,
+    request,
+    token,
+    appId
+  } = config;
+
+  await test.step(`Deleting all ${resourceName}`, async () => {
+    const getResourcesResponse = await getAllResources(request, token, appId);
+    const initialCount = getResourcesResponse.data.length;
+
+    if (initialCount > 0) {
+      await batchDeleteResources(
+        request,
+        token,
+        getResourcesResponse.data.map((resource) => resource.id),
+        appId
+      );
+    }
+
+    const getResourcesResponseAfterDeletion = await getAllResources(
+      request,
+      token,
+      appId
+    );
+    const finalCount = getResourcesResponseAfterDeletion.data.length;
+
+    expect(finalCount).toBe(0);
+
+    await test.step(
+      `Deleted ${initialCount} ${resourceName}, ${finalCount} remaining.`,
+      async () => {}
+    );
+  });
+}
+
+/**
+ * Generic helper for deleting all resources using individual deletion pattern
+ * @param config Configuration object with resource-specific functions and parameters
+ */
+async function deleteAllResourcesWithLoop<T extends { id: string }>(config: {
+  resourceName: string;
+  getAllResources: (
+    request: APIRequestContext,
+    token: string,
+    appId?: string
+  ) => Promise<{ data: T[] }>;
+  deleteResource: (
+    request: APIRequestContext,
+    token: string,
+    resourceId: string,
+    appId?: string
+  ) => Promise<unknown>;
+  request: APIRequestContext;
+  token: string;
+  appId?: string;
+}): Promise<void> {
+  const {
+    resourceName,
+    getAllResources,
+    deleteResource,
+    request,
+    token,
+    appId
+  } = config;
+
+  await test.step(`Deleting all ${resourceName}`, async () => {
+    const getResourcesResponse = await getAllResources(request, token, appId);
+    const initialCount = getResourcesResponse.data.length;
+
+    for (const resource of getResourcesResponse.data) {
+      await deleteResource(request, token, resource.id, appId);
+    }
+
+    const getResourcesResponseAfterDeletion = await getAllResources(
+      request,
+      token,
+      appId
+    );
+    const finalCount = getResourcesResponseAfterDeletion.data.length;
+
+    expect(finalCount).toBe(0);
+
+    await test.step(
+      `Deleted ${initialCount} ${resourceName}, ${finalCount} remaining.`,
+      async () => {}
+    );
+  });
+}
+
 export async function deleteAllUsers(
   request: APIRequestContext,
   token: string,
   appId?: string
 ): Promise<void> {
-  await test.step('Deleting all users', async () => {
-    const getUsersResponseJson = await getAllUsersWithApi(request, token, {
-      appId
-    });
-    const initialUserCount = getUsersResponseJson.data.length;
-
-    for (const user of getUsersResponseJson.data) {
-      await deleteUserWithApi(request, token, user.id, appId);
-    }
-
-    const getUsersResponseJsonAfterDeletion = await getAllUsersWithApi(
-      request,
-      token,
-      { appId }
-    );
-    const finalUserCount = getUsersResponseJsonAfterDeletion.data.length;
-
-    expect(finalUserCount).toBe(0);
-
-    await test.step(`Deleted ${initialUserCount} users, ${finalUserCount} remaining.`, async () => {});
+  await deleteAllResourcesWithLoop({
+    resourceName: 'users',
+    getAllResources: (req, tok, id) =>
+      getAllUsersWithApi(req, tok, { appId: id }),
+    deleteResource: deleteUserWithApi,
+    request,
+    token,
+    appId
   });
 }
 
@@ -58,31 +159,13 @@ export async function deleteAllSegments(
   token: string,
   appId?: string
 ): Promise<void> {
-  await test.step('Deleting all segments', async () => {
-    const getSegmentsResponseJson = await getAllSegmentsWithApi(
-      request,
-      token,
-      appId
-    );
-    const initialSegmentCount = getSegmentsResponseJson.data.length;
-
-    await batchDeleteSegmentsWithApi(
-      request,
-      token,
-      getSegmentsResponseJson.data.map((segment: { id: string }) => segment.id),
-      appId
-    );
-
-    const getSegmentsResponseJsonAfterDeletion = await getAllSegmentsWithApi(
-      request,
-      token,
-      appId
-    );
-    const finalSegmentCount = getSegmentsResponseJsonAfterDeletion.data.length;
-
-    expect(finalSegmentCount).toBe(0);
-
-    await test.step(`Deleted ${initialSegmentCount} segments, ${finalSegmentCount} remaining.`, async () => {});
+  await deleteAllResourcesWithBatch({
+    resourceName: 'segments',
+    getAllResources: getAllSegmentsWithApi,
+    batchDeleteResources: batchDeleteSegmentsWithApi,
+    request,
+    token,
+    appId
   });
 }
 
@@ -91,33 +174,14 @@ export async function deleteAllGeofences(
   token: string,
   appId?: string
 ): Promise<void> {
-  await test.step('Deleting all geofences', async () => {
-    const getGeofencesResponseJson = await listGeofencesWithApi(request, token, 1, 1000, 'desc', appId);
-    const initialGeofenceCount = getGeofencesResponseJson.data.length;
-
-    await batchDestroyGeofencesWithApi(
-      request,
-      token,
-      getGeofencesResponseJson.data.map(
-        (geofence: { id: string }) => geofence.id
-      ),
-      appId
-    );
-
-    const getGeofencesResponseJsonAfterDeletion = await listGeofencesWithApi(
-      request,
-      token,
-      1,
-      1000,
-      'desc',
-      appId
-    );
-    const finalGeofenceCount =
-      getGeofencesResponseJsonAfterDeletion.data.length;
-
-    expect(finalGeofenceCount).toBe(0);
-
-    await test.step(`Deleted ${initialGeofenceCount} geofences, ${finalGeofenceCount} remaining.`, async () => {});
+  await deleteAllResourcesWithBatch({
+    resourceName: 'geofences',
+    getAllResources: (req, tok, id) =>
+      listGeofencesWithApi(req, tok, 1, 1000, 'desc', id),
+    batchDeleteResources: batchDestroyGeofencesWithApi,
+    request,
+    token,
+    appId
   });
 }
 
@@ -126,32 +190,14 @@ export async function deleteAllCampaigns(
   token: string,
   appId?: string
 ): Promise<void> {
-  await test.step('Deleting all campaigns', async () => {
-    const getCampaignsResponseJson = await getCampaignsWithApi(request, token, {
-      appId
-    });
-    const initialCampaignCount = getCampaignsResponseJson.data.length;
-
-    await batchDeleteCampaignsWithApi(
-      request,
-      token,
-      getCampaignsResponseJson.data.map(
-        (campaign: { id: string }) => campaign.id
-      ),
-      appId
-    );
-
-    const getCampaignsResponseJsonAfterDeletion = await getCampaignsWithApi(
-      request,
-      token,
-      { appId }
-    );
-    const finalCampaignCount =
-      getCampaignsResponseJsonAfterDeletion.data.length;
-
-    expect(finalCampaignCount).toBe(0);
-
-    await test.step(`Deleted ${initialCampaignCount} campaigns, ${finalCampaignCount} remaining.`, async () => {});
+  await deleteAllResourcesWithBatch({
+    resourceName: 'campaigns',
+    getAllResources: (req, tok, id) =>
+      getCampaignsWithApi(req, tok, { appId: id }),
+    batchDeleteResources: batchDeleteCampaignsWithApi,
+    request,
+    token,
+    appId
   });
 }
 
@@ -160,25 +206,14 @@ export async function deleteAllGroups(
   token: string,
   appId?: string
 ): Promise<void> {
-  await test.step('Deleting all groups', async () => {
-    const getGroupsResponseJson = await getAllGroupsWithApi(request, token, undefined, appId);
-    const initialGroupCount = getGroupsResponseJson.data.length;
-
-    for (const group of getGroupsResponseJson.data) {
-      await deleteGroupWithApi(request, token, group.id, appId);
-    }
-
-    const getGroupsResponseJsonAfterDeletion = await getAllGroupsWithApi(
-      request,
-      token,
-      undefined,
-      appId
-    );
-    const finalGroupCount = getGroupsResponseJsonAfterDeletion.data.length;
-
-    expect(finalGroupCount).toBe(0);
-
-    await test.step(`Deleted ${initialGroupCount} groups, ${finalGroupCount} remaining.`, async () => {});
+  await deleteAllResourcesWithLoop({
+    resourceName: 'groups',
+    getAllResources: (req, tok, id) =>
+      getAllGroupsWithApi(req, tok, undefined, id),
+    deleteResource: deleteGroupWithApi,
+    request,
+    token,
+    appId
   });
 }
 
@@ -187,25 +222,14 @@ export async function deleteAllDeeplinks(
   token: string,
   appId?: string
 ): Promise<void> {
-  await test.step('Deleting all deeplinks', async () => {
-    const getDeeplinksResponseJson = await getAllDeeplinksWithApi(request, token, appId);
-    const initialDeeplinkCount = getDeeplinksResponseJson.data.length;
-
-    for (const deeplink of getDeeplinksResponseJson.data) {
-      await deleteDeeplinksWithApi(request, token, [deeplink.id], appId);
-    }
-
-    const getDeeplinksResponseJsonAfterDeletion = await getAllDeeplinksWithApi(
-      request,
-      token,
-      appId
-    );
-    const finalDeeplinkCount =
-      getDeeplinksResponseJsonAfterDeletion.data.length;
-
-    expect(finalDeeplinkCount).toBe(0);
-
-    await test.step(`Deleted ${initialDeeplinkCount} deeplinks, ${finalDeeplinkCount} remaining.`, async () => {});
+  await deleteAllResourcesWithLoop({
+    resourceName: 'deeplinks',
+    getAllResources: getAllDeeplinksWithApi,
+    deleteResource: (req, tok, id, app) =>
+      deleteDeeplinksWithApi(req, tok, [id], app),
+    request,
+    token,
+    appId
   });
 }
 

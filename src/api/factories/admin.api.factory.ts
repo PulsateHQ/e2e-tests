@@ -20,11 +20,11 @@ export async function registerCompany(
   authToken: string,
   registrationData: CompanyAdminRegistrationRequest
 ): Promise<APIResponse> {
-  const headers = createAuthHeaders(authToken);
+  const headers = createAuthHeadersWithJson(authToken);
 
   const response = await request.post(apiUrls.admins.v2.register, {
     headers,
-    data: registrationData
+    data: JSON.stringify(registrationData)
   });
 
   validateStatusCode(response, 201);
