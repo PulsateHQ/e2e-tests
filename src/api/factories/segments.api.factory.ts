@@ -1,11 +1,17 @@
-import { CreateSegmentPayload } from '@_src/api/models/segment.model';
+import {
+  CreateSegmentPayload,
+  SegmentListResponse,
+  SegmentResponse,
+  SegmentTotalAudienceResponse,
+  SegmentUsersResponse
+} from '@_src/api/models/segment.model';
 import { generateCsvContentForAliases } from '@_src/api/test-data/cms/users/generate-user-aliases.payload';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { validateStatusCode } from '@_src/api/utils/response.util';
+import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -13,7 +19,7 @@ export async function getAllSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,
   appId?: string
-): Promise<APIResponse> {
+): Promise<SegmentListResponse> {
   const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -22,12 +28,12 @@ export async function getAllSegmentsWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<SegmentListResponse>(response);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
 
-  return response;
+  return responseJson;
 }
 
 export async function getSingleSegmentUsersWithApi(
@@ -35,7 +41,7 @@ export async function getSingleSegmentUsersWithApi(
   authToken: string,
   segmentId: string,
   appId?: string
-): Promise<APIResponse> {
+): Promise<SegmentUsersResponse> {
   const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -44,11 +50,11 @@ export async function getSingleSegmentUsersWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<SegmentUsersResponse>(response);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
-  return response;
+  return responseJson;
 }
 
 export async function getSingleSegmentWithApi(
@@ -56,7 +62,7 @@ export async function getSingleSegmentWithApi(
   authToken: string,
   segmentId: string,
   appId?: string
-): Promise<APIResponse> {
+): Promise<SegmentResponse> {
   const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -65,12 +71,12 @@ export async function getSingleSegmentWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<SegmentResponse>(response);
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('created_at');
   expect(responseJson).toHaveProperty('groups');
 
-  return response;
+  return responseJson;
 }
 
 export async function getTotalAudienceForSegmentWithApi(
@@ -78,7 +84,7 @@ export async function getTotalAudienceForSegmentWithApi(
   authToken: string,
   expectedTotalAudience?: number,
   appId?: string
-): Promise<APIResponse> {
+): Promise<SegmentTotalAudienceResponse> {
   const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -89,7 +95,7 @@ export async function getTotalAudienceForSegmentWithApi(
   await expect(async () => {
     response = await request.get(url, { headers });
     validateStatusCode(response, 200);
-    const responseJson = await response.json();
+    const responseJson = await parseJsonResponse<SegmentTotalAudienceResponse>(response);
 
     // Validate optional stats - validate all provided options
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -100,7 +106,7 @@ export async function getTotalAudienceForSegmentWithApi(
       );
   }).toPass({ timeout: 60_000, intervals: [1000, 2000, 5000] });
 
-  return response!;
+  return await parseJsonResponse<SegmentTotalAudienceResponse>(response!);
 }
 
 export async function getUserCountForAlias(

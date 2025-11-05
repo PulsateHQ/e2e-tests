@@ -101,13 +101,12 @@ test.describe('Feed Post Campaign', () => {
     const campaignPayload = createCampaignFeedOneButtonToUrl([
       createSegmentResponseJson.segment.id
     ]);
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       campaignPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(campaignPayload.name);
@@ -120,12 +119,11 @@ test.describe('Feed Post Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();

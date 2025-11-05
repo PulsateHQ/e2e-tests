@@ -31,26 +31,22 @@ export async function deleteAllUsers(
   appId?: string
 ): Promise<void> {
   await test.step('Deleting all users', async () => {
-    const getUsersResponse = await getAllUsersWithApi(request, token, {
+    const getUsersResponseJson = await getAllUsersWithApi(request, token, {
       appId
     });
-    const getUsersResponseJson = await getUsersResponse.json();
     const initialUserCount = getUsersResponseJson.data.length;
 
     for (const user of getUsersResponseJson.data) {
       await deleteUserWithApi(request, token, user.id, appId);
     }
 
-    const getUsersResponseAfterDeletion = await getAllUsersWithApi(
+    const getUsersResponseJsonAfterDeletion = await getAllUsersWithApi(
       request,
       token,
       { appId }
     );
-    const getUsersResponseJsonAfterDeletion =
-      await getUsersResponseAfterDeletion.json();
     const finalUserCount = getUsersResponseJsonAfterDeletion.data.length;
 
-    expect(getUsersResponseAfterDeletion.status()).toBe(200);
     expect(finalUserCount).toBe(0);
 
     await test.step(`Deleted ${initialUserCount} users, ${finalUserCount} remaining.`, async () => {});
@@ -63,12 +59,11 @@ export async function deleteAllSegments(
   appId?: string
 ): Promise<void> {
   await test.step('Deleting all segments', async () => {
-    const getSegmentsResponse = await getAllSegmentsWithApi(
+    const getSegmentsResponseJson = await getAllSegmentsWithApi(
       request,
       token,
       appId
     );
-    const getSegmentsResponseJson = await getSegmentsResponse.json();
     const initialSegmentCount = getSegmentsResponseJson.data.length;
 
     await batchDeleteSegmentsWithApi(
@@ -78,16 +73,13 @@ export async function deleteAllSegments(
       appId
     );
 
-    const getSegmentsResponseAfterDeletion = await getAllSegmentsWithApi(
+    const getSegmentsResponseJsonAfterDeletion = await getAllSegmentsWithApi(
       request,
       token,
       appId
     );
-    const getSegmentsResponseJsonAfterDeletion =
-      await getSegmentsResponseAfterDeletion.json();
     const finalSegmentCount = getSegmentsResponseJsonAfterDeletion.data.length;
 
-    expect(getSegmentsResponseAfterDeletion.status()).toBe(200);
     expect(finalSegmentCount).toBe(0);
 
     await test.step(`Deleted ${initialSegmentCount} segments, ${finalSegmentCount} remaining.`, async () => {});
@@ -100,8 +92,7 @@ export async function deleteAllGeofences(
   appId?: string
 ): Promise<void> {
   await test.step('Deleting all geofences', async () => {
-    const getGeofencesResponse = await listGeofencesWithApi(request, token, 1, 1000, 'desc', appId);
-    const getGeofencesResponseJson = await getGeofencesResponse.json();
+    const getGeofencesResponseJson = await listGeofencesWithApi(request, token, 1, 1000, 'desc', appId);
     const initialGeofenceCount = getGeofencesResponseJson.data.length;
 
     await batchDestroyGeofencesWithApi(
@@ -113,7 +104,7 @@ export async function deleteAllGeofences(
       appId
     );
 
-    const getGeofencesResponseAfterDeletion = await listGeofencesWithApi(
+    const getGeofencesResponseJsonAfterDeletion = await listGeofencesWithApi(
       request,
       token,
       1,
@@ -121,12 +112,9 @@ export async function deleteAllGeofences(
       'desc',
       appId
     );
-    const getGeofencesResponseJsonAfterDeletion =
-      await getGeofencesResponseAfterDeletion.json();
     const finalGeofenceCount =
       getGeofencesResponseJsonAfterDeletion.data.length;
 
-    expect(getGeofencesResponseAfterDeletion.status()).toBe(200);
     expect(finalGeofenceCount).toBe(0);
 
     await test.step(`Deleted ${initialGeofenceCount} geofences, ${finalGeofenceCount} remaining.`, async () => {});
@@ -139,10 +127,9 @@ export async function deleteAllCampaigns(
   appId?: string
 ): Promise<void> {
   await test.step('Deleting all campaigns', async () => {
-    const getCampaignsResponse = await getCampaignsWithApi(request, token, {
+    const getCampaignsResponseJson = await getCampaignsWithApi(request, token, {
       appId
     });
-    const getCampaignsResponseJson = await getCampaignsResponse.json();
     const initialCampaignCount = getCampaignsResponseJson.data.length;
 
     await batchDeleteCampaignsWithApi(
@@ -154,17 +141,14 @@ export async function deleteAllCampaigns(
       appId
     );
 
-    const getCampaignsResponseAfterDeletion = await getCampaignsWithApi(
+    const getCampaignsResponseJsonAfterDeletion = await getCampaignsWithApi(
       request,
       token,
       { appId }
     );
-    const getCampaignsResponseJsonAfterDeletion =
-      await getCampaignsResponseAfterDeletion.json();
     const finalCampaignCount =
       getCampaignsResponseJsonAfterDeletion.data.length;
 
-    expect(getCampaignsResponseAfterDeletion.status()).toBe(200);
     expect(finalCampaignCount).toBe(0);
 
     await test.step(`Deleted ${initialCampaignCount} campaigns, ${finalCampaignCount} remaining.`, async () => {});
@@ -177,25 +161,21 @@ export async function deleteAllGroups(
   appId?: string
 ): Promise<void> {
   await test.step('Deleting all groups', async () => {
-    const getGroupsResponse = await getAllGroupsWithApi(request, token, undefined, appId);
-    const getGroupsResponseJson = await getGroupsResponse.json();
+    const getGroupsResponseJson = await getAllGroupsWithApi(request, token, undefined, appId);
     const initialGroupCount = getGroupsResponseJson.data.length;
 
     for (const group of getGroupsResponseJson.data) {
       await deleteGroupWithApi(request, token, group.id, appId);
     }
 
-    const getGroupsResponseAfterDeletion = await getAllGroupsWithApi(
+    const getGroupsResponseJsonAfterDeletion = await getAllGroupsWithApi(
       request,
       token,
       undefined,
       appId
     );
-    const getGroupsResponseJsonAfterDeletion =
-      await getGroupsResponseAfterDeletion.json();
     const finalGroupCount = getGroupsResponseJsonAfterDeletion.data.length;
 
-    expect(getGroupsResponseAfterDeletion.status()).toBe(200);
     expect(finalGroupCount).toBe(0);
 
     await test.step(`Deleted ${initialGroupCount} groups, ${finalGroupCount} remaining.`, async () => {});
@@ -208,25 +188,21 @@ export async function deleteAllDeeplinks(
   appId?: string
 ): Promise<void> {
   await test.step('Deleting all deeplinks', async () => {
-    const getDeeplinksResponse = await getAllDeeplinksWithApi(request, token, appId);
-    const getDeeplinksResponseJson = await getDeeplinksResponse.json();
+    const getDeeplinksResponseJson = await getAllDeeplinksWithApi(request, token, appId);
     const initialDeeplinkCount = getDeeplinksResponseJson.data.length;
 
     for (const deeplink of getDeeplinksResponseJson.data) {
       await deleteDeeplinksWithApi(request, token, [deeplink.id], appId);
     }
 
-    const getDeeplinksResponseAfterDeletion = await getAllDeeplinksWithApi(
+    const getDeeplinksResponseJsonAfterDeletion = await getAllDeeplinksWithApi(
       request,
       token,
       appId
     );
-    const getDeeplinksResponseJsonAfterDeletion =
-      await getDeeplinksResponseAfterDeletion.json();
     const finalDeeplinkCount =
       getDeeplinksResponseJsonAfterDeletion.data.length;
 
-    expect(getDeeplinksResponseAfterDeletion.status()).toBe(200);
     expect(finalDeeplinkCount).toBe(0);
 
     await test.step(`Deleted ${initialDeeplinkCount} deeplinks, ${finalDeeplinkCount} remaining.`, async () => {});

@@ -116,13 +116,12 @@ test.describe('Geofence Feed Campaign', () => {
     );
 
     // Create Campaign
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       campaignPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(campaignPayload.name);
@@ -137,12 +136,11 @@ test.describe('Geofence Feed Campaign', () => {
 
     expect(getCampaignDetailsResponse.status).toBe('Active');
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];

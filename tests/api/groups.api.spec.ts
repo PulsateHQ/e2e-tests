@@ -85,16 +85,12 @@ test.describe('Groups Management', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
 
-    const getAllGroupsResponse = await getAllGroupsWithApi(
+    const getAllGroupsResponseJson = await getAllGroupsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       undefined,
       APIE2ELoginUserModel.apiE2EAppId
     );
-
-    expect(getAllGroupsResponse.status()).toBe(200);
-
-    const getAllGroupsResponseJson = await getAllGroupsResponse.json();
     expect(getAllGroupsResponseJson.data).toHaveLength(0);
 
     // Store the payload before making the API call
@@ -114,15 +110,12 @@ test.describe('Groups Management', () => {
     expect(createGroupResponseJson.name).toBe(groupPayload.group.name);
     expect(createGroupResponseJson.resource_type).toBe('Mobile::App::Segment');
 
-    const getSingleGroupResponse = await getSingleGroupWithApi(
+    const getSingleGroupResponseJson = await getSingleGroupWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       firstGroupId,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const getSingleGroupResponseJson = await getSingleGroupResponse.json();
-
-    expect(getSingleGroupResponse.status()).toBe(200);
     expect(getSingleGroupResponseJson.name).toBe(groupPayload.group.name);
     expect(getSingleGroupResponseJson.id).toBe(firstGroupId);
     expect(getSingleGroupResponseJson.resource_type).toBe(
@@ -141,30 +134,23 @@ test.describe('Groups Management', () => {
 
     expect(addResourcesToGroupResponse.status()).toBe(200);
 
-    const getSingleGroupAfterAddResourcesResponse = await getSingleGroupWithApi(
-      request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstGroupId,
-      APIE2ELoginUserModel.apiE2EAppId
-    );
-
-    expect(getSingleGroupAfterAddResourcesResponse.status()).toBe(200);
     const getSingleGroupAfterAddResourcesResponseJson =
-      await getSingleGroupAfterAddResourcesResponse.json();
+      await getSingleGroupWithApi(
+        request,
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        firstGroupId,
+        APIE2ELoginUserModel.apiE2EAppId
+      );
     expect(
       getSingleGroupAfterAddResourcesResponseJson.resource_ids.segment_ids
     ).toContain(firstSegmentId);
 
-    const getSingleSegmentWithApiResponse = await getSingleSegmentWithApi(
+    const getSingleSegmentWithApiResponseJson = await getSingleSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       firstSegmentId,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const getSingleSegmentWithApiResponseJson =
-      await getSingleSegmentWithApiResponse.json();
-
-    expect(getSingleSegmentWithApiResponse.status()).toBe(200);
     expect(getSingleSegmentWithApiResponseJson.groups_ids).toHaveLength(1);
 
     const updateGroupResponse = await updateGroupWithApi(
@@ -179,16 +165,12 @@ test.describe('Groups Management', () => {
     const updateGroupResponseJson = await updateGroupResponse.json();
     expect(updateGroupResponseJson.name).toBe(groupPayload.group.name);
 
-    const getSingleGroupAfterUpdateResponse = await getSingleGroupWithApi(
+    const getSingleGroupAfterUpdateResponseJson = await getSingleGroupWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       firstGroupId,
       APIE2ELoginUserModel.apiE2EAppId
     );
-
-    expect(getSingleGroupAfterUpdateResponse.status()).toBe(200);
-    const getSingleGroupAfterUpdateResponseJson =
-      await getSingleGroupAfterUpdateResponse.json();
     expect(getSingleGroupAfterUpdateResponseJson.name).toBe(
       groupPayload.group.name
     );
@@ -206,17 +188,13 @@ test.describe('Groups Management', () => {
 
     expect(removeResourcesFromGroupResponse.status()).toBe(200);
 
-    const getSingleGroupAfterRemoveResourcesResponse =
+    const getSingleGroupAfterRemoveResourcesResponseJson =
       await getSingleGroupWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         firstGroupId,
         APIE2ELoginUserModel.apiE2EAppId
       );
-
-    expect(getSingleGroupAfterRemoveResourcesResponse.status()).toBe(200);
-    const getSingleGroupAfterRemoveResourcesResponseJson =
-      await getSingleGroupAfterRemoveResourcesResponse.json();
     expect(
       getSingleGroupAfterRemoveResourcesResponseJson.resource_ids.segment_ids
     ).not.toContain(firstSegmentId);
@@ -230,16 +208,12 @@ test.describe('Groups Management', () => {
 
     expect(deleteGroupResponse.status()).toBe(200);
 
-    const getAllGroupsAfterDeleteResponse = await getAllGroupsWithApi(
+    const getAllGroupsAfterDeleteResponseJson = await getAllGroupsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       undefined,
       APIE2ELoginUserModel.apiE2EAppId
     );
-
-    expect(getAllGroupsAfterDeleteResponse.status()).toBe(200);
-    const getAllGroupsAfterDeleteResponseJson =
-      await getAllGroupsAfterDeleteResponse.json();
     expect(getAllGroupsAfterDeleteResponseJson.data).toHaveLength(0);
   });
 });

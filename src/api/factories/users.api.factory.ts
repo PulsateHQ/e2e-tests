@@ -1,10 +1,15 @@
-import { UserRequest, UserResponse } from '@_src/api/models/user.model';
+import {
+  GetAllUsersOptions,
+  UserListResponse,
+  UserRequest,
+  UserResponse
+} from '@_src/api/models/user.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { validateStatusCode } from '@_src/api/utils/response.util';
+import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -12,14 +17,8 @@ import { APIRequestContext, APIResponse } from '@playwright/test';
 export async function getAllUsersWithApi(
   request: APIRequestContext,
   authToken: string,
-  options?: {
-    sort?: string;
-    order?: string;
-    page?: number;
-    perPage?: number;
-    appId?: string;
-  }
-): Promise<APIResponse> {
+  options?: GetAllUsersOptions
+): Promise<UserListResponse> {
   const {
     sort = 'created_at',
     order = 'desc',
@@ -35,19 +34,13 @@ export async function getAllUsersWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  validateStatusCode(response, 200);
+  const responseJson = await parseJsonResponse<UserListResponse>(response);
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
-  return response;
+  return responseJson;
 }
 
 export async function getUserWithApi(
@@ -64,7 +57,7 @@ export async function getUserWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = (await response.json()) as UserResponse;
+  const responseJson = await parseJsonResponse<UserResponse>(response);
   expect(responseJson).toHaveProperty('id', userId);
 
   return response;

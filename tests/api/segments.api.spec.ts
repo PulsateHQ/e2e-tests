@@ -72,12 +72,11 @@ test.describe('Segment Management', () => {
       numberOfUsers
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
     const firstAliasUser = getUsersResponseJson.data[0].alias;
     const secondAliasUser = getUsersResponseJson.data[1].alias;
     const thirdAliasUser = getUsersResponseJson.data[2].alias;
@@ -97,15 +96,13 @@ test.describe('Segment Management', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
 
-    const getSingleSegmentResponseAfterCreation =
+    const getSingleSegmentResponseAfterCreationJson =
       await getSingleSegmentUsersWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         firstSegmentId,
         APIE2ELoginUserModel.apiE2EAppId
       );
-    const getSingleSegmentResponseAfterCreationJson =
-      await getSingleSegmentResponseAfterCreation.json();
 
     const updateSegmentResponse = await updateSegmentWithApi(
       request,
@@ -143,16 +140,13 @@ test.describe('Segment Management', () => {
     const batchDeleteSegmentsWithApiResponseJson =
       await batchDeleteSegmentsWithApiResponse.json();
 
-    const getSegmentsResponseAfterCreation = await getAllSegmentsWithApi(
+    const getSegmentsResponseJsonAfterCreation = await getAllSegmentsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const getSegmentsResponseJsonAfterCreation =
-      await getSegmentsResponseAfterCreation.json();
 
     // Assert
-    expect(getUsersResponse.status()).toBe(200);
     expect(getUsersResponseJson.data.length).toBe(3);
 
     expect(createSegmentResponse.status()).toBe(200);
@@ -161,7 +155,6 @@ test.describe('Segment Management', () => {
       firstSegmentPayload.name
     );
 
-    expect(getSingleSegmentResponseAfterCreation.status()).toBe(200);
     expect(getSingleSegmentResponseAfterCreationJson.data.length).toBe(1);
 
     expect(updateSegmentResponse.status()).toBe(200);
@@ -182,7 +175,6 @@ test.describe('Segment Management', () => {
     expect(batchDeleteSegmentsWithApiResponse.status()).toBe(200);
     expect(batchDeleteSegmentsWithApiResponseJson.resources_count).toBe(2);
 
-    expect(getSegmentsResponseAfterCreation.status()).toBe(200);
     expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(2);
   });
 
@@ -190,23 +182,16 @@ test.describe('Segment Management', () => {
     request
   }) => {
     // Arrange
-    const getTotalAudienceForSegmentWithApiBeforeUserCreationResponse =
+    const getTotalAudienceForSegmentWithApiBeforeUserCreationResponseJson =
       await getTotalAudienceForSegmentWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         undefined,
         APIE2ELoginUserModel.apiE2EAppId
       );
-    const getTotalAudienceForSegmentWithApiBeforeUserCreationResponseJson =
-      await getTotalAudienceForSegmentWithApiBeforeUserCreationResponse.json();
 
     const totalAudience =
       getTotalAudienceForSegmentWithApiBeforeUserCreationResponseJson.total_audience;
-
-    // Assert initial state
-    expect(
-      getTotalAudienceForSegmentWithApiBeforeUserCreationResponse.status()
-    ).toBe(200);
 
     // Arrange
     const numberOfUsers = 3;
@@ -217,12 +202,11 @@ test.describe('Segment Management', () => {
       numberOfUsers
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
     const firstAliasUser = getUsersResponseJson.data[0].alias;
     const secondAliasUser = getUsersResponseJson.data[1].alias;
 
@@ -240,25 +224,21 @@ test.describe('Segment Management', () => {
 
     const totalAudiencePlusUsers = totalAudience + numberOfUsers;
 
-    const getTotalAudienceForSegmentWithApiResponse =
+    const getTotalAudienceForSegmentWithApiResponseJson =
       await getTotalAudienceForSegmentWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         totalAudiencePlusUsers,
         APIE2ELoginUserModel.apiE2EAppId
       );
-    const getTotalAudienceForSegmentWithApiResponseJson =
-      await getTotalAudienceForSegmentWithApiResponse.json();
 
-    const getSingleSegmentWithApiAfterCreationForAllUsers =
+    const getSingleSegmentWithApiAfterCreationForAllUsersJson =
       await getSingleSegmentWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         firstSegmentId,
         APIE2ELoginUserModel.apiE2EAppId
       );
-    const getSingleSegmentWithApiAfterCreationForAllUsersJson =
-      await getSingleSegmentWithApiAfterCreationForAllUsers.json();
 
     const getUserCountForAliasResponse = await getUserCountForAlias(
       request,
@@ -292,26 +272,20 @@ test.describe('Segment Management', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getSegmentsResponseAfterCreation = await getAllSegmentsWithApi(
+    const getSegmentsResponseJsonAfterCreation = await getAllSegmentsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const getSegmentsResponseJsonAfterCreation =
-      await getSegmentsResponseAfterCreation.json();
 
     // Assert
-    expect(getUsersResponse.status()).toBe(200);
     expect(getUsersResponseJson.data.length).toBe(3);
 
     expect(createSegmentResponse.status()).toBe(200);
 
-    expect(getTotalAudienceForSegmentWithApiResponse.status()).toBe(200);
     expect(getTotalAudienceForSegmentWithApiResponseJson.total_audience).toBe(
       totalAudiencePlusUsers
     );
-
-    expect(getSingleSegmentWithApiAfterCreationForAllUsers.status()).toBe(200);
 
     expect(getSingleSegmentWithApiAfterCreationForAllUsersJson).toHaveProperty(
       'id',
@@ -331,7 +305,6 @@ test.describe('Segment Management', () => {
 
     expect(estimateSegmentsWithApiResponse.status()).toBe(200);
 
-    expect(getSegmentsResponseAfterCreation.status()).toBe(200);
     expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(3);
   });
 
@@ -347,12 +320,11 @@ test.describe('Segment Management', () => {
       numberOfUsers
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
     const firstAliasUser = getUsersResponseJson.data[0].alias;
     const secondAliasUser = getUsersResponseJson.data[1].alias;
 
@@ -371,24 +343,21 @@ test.describe('Segment Management', () => {
     expect(createSegmentFromFileResponse.status()).toBe(200);
 
     // Get segment ID
-    const getAllSegmentsResponse = await getAllSegmentsWithApi(
+    const getAllSegmentsResponseJson = await getAllSegmentsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const segmentId = (await getAllSegmentsResponse.json()).data[0].id;
+    const segmentId = getAllSegmentsResponseJson.data[0].id;
 
     // Assert
     await expect(async () => {
-      const segmentUsersResponse = await getSingleSegmentUsersWithApi(
+      const segmentUsersResponseJson = await getSingleSegmentUsersWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         segmentId,
         APIE2ELoginUserModel.apiE2EAppId
       );
-      const segmentUsersResponseJson = await segmentUsersResponse.json();
-
-      expect(segmentUsersResponse.status()).toBe(200);
       expect(segmentUsersResponseJson.data).toHaveLength(2);
       expect(segmentUsersResponseJson.data.map((user) => user.alias)).toEqual(
         expect.arrayContaining([firstAliasUser, secondAliasUser])

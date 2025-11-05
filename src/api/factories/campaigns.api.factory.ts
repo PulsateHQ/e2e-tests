@@ -1,27 +1,24 @@
 import {
+  CampaignCreateResponse,
   CampaignDetailsResponse,
-  CreateCampaignPayload
+  CampaignListResponse,
+  CreateCampaignPayload,
+  GetCampaignsOptions
 } from '@_src/api/models/campaign.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { validateStatusCode } from '@_src/api/utils/response.util';
+import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
 export async function getCampaignsWithApi(
   request: APIRequestContext,
   authToken: string,
-  options?: {
-    sort?: string;
-    order?: string;
-    page?: number;
-    perPage?: number;
-    appId?: string;
-  }
-): Promise<APIResponse> {
+  options?: GetCampaignsOptions
+): Promise<CampaignListResponse> {
   const {
     sort = 'created_at',
     order = 'desc',
@@ -38,13 +35,13 @@ export async function getCampaignsWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<CampaignListResponse>(response);
 
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
 
-  return response;
+  return responseJson;
 }
 
 export async function createCampaignWithApi(
@@ -52,7 +49,7 @@ export async function createCampaignWithApi(
   authToken: string,
   payload: CreateCampaignPayload,
   appId?: string
-): Promise<APIResponse> {
+): Promise<CampaignCreateResponse> {
   const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -62,12 +59,12 @@ export async function createCampaignWithApi(
   });
 
   validateStatusCode(response, 201);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<CampaignCreateResponse>(response);
 
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name', payload.name);
 
-  return response;
+  return responseJson;
 }
 
 export async function deleteCampaignWithApi(
@@ -131,7 +128,7 @@ export async function getCampaignDetailsWithApi(
   await expect(async () => {
     response = await request.get(url, { headers });
     validateStatusCode(response, 200);
-    const responseJson = (await response.json()) as CampaignDetailsResponse;
+    const responseJson = await parseJsonResponse<CampaignDetailsResponse>(response);
 
     expect(responseJson).toHaveProperty('id');
     expect(responseJson).toHaveProperty('name');
@@ -139,5 +136,5 @@ export async function getCampaignDetailsWithApi(
     expect(responseJson).toHaveProperty('status', expectedStatusCampaign);
   }).toPass({ timeout: 60_000 });
 
-  return (await response!.json()) as CampaignDetailsResponse;
+  return await parseJsonResponse<CampaignDetailsResponse>(response!);
 }

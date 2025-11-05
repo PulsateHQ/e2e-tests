@@ -80,12 +80,11 @@ test.describe('User Management', () => {
       numberOfUsers
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       apiE2EAccessTokenAdmin,
       { appId: apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
     const userId = getUsersResponseJson.data[0].id;
 
     const getUserResponse = await getUserWithApi(
@@ -97,7 +96,6 @@ test.describe('User Management', () => {
     const getUserResponseJson = await getUserResponse.json();
 
     // Assert
-    expect(getUsersResponse.status()).toBe(200);
     expect(getUsersResponseJson.data.length).toBe(1);
 
     expect(getUserResponse.status()).toBe(200);
@@ -133,12 +131,11 @@ test.describe('User Management', () => {
     const createUserWithApiResponseJson =
       await createUserWithApiResponse.json();
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
     const userId = getUsersResponseJson.data[0].id;
 
     const deleteUserWithApiResponse = await deleteUserWithApi(
@@ -148,13 +145,11 @@ test.describe('User Management', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getAllUsersWithApiAfterUnsubscribe = await getAllUsersWithApi(
+    const getAllUsersWithApiAfterUnsubscribeJson = await getAllUsersWithApi(
       request,
       apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getAllUsersWithApiAfterUnsubscribeJson =
-      await getAllUsersWithApiAfterUnsubscribe.json();
 
     // Assert
     expect(upsertUserWithApiResponse.status()).toBe(200);
@@ -163,12 +158,10 @@ test.describe('User Management', () => {
     expect(createUserWithApiResponse.status()).toBe(200);
     expect(createUserWithApiResponseJson.alias).toBe(createUserPayload.alias);
 
-    expect(getUsersResponse.status()).toBe(200);
     expect(getUsersResponseJson.data.length).toBe(2);
 
     expect(deleteUserWithApiResponse.status()).toBe(200);
 
-    expect(getAllUsersWithApiAfterUnsubscribe.status()).toBe(200);
     expect(getAllUsersWithApiAfterUnsubscribeJson.data.length).toBe(1);
   });
 
@@ -202,12 +195,11 @@ test.describe('User Management', () => {
     // Wait for segments to be created and verify
     let segmentId: string;
     await expect(async () => {
-      const getAllSegmentsResponse = await getAllSegmentsWithApi(
+      const getAllSegmentsResponseJson = await getAllSegmentsWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         APIE2ELoginUserModel.apiE2EAppId
       );
-      const getAllSegmentsResponseJson = await getAllSegmentsResponse.json();
 
       segmentId = getAllSegmentsResponseJson.data[0].id;
       expect(getAllSegmentsResponseJson.data).toHaveLength(1);
@@ -221,15 +213,13 @@ test.describe('User Management', () => {
 
     // Verify segment users
     await expect(async () => {
-      const segmentUsersResponse = await getSingleSegmentUsersWithApi(
+      const segmentUsersResponseJson = await getSingleSegmentUsersWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         segmentId,
         APIE2ELoginUserModel.apiE2EAppId
       );
-      const segmentUsersResponseJson = await segmentUsersResponse.json();
 
-      expect(segmentUsersResponse.status()).toBe(200);
       expect(segmentUsersResponseJson.data).toHaveLength(2);
       userId = segmentUsersResponseJson.data[0].id;
       aliasId = segmentUsersResponseJson.data[0].alias;

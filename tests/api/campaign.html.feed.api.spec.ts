@@ -114,13 +114,12 @@ test.describe('HTML Feed Campaign', () => {
     // Create Campaign
     const createCampaignFeedOneButtonToUrlPayload =
       createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedOneButtonToUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -135,12 +134,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();
@@ -334,13 +332,12 @@ test.describe('HTML Feed Campaign', () => {
 
     // Create Campaign
 
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedOneButtonWithDeeplinkPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -355,12 +352,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();
@@ -551,13 +547,12 @@ test.describe('HTML Feed Campaign', () => {
 
     // Create Campaign
 
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedOneButtonBackWithDismissPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -572,12 +567,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();
@@ -904,13 +898,12 @@ test.describe('HTML Feed Campaign', () => {
 
     // Create Campaign
 
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedTwoButtonsWithBackAndDeeplinkPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -925,12 +918,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();
@@ -1226,13 +1218,12 @@ test.describe('HTML Feed Campaign', () => {
     // Create Campaign
     const createCampaignFeedOneButtonToUrlPayload =
       createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedOneButtonToUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -1247,12 +1238,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();
@@ -1447,13 +1437,12 @@ test.describe('HTML Feed Campaign', () => {
 
     // Create Campaign
 
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedTwoButtonsWithBackAndDeeplinkPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -1468,12 +1457,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();
@@ -1655,14 +1643,12 @@ test.describe('HTML Feed Campaign', () => {
     // Create Campaign
     const createCampaignFeedOneButtonToUrlPayload =
       createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
-    const createFirstCampaignResponse = await createCampaignWithApi(
+    const createFirstCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedOneButtonToUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createFirstCampaignResponseJson =
-      await createFirstCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createFirstCampaignResponseJson.name).toBe(
@@ -1677,14 +1663,12 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const createSecondCampaignResponse = await createCampaignWithApi(
+    const createSecondCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedOneButtonToUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createSecondCampaignResponseJson =
-      await createSecondCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createSecondCampaignResponseJson.name).toBe(
@@ -1699,12 +1683,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     const startMobileSessionFeedPayloadResponse =
       startMobileSessionFeedPayload();

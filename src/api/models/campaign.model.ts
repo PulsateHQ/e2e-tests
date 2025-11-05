@@ -300,3 +300,58 @@ export interface InAppCardStatsValidationOptions {
   cardButtonClick?: number;
   frontImpression?: number;
 }
+
+export interface CampaignListResponse {
+  data: CampaignDetailsResponse[];
+  bulk_actions: unknown;
+  metadata: {
+    page: number;
+    per_page: number;
+    total_pages: number;
+    data_count: number;
+  };
+}
+
+export interface CampaignCreateResponse {
+  id: string;
+  name: string;
+  guid?: string;
+  card_notification?: {
+    front_parts?: {
+      call_to_action?: unknown;
+      text?: unknown;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+export interface GetCampaignsOptions {
+  sort?: string;
+  order?: string;
+  page?: number;
+  perPage?: number;
+  appId?: string;
+}
+
+export interface CampaignStatsResponse {
+  export_url: string;
+  type: string;
+  send: number;
+  card?: {
+    clicks: { total_uniq: number };
+    front: {
+      front_impression: { total_uniq: number };
+      front_button_click_one: { total_uniq: number };
+      front_button_click_two?: { total_uniq: number };
+    };
+  };
+  back?: {
+    back_button_clicks_one: { total_uniq: number };
+    back_button_clicks_two?: { total_uniq: number };
+  };
+  in_app?: {
+    clicks: { total_uniq: number };
+  };
+}

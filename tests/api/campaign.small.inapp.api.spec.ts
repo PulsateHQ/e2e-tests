@@ -2,7 +2,6 @@ import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import {
   createCampaignWithApi,
@@ -32,6 +31,7 @@ import {
   userActions
 } from '@_src/api/test-data/mobile/update/update-user.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllDeeplinks,
@@ -110,13 +110,12 @@ test.describe('Small In-App Campaign', () => {
       createCampaignInAppSmallTopWithUrl([
         createSegmentResponseJson.segment.id
       ]);
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignInAppSmallTopWithUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -131,12 +130,11 @@ test.describe('Small In-App Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -281,13 +279,12 @@ test.describe('Small In-App Campaign', () => {
         updateDeeplinkResponse.id
       );
 
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignInAppSmallBottomWithDeeplinkPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -302,12 +299,11 @@ test.describe('Small In-App Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -423,13 +419,12 @@ test.describe('Small In-App Campaign', () => {
       createCampaignInAppSmallTopWithDismiss([
         createSegmentResponseJson.segment.id
       ]);
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignInAppSmallTopWithDismissPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -444,12 +439,11 @@ test.describe('Small In-App Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -561,12 +555,11 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Get users alias
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -599,13 +592,12 @@ test.describe('Small In-App Campaign', () => {
       ]);
 
     // Create campaign
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignInAppSmallTopWithUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(

@@ -86,7 +86,7 @@ test.describe('Geofences Management', () => {
       await createFirstGeofenceResponse.json();
     const firstGeofenceId = createFirstGeofenceResponseJson.id;
 
-    const listGeofencesResponseAfterCreation = await listGeofencesWithApi(
+    const listGeofencesResponseJsonAfterCreation = await listGeofencesWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       1,
@@ -94,8 +94,6 @@ test.describe('Geofences Management', () => {
       'desc',
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const listGeofencesResponseJsonAfterCreation =
-      await listGeofencesResponseAfterCreation.json();
 
     const updateGeofenceResponse = await updateGeofenceWithApi(
       request,
@@ -135,7 +133,7 @@ test.describe('Geofences Management', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const listGeofencesResponseAfterDeletion = await listGeofencesWithApi(
+    const listGeofencesResponseJsonAfterDeletion = await listGeofencesWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       1,
@@ -143,8 +141,6 @@ test.describe('Geofences Management', () => {
       'desc',
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const listGeofencesResponseJsonAfterDeletion =
-      await listGeofencesResponseAfterDeletion.json();
 
     // Assert
     expect(createFirstGeofenceResponse.status()).toBe(201);
@@ -153,7 +149,6 @@ test.describe('Geofences Management', () => {
       firstGeofencePayload.name
     );
 
-    expect(listGeofencesResponseAfterCreation.status()).toBe(200);
     expect(listGeofencesResponseJsonAfterCreation.data.length).toBe(1);
 
     expect(updateGeofenceResponse.status()).toBe(200);
@@ -174,7 +169,6 @@ test.describe('Geofences Management', () => {
 
     expect(batchDeleteGeofencesResponse.status()).toBe(200);
 
-    expect(listGeofencesResponseAfterDeletion.status()).toBe(200);
     expect(listGeofencesResponseJsonAfterDeletion.data.length).toBe(2);
   });
 });

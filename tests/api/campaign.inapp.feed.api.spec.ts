@@ -152,14 +152,12 @@ test.describe('In-App Campaign with Feed', () => {
       );
 
     // Create InApp plus Feed Campaign
-    const createInAppFeedCampaignResponse = await createCampaignWithApi(
+    const createInAppFeedCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignSmallInAppWithCardPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createInAppFeedCampaignResponseJson =
-      await createInAppFeedCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createInAppFeedCampaignResponseJson.name).toBe(
@@ -174,12 +172,11 @@ test.describe('In-App Campaign with Feed', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -378,14 +375,12 @@ test.describe('In-App Campaign with Feed', () => {
     const createCampaignFeedOneButtonToUrlPayload =
       createCampaignFeedOneButtonToUrl([createSegmentResponseJson.segment.id]);
 
-    const createFeedCampaignResponse = await createCampaignWithApi(
+    const createFeedCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignFeedOneButtonToUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createFeedCampaignResponseJson =
-      await createFeedCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createFeedCampaignResponseJson.name).toBe(
@@ -400,12 +395,11 @@ test.describe('In-App Campaign with Feed', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -450,14 +444,12 @@ test.describe('In-App Campaign with Feed', () => {
       createCampaignInAppLargeWithOpenFeed([
         createSegmentResponseJson.segment.id
       ]);
-    const createInAppCampaignResponse = await createCampaignWithApi(
+    const createInAppCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignInAppLargeWithOpenFeedPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createInAppCampaignResponseJson =
-      await createInAppCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createInAppCampaignResponseJson.name).toBe(
@@ -623,14 +615,12 @@ test.describe('In-App Campaign with Feed', () => {
       );
 
     // Create Large InApp plus Feed Campaign with front/back
-    const createInAppFeedCampaignResponse = await createCampaignWithApi(
+    const createInAppFeedCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignLargeInAppWithFeedCardFrontBackPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createInAppFeedCampaignResponseJson =
-      await createInAppFeedCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createInAppFeedCampaignResponseJson.name).toBe(
@@ -645,12 +635,11 @@ test.describe('In-App Campaign with Feed', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 

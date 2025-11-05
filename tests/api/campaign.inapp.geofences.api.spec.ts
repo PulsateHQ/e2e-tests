@@ -121,13 +121,12 @@ test.describe('Geofence InApp Campaign', () => {
 
     // Create Campaign
 
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignInAppLargeButtonWithUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(
@@ -144,12 +143,11 @@ test.describe('Geofence InApp Campaign', () => {
 
     expect(getCampaignDetailsResponse.status).toBe('Active');
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -297,12 +295,11 @@ test.describe('Geofence InApp Campaign', () => {
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
     // Get users alias
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     expect(getUsersResponseJson.data.length).toBe(numberOfUsers);
 
@@ -318,13 +315,12 @@ test.describe('Geofence InApp Campaign', () => {
       });
 
     // Create campaign
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignInAppSmallTopWithUrlPayload,
       APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(

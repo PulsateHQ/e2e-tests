@@ -11,7 +11,10 @@ import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { validateStatusCode } from '@_src/api/utils/response.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -22,7 +25,7 @@ export async function listGeofencesWithApi(
   perPage = 1000,
   order = 'desc',
   appId?: string
-): Promise<APIResponse> {
+): Promise<GeofenceListResponse> {
   const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -31,7 +34,7 @@ export async function listGeofencesWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = (await response.json()) as GeofenceListResponse;
+  const responseJson = await parseJsonResponse<GeofenceListResponse>(response);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
@@ -48,13 +51,13 @@ export async function listGeofencesWithApi(
   expect(responseJson.metadata).toHaveProperty('max_radius');
   expect(responseJson.metadata).toHaveProperty('export_link');
 
-  return response;
+  return responseJson;
 }
 
 export async function createGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: GeofencePayload = geofencePayload,
+  payload: GeofencePayload = geofencePayload(),
   appId?: string
 ): Promise<APIResponse> {
   const headers = createAuthHeadersWithJson(authToken);
@@ -68,7 +71,7 @@ export async function createGeofenceWithApi(
   });
 
   validateStatusCode(response, 201);
-  const responseJson = (await response.json()) as GeofenceResponse;
+  const responseJson = await parseJsonResponse<GeofenceResponse>(response);
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name', payload.name);
   expect(responseJson).toHaveProperty('location', payload.location);

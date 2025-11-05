@@ -23,3 +23,19 @@ export interface UpdateGroupPayload {
     name: string;
   };
 }
+
+export interface GroupListResponse {
+  data: GroupResponse[];
+  metadata: {
+    page: number;
+    per_page: number;
+    total_pages: number;
+    data_count: number;
+  };
+}
+
+export interface GetAllGroupsOptions {
+  resourceType?: string;
+  page?: number;
+  perPage?: number;
+}

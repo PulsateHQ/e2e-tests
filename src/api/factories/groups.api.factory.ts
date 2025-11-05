@@ -8,20 +8,16 @@ import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { validateStatusCode } from '@_src/api/utils/response.util';
+import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
 export async function getAllGroupsWithApi(
   request: APIRequestContext,
   authToken: string,
-  options?: {
-    resourceType?: string;
-    page?: number;
-    perPage?: number;
-  },
+  options?: GetAllGroupsOptions,
   appId?: string
-): Promise<APIResponse> {
+): Promise<GroupListResponse> {
   const { resourceType = 'segments', page = 1, perPage = 1000 } = options || {};
 
   const headers = createAuthHeaders(authToken);
@@ -32,7 +28,7 @@ export async function getAllGroupsWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<GroupListResponse>(response);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
   expect(responseJson.metadata).toMatchObject({
@@ -42,7 +38,7 @@ export async function getAllGroupsWithApi(
     data_count: expect.any(Number)
   });
 
-  return response;
+  return responseJson;
 }
 
 export async function getSingleGroupWithApi(
@@ -50,7 +46,7 @@ export async function getSingleGroupWithApi(
   authToken: string,
   groupId: string,
   appId?: string
-): Promise<APIResponse> {
+): Promise<GroupResponse> {
   const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -59,14 +55,13 @@ export async function getSingleGroupWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<GroupResponse>(response);
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name');
   expect(responseJson).toHaveProperty('resource_type');
-  expect(responseJson).toHaveProperty('resource_ids');
   expect(responseJson).toHaveProperty('created_at');
 
-  return response;
+  return responseJson;
 }
 
 export async function createGroupForSegmentWithApi(

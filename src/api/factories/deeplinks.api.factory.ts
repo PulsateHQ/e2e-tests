@@ -1,10 +1,14 @@
-import { DeeplinkPayload, DeeplinkResponse } from '../models/deeplink.model';
+import {
+  DeeplinkListResponse,
+  DeeplinkPayload,
+  DeeplinkResponse
+} from '../models/deeplink.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { validateStatusCode } from '@_src/api/utils/response.util';
+import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -12,7 +16,7 @@ export async function getAllDeeplinksWithApi(
   request: APIRequestContext,
   authToken: string,
   appId?: string
-): Promise<APIResponse> {
+): Promise<DeeplinkListResponse> {
   const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
@@ -21,12 +25,12 @@ export async function getAllDeeplinksWithApi(
   const response = await request.get(url, { headers });
 
   validateStatusCode(response, 200);
-  const responseJson = await response.json();
+  const responseJson = await parseJsonResponse<DeeplinkListResponse>(response);
 
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
-  return response;
+  return responseJson;
 }
 
 export async function createDeeplinkWithApi(
@@ -44,7 +48,7 @@ export async function createDeeplinkWithApi(
   });
 
   validateStatusCode(response, 201);
-  const responseJson = (await response.json()) as DeeplinkResponse;
+  const responseJson = await parseJsonResponse<DeeplinkResponse>(response);
 
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('nickname', payload.nickname);
@@ -72,7 +76,7 @@ export async function updateDeeplinkWithApi(
   });
 
   validateStatusCode(response, 200);
-  const responseJson = (await response.json()) as DeeplinkResponse;
+  const responseJson = await parseJsonResponse<DeeplinkResponse>(response);
 
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('nickname', payload.nickname);
