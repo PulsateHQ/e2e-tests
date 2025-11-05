@@ -27,20 +27,24 @@ import { APIRequestContext, test } from '@playwright/test';
 
 export async function deleteAllUsers(
   request: APIRequestContext,
-  token: string
+  token: string,
+  appId?: string
 ): Promise<void> {
   await test.step('Deleting all users', async () => {
-    const getUsersResponse = await getAllUsersWithApi(request, token);
+    const getUsersResponse = await getAllUsersWithApi(request, token, {
+      appId
+    });
     const getUsersResponseJson = await getUsersResponse.json();
     const initialUserCount = getUsersResponseJson.data.length;
 
     for (const user of getUsersResponseJson.data) {
-      await deleteUserWithApi(request, token, user.id);
+      await deleteUserWithApi(request, token, user.id, appId);
     }
 
     const getUsersResponseAfterDeletion = await getAllUsersWithApi(
       request,
-      token
+      token,
+      { appId }
     );
     const getUsersResponseJsonAfterDeletion =
       await getUsersResponseAfterDeletion.json();
@@ -55,22 +59,29 @@ export async function deleteAllUsers(
 
 export async function deleteAllSegments(
   request: APIRequestContext,
-  token: string
+  token: string,
+  appId?: string
 ): Promise<void> {
   await test.step('Deleting all segments', async () => {
-    const getSegmentsResponse = await getAllSegmentsWithApi(request, token);
+    const getSegmentsResponse = await getAllSegmentsWithApi(
+      request,
+      token,
+      appId
+    );
     const getSegmentsResponseJson = await getSegmentsResponse.json();
     const initialSegmentCount = getSegmentsResponseJson.data.length;
 
     await batchDeleteSegmentsWithApi(
       request,
       token,
-      getSegmentsResponseJson.data.map((segment: { id: string }) => segment.id)
+      getSegmentsResponseJson.data.map((segment: { id: string }) => segment.id),
+      appId
     );
 
     const getSegmentsResponseAfterDeletion = await getAllSegmentsWithApi(
       request,
-      token
+      token,
+      appId
     );
     const getSegmentsResponseJsonAfterDeletion =
       await getSegmentsResponseAfterDeletion.json();
@@ -85,10 +96,11 @@ export async function deleteAllSegments(
 
 export async function deleteAllGeofences(
   request: APIRequestContext,
-  token: string
+  token: string,
+  appId?: string
 ): Promise<void> {
   await test.step('Deleting all geofences', async () => {
-    const getGeofencesResponse = await listGeofencesWithApi(request, token);
+    const getGeofencesResponse = await listGeofencesWithApi(request, token, 1, 1000, 'desc', appId);
     const getGeofencesResponseJson = await getGeofencesResponse.json();
     const initialGeofenceCount = getGeofencesResponseJson.data.length;
 
@@ -97,12 +109,17 @@ export async function deleteAllGeofences(
       token,
       getGeofencesResponseJson.data.map(
         (geofence: { id: string }) => geofence.id
-      )
+      ),
+      appId
     );
 
     const getGeofencesResponseAfterDeletion = await listGeofencesWithApi(
       request,
-      token
+      token,
+      1,
+      1000,
+      'desc',
+      appId
     );
     const getGeofencesResponseJsonAfterDeletion =
       await getGeofencesResponseAfterDeletion.json();
@@ -118,10 +135,13 @@ export async function deleteAllGeofences(
 
 export async function deleteAllCampaigns(
   request: APIRequestContext,
-  token: string
+  token: string,
+  appId?: string
 ): Promise<void> {
   await test.step('Deleting all campaigns', async () => {
-    const getCampaignsResponse = await getCampaignsWithApi(request, token);
+    const getCampaignsResponse = await getCampaignsWithApi(request, token, {
+      appId
+    });
     const getCampaignsResponseJson = await getCampaignsResponse.json();
     const initialCampaignCount = getCampaignsResponseJson.data.length;
 
@@ -130,12 +150,14 @@ export async function deleteAllCampaigns(
       token,
       getCampaignsResponseJson.data.map(
         (campaign: { id: string }) => campaign.id
-      )
+      ),
+      appId
     );
 
     const getCampaignsResponseAfterDeletion = await getCampaignsWithApi(
       request,
-      token
+      token,
+      { appId }
     );
     const getCampaignsResponseJsonAfterDeletion =
       await getCampaignsResponseAfterDeletion.json();
@@ -151,20 +173,23 @@ export async function deleteAllCampaigns(
 
 export async function deleteAllGroups(
   request: APIRequestContext,
-  token: string
+  token: string,
+  appId?: string
 ): Promise<void> {
   await test.step('Deleting all groups', async () => {
-    const getGroupsResponse = await getAllGroupsWithApi(request, token);
+    const getGroupsResponse = await getAllGroupsWithApi(request, token, undefined, appId);
     const getGroupsResponseJson = await getGroupsResponse.json();
     const initialGroupCount = getGroupsResponseJson.data.length;
 
     for (const group of getGroupsResponseJson.data) {
-      await deleteGroupWithApi(request, token, group.id);
+      await deleteGroupWithApi(request, token, group.id, appId);
     }
 
     const getGroupsResponseAfterDeletion = await getAllGroupsWithApi(
       request,
-      token
+      token,
+      undefined,
+      appId
     );
     const getGroupsResponseJsonAfterDeletion =
       await getGroupsResponseAfterDeletion.json();
@@ -179,20 +204,22 @@ export async function deleteAllGroups(
 
 export async function deleteAllDeeplinks(
   request: APIRequestContext,
-  token: string
+  token: string,
+  appId?: string
 ): Promise<void> {
   await test.step('Deleting all deeplinks', async () => {
-    const getDeeplinksResponse = await getAllDeeplinksWithApi(request, token);
+    const getDeeplinksResponse = await getAllDeeplinksWithApi(request, token, appId);
     const getDeeplinksResponseJson = await getDeeplinksResponse.json();
     const initialDeeplinkCount = getDeeplinksResponseJson.data.length;
 
     for (const deeplink of getDeeplinksResponseJson.data) {
-      await deleteDeeplinksWithApi(request, token, [deeplink.id]);
+      await deleteDeeplinksWithApi(request, token, [deeplink.id], appId);
     }
 
     const getDeeplinksResponseAfterDeletion = await getAllDeeplinksWithApi(
       request,
-      token
+      token,
+      appId
     );
     const getDeeplinksResponseJsonAfterDeletion =
       await getDeeplinksResponseAfterDeletion.json();

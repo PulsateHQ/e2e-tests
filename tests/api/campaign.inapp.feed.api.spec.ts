@@ -1,9 +1,9 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
@@ -53,14 +53,16 @@ import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('In-App Campaign with Feed', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
-
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN,
+      API_E2E_ACCESS_TOKEN_ADMIN,
+      'campaign.inapp.feed.api.spec.ts'
+    );
+
     const sdkCredentialsResponse = await getSdkCredentials(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -78,12 +80,18 @@ test.describe('In-App Campaign with Feed', () => {
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
@@ -103,14 +111,16 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      createSegmentAllUsersPayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Prepare Deeplink
     await deleteAllDeeplinks(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const createDeeplinkResponse = await createDeeplinkWithApi(
@@ -119,7 +129,8 @@ test.describe('In-App Campaign with Feed', () => {
       {
         nickname: 'Plawright',
         target: `${apiUrls.campaigns.v2.base}`
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const updateDeeplinkResponse = await updateDeeplinkWithApi(
@@ -129,7 +140,8 @@ test.describe('In-App Campaign with Feed', () => {
       {
         nickname: 'Plawright Campaign Deeplink',
         target: `${apiUrls.campaigns.v2.base}`
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Preparing payload for campaign creation
@@ -143,7 +155,8 @@ test.describe('In-App Campaign with Feed', () => {
     const createInAppFeedCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignSmallInAppWithCardPayload
+      createCampaignSmallInAppWithCardPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createInAppFeedCampaignResponseJson =
       await createInAppFeedCampaignResponse.json();
@@ -157,12 +170,14 @@ test.describe('In-App Campaign with Feed', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createInAppFeedCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -279,7 +294,9 @@ test.describe('In-App Campaign with Feed', () => {
         createInAppFeedCampaignResponseJson.id,
         1,
         1,
-        1
+        1,
+        undefined,
+        APIE2ELoginUserModel.apiE2EAppId
       );
 
     const getCampaignStatsWithWaitResponseJson =
@@ -355,7 +372,8 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      createSegmentAllUsersPayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -366,7 +384,8 @@ test.describe('In-App Campaign with Feed', () => {
     const createFeedCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignFeedOneButtonToUrlPayload
+      createCampaignFeedOneButtonToUrlPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createFeedCampaignResponseJson =
       await createFeedCampaignResponse.json();
@@ -380,12 +399,14 @@ test.describe('In-App Campaign with Feed', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createFeedCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -435,7 +456,8 @@ test.describe('In-App Campaign with Feed', () => {
     const createInAppCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppLargeWithOpenFeedPayload
+      createCampaignInAppLargeWithOpenFeedPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createInAppCampaignResponseJson =
       await createInAppCampaignResponse.json();
@@ -449,7 +471,8 @@ test.describe('In-App Campaign with Feed', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createInAppCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Start session for first user
@@ -515,7 +538,11 @@ test.describe('In-App Campaign with Feed', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createInAppCampaignResponseJson.id,
-      1
+      1,
+      undefined,
+      undefined,
+      undefined,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getCampaignStatsWithWaitResponseJson =
@@ -571,14 +598,16 @@ test.describe('In-App Campaign with Feed', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      createSegmentAllUsersPayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Prepare Deeplink for the back side button
     await deleteAllDeeplinks(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const createDeeplinkResponse = await createDeeplinkWithApi(
@@ -587,7 +616,8 @@ test.describe('In-App Campaign with Feed', () => {
       {
         nickname: 'CardBackDeeplink',
         target: `${apiUrls.campaigns.v2.base}`
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Preparing payload for campaign creation
@@ -601,7 +631,8 @@ test.describe('In-App Campaign with Feed', () => {
     const createInAppFeedCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignLargeInAppWithFeedCardFrontBackPayload
+      createCampaignLargeInAppWithFeedCardFrontBackPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createInAppFeedCampaignResponseJson =
       await createInAppFeedCampaignResponse.json();
@@ -615,12 +646,14 @@ test.describe('In-App Campaign with Feed', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createInAppFeedCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -738,7 +771,9 @@ test.describe('In-App Campaign with Feed', () => {
         createInAppFeedCampaignResponseJson.id,
         1,
         1,
-        1
+        1,
+        undefined,
+        APIE2ELoginUserModel.apiE2EAppId
       );
 
     const getCampaignStatsWithWaitResponseJson =

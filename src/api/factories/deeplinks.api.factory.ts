@@ -1,19 +1,21 @@
 import { DeeplinkPayload, DeeplinkResponse } from '../models/deeplink.model';
 import { Headers } from '@_src/api/models/headers.model';
-import { apiUrls } from '@_src/api/utils/api.util';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
 export async function getAllDeeplinksWithApi(
   request: APIRequestContext,
-  authToken: string
+  authToken: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.deeplinks.v2}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.deeplinks.v2}`;
 
   const response = await request.get(url, { headers });
 
@@ -35,7 +37,8 @@ export async function getAllDeeplinksWithApi(
 export async function createDeeplinkWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: DeeplinkPayload
+  payload: DeeplinkPayload,
+  appId?: string
 ): Promise<DeeplinkResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -43,7 +46,8 @@ export async function createDeeplinkWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.deeplinks.v2, {
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const response = await request.post(urls.deeplinks.v2, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -69,7 +73,8 @@ export async function updateDeeplinkWithApi(
   request: APIRequestContext,
   authToken: string,
   deeplinkId: string,
-  payload: DeeplinkPayload
+  payload: DeeplinkPayload,
+  appId?: string
 ): Promise<DeeplinkResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -77,7 +82,8 @@ export async function updateDeeplinkWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.deeplinks.v2}/${deeplinkId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.deeplinks.v2}/${deeplinkId}`;
 
   const response = await request.put(url, {
     headers,
@@ -105,14 +111,16 @@ export async function updateDeeplinkWithApi(
 export async function deleteDeeplinksWithApi(
   request: APIRequestContext,
   authToken: string,
-  deeplinkIds: string[]
+  deeplinkIds: string[],
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.deeplinks.v2}/${deeplinkIds}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.deeplinks.v2}/${deeplinkIds}`;
 
   const response = await request.delete(url, { headers });
 

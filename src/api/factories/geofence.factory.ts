@@ -7,7 +7,7 @@ import {
 } from '@_src/api/models/geofence.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
-import { apiUrls } from '@_src/api/utils/api.util';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -16,14 +16,16 @@ export async function listGeofencesWithApi(
   authToken: string,
   page = 1,
   perPage = 1000,
-  order = 'desc'
+  order = 'desc',
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.geofences.v2}?page=${page}&per_page=${perPage}&order=${order}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.geofences.v2}?page=${page}&per_page=${perPage}&order=${order}`;
 
   const response = await request.get(url, { headers });
 
@@ -58,7 +60,8 @@ export async function listGeofencesWithApi(
 export async function createGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: GeofencePayload = geofencePayload
+  payload: GeofencePayload = geofencePayload,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -66,7 +69,8 @@ export async function createGeofenceWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.geofences.v2}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.geofences.v2}`;
 
   const response = await request.post(url, {
     headers,
@@ -98,7 +102,8 @@ export async function updateGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,
   geofenceId: string,
-  payload: UpdateGeofencePayload
+  payload: UpdateGeofencePayload,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -106,7 +111,8 @@ export async function updateGeofenceWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.geofences.v2}/${geofenceId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.geofences.v2}/${geofenceId}`;
 
   const response = await request.put(url, {
     headers,
@@ -138,7 +144,8 @@ export async function updateGeofenceWithApi(
 export async function batchDestroyGeofencesWithApi(
   request: APIRequestContext,
   authToken: string,
-  resourceIds: string[]
+  resourceIds: string[],
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -150,7 +157,8 @@ export async function batchDestroyGeofencesWithApi(
     resource_ids: resourceIds
   };
 
-  const url = `${apiUrls.geofences.v2}/batch_destroy`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.geofences.v2}/batch_destroy`;
 
   const response = await request.delete(url, {
     headers,

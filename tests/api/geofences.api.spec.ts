@@ -2,7 +2,7 @@ import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
-import { API_E2E_APP_ID } from '@_config/env.config';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   batchDestroyGeofencesWithApi,
   createGeofenceWithApi,
@@ -21,30 +21,40 @@ import {
 import { expect, test } from '@playwright/test';
 
 test.describe('Geofences Management', () => {
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN,
+      API_E2E_ACCESS_TOKEN_ADMIN,
+      'geofences.api.spec.ts'
+    );
+
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-      [API_E2E_APP_ID]
+      [APIE2ELoginUserModel.apiE2EAppId]
     );
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     await deleteAllGeofences(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
@@ -69,7 +79,8 @@ test.describe('Geofences Management', () => {
     const createFirstGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstGeofencePayload
+      firstGeofencePayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createFirstGeofenceResponseJson =
       await createFirstGeofenceResponse.json();
@@ -77,7 +88,11 @@ test.describe('Geofences Management', () => {
 
     const listGeofencesResponseAfterCreation = await listGeofencesWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      1,
+      1000,
+      'desc',
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const listGeofencesResponseJsonAfterCreation =
       await listGeofencesResponseAfterCreation.json();
@@ -90,14 +105,16 @@ test.describe('Geofences Management', () => {
         ...createFirstGeofenceResponseJson,
         name: 'Updated First Geofence',
         radius: '1000'
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const updateGeofenceResponseJson = await updateGeofenceResponse.json();
 
     const createSecondGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      secondGeofencePayload
+      secondGeofencePayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSecondGeofenceResponseJson =
       await createSecondGeofenceResponse.json();
@@ -105,7 +122,8 @@ test.describe('Geofences Management', () => {
     const createThirdGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      thirdGeofencePayload
+      thirdGeofencePayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createThirdGeofenceResponseJson =
       await createThirdGeofenceResponse.json();
@@ -113,12 +131,17 @@ test.describe('Geofences Management', () => {
     const batchDeleteGeofencesResponse = await batchDestroyGeofencesWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      [firstGeofenceId]
+      [firstGeofenceId],
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const listGeofencesResponseAfterDeletion = await listGeofencesWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      1,
+      1000,
+      'desc',
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const listGeofencesResponseJsonAfterDeletion =
       await listGeofencesResponseAfterDeletion.json();

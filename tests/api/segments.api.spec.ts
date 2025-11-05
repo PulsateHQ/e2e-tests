@@ -1,6 +1,5 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import {
@@ -16,12 +15,12 @@ import {
   getUserCountForAlias,
   updateSegmentWithApi
 } from '@_src/api/factories/segments.api.factory';
-import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateUniqueCustomTag } from '@_src/api/test-data/cms/custom-attributes/custom-attribute.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';
 import { createSegmentSingleAliasPayload } from '@_src/api/test-data/cms/segment/create-segment-single-alias.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -31,29 +30,33 @@ import {
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Segment Management', () => {
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
-    await superAdminsFeatureFLagDefaultBatchUpdate(
+    // Create isolated company/app for this test file
+    APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-      [API_E2E_APP_ID]
+      SUPER_ADMIN_ACCESS_TOKEN,
+      API_E2E_ACCESS_TOKEN_ADMIN,
+      'segments.api.spec.ts'
     );
   });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
@@ -71,7 +74,8 @@ test.describe('Segment Management', () => {
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
     const firstAliasUser = getUsersResponseJson.data[0].alias;
@@ -87,7 +91,8 @@ test.describe('Segment Management', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstSegmentPayload
+      firstSegmentPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
@@ -96,7 +101,8 @@ test.describe('Segment Management', () => {
       await getSingleSegmentUsersWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        firstSegmentId
+        firstSegmentId,
+        APIE2ELoginUserModel.apiE2EAppId
       );
     const getSingleSegmentResponseAfterCreationJson =
       await getSingleSegmentResponseAfterCreation.json();
@@ -105,14 +111,16 @@ test.describe('Segment Management', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       firstSegmentId,
-      firstSegmentPayload
+      firstSegmentPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const updateSegmentResponseJson = await updateSegmentResponse.json();
 
     const createSecondSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      secondSegmentPayload
+      secondSegmentPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSecondSegmentResponseJson =
       await createSecondSegmentResponse.json();
@@ -120,7 +128,8 @@ test.describe('Segment Management', () => {
     const createThirdSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      thirdSegmentPayload
+      thirdSegmentPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createThirdSegmentResponseJson =
       await createThirdSegmentResponse.json();
@@ -128,14 +137,16 @@ test.describe('Segment Management', () => {
     const batchDeleteSegmentsWithApiResponse = await batchDeleteSegmentsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      [firstSegmentId]
+      [firstSegmentId],
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const batchDeleteSegmentsWithApiResponseJson =
       await batchDeleteSegmentsWithApiResponse.json();
 
     const getSegmentsResponseAfterCreation = await getAllSegmentsWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const getSegmentsResponseJsonAfterCreation =
       await getSegmentsResponseAfterCreation.json();
@@ -182,7 +193,9 @@ test.describe('Segment Management', () => {
     const getTotalAudienceForSegmentWithApiBeforeUserCreationResponse =
       await getTotalAudienceForSegmentWithApi(
         request,
-        APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        undefined,
+        APIE2ELoginUserModel.apiE2EAppId
       );
     const getTotalAudienceForSegmentWithApiBeforeUserCreationResponseJson =
       await getTotalAudienceForSegmentWithApiBeforeUserCreationResponse.json();
@@ -206,7 +219,8 @@ test.describe('Segment Management', () => {
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
     const firstAliasUser = getUsersResponseJson.data[0].alias;
@@ -218,7 +232,8 @@ test.describe('Segment Management', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      segmentAllUsersPayload
+      segmentAllUsersPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
     const firstSegmentId = createSegmentResponseJson.segment.id;
@@ -229,7 +244,8 @@ test.describe('Segment Management', () => {
       await getTotalAudienceForSegmentWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        totalAudiencePlusUsers
+        totalAudiencePlusUsers,
+        APIE2ELoginUserModel.apiE2EAppId
       );
     const getTotalAudienceForSegmentWithApiResponseJson =
       await getTotalAudienceForSegmentWithApiResponse.json();
@@ -238,7 +254,8 @@ test.describe('Segment Management', () => {
       await getSingleSegmentWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        firstSegmentId
+        firstSegmentId,
+        APIE2ELoginUserModel.apiE2EAppId
       );
     const getSingleSegmentWithApiAfterCreationForAllUsersJson =
       await getSingleSegmentWithApiAfterCreationForAllUsers.json();
@@ -246,7 +263,8 @@ test.describe('Segment Management', () => {
     const getUserCountForAliasResponse = await getUserCountForAlias(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstAliasUser
+      firstAliasUser,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const getUserCountForAliasResponseJson =
       await getUserCountForAliasResponse.json();
@@ -254,13 +272,15 @@ test.describe('Segment Management', () => {
     const createSecondSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentSingleAliasPayload(secondAliasUser)
+      createSegmentSingleAliasPayload(secondAliasUser),
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const duplicateSegmentWithApiResponse = await duplicateSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstSegmentId
+      firstSegmentId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const duplicateSegmentWithApiResponseJson =
       await duplicateSegmentWithApiResponse.json();
@@ -268,12 +288,14 @@ test.describe('Segment Management', () => {
     const estimateSegmentsWithApiResponse = await estimateSegmentsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstSegmentId
+      firstSegmentId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getSegmentsResponseAfterCreation = await getAllSegmentsWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const getSegmentsResponseJsonAfterCreation =
       await getSegmentsResponseAfterCreation.json();
@@ -327,7 +349,8 @@ test.describe('Segment Management', () => {
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
     const firstAliasUser = getUsersResponseJson.data[0].alias;
@@ -340,7 +363,8 @@ test.describe('Segment Management', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       'test',
       uniqueCustomTag,
-      [firstAliasUser, secondAliasUser]
+      [firstAliasUser, secondAliasUser],
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Assert initial segment creation
@@ -349,7 +373,8 @@ test.describe('Segment Management', () => {
     // Get segment ID
     const getAllSegmentsResponse = await getAllSegmentsWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const segmentId = (await getAllSegmentsResponse.json()).data[0].id;
 
@@ -358,7 +383,8 @@ test.describe('Segment Management', () => {
       const segmentUsersResponse = await getSingleSegmentUsersWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        segmentId
+        segmentId,
+        APIE2ELoginUserModel.apiE2EAppId
       );
       const segmentUsersResponseJson = await segmentUsersResponse.json();
 

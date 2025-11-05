@@ -1,6 +1,6 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID
+  SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getAllSegmentsWithApi } from '@_src/api/factories/segments.api.factory';
 import { getSingleSegmentUsersWithApi } from '@_src/api/factories/segments.api.factory';
@@ -25,6 +25,7 @@ import {
   generateUniqueCustomTag
 } from '@_src/api/test-data/cms/custom-attributes/custom-attribute.payload';
 import { createUserRequestPayload } from '@_src/api/test-data/cms/users/create-users.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -34,20 +35,33 @@ import {
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('User Management', () => {
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
+
+  test.beforeAll(async ({ request }) => {
+    // Create isolated company/app for this test file
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN,
+      API_E2E_ACCESS_TOKEN_ADMIN,
+      'users.api.spec.ts'
+    );
+  });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
@@ -68,7 +82,8 @@ test.describe('User Management', () => {
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      apiE2EAccessTokenAdmin
+      apiE2EAccessTokenAdmin,
+      { appId: apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
     const userId = getUsersResponseJson.data[0].id;
@@ -76,7 +91,8 @@ test.describe('User Management', () => {
     const getUserResponse = await getUserWithApi(
       request,
       apiE2EAccessTokenAdmin,
-      userId
+      userId,
+      apiE2EAppId
     );
     const getUserResponseJson = await getUserResponse.json();
 
@@ -102,7 +118,8 @@ test.describe('User Management', () => {
     const upsertUserWithApiResponse = await upsertUserWithApi(
       request,
       apiE2EAccessTokenAdmin,
-      upsertUserPayload
+      upsertUserPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const upsertUserWithApiResponseJson =
       await upsertUserWithApiResponse.json();
@@ -110,14 +127,16 @@ test.describe('User Management', () => {
     const createUserWithApiResponse = await createUserWithApi(
       request,
       apiE2EAccessTokenAdmin,
-      createUserPayload
+      createUserPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createUserWithApiResponseJson =
       await createUserWithApiResponse.json();
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      apiE2EAccessTokenAdmin
+      apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
     const userId = getUsersResponseJson.data[0].id;
@@ -125,12 +144,14 @@ test.describe('User Management', () => {
     const deleteUserWithApiResponse = await deleteUserWithApi(
       request,
       apiE2EAccessTokenAdmin,
-      userId
+      userId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getAllUsersWithApiAfterUnsubscribe = await getAllUsersWithApi(
       request,
-      apiE2EAccessTokenAdmin
+      apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getAllUsersWithApiAfterUnsubscribeJson =
       await getAllUsersWithApiAfterUnsubscribe.json();
@@ -157,7 +178,8 @@ test.describe('User Management', () => {
     // Arrange
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const numberOfUsers = 2;
     const uniqueCustomTag = generateUniqueCustomTag();
@@ -170,7 +192,8 @@ test.describe('User Management', () => {
         numberOfUsers: numberOfUsers,
         segmentName: 'segment_test',
         customTag: uniqueCustomTag
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Assert
@@ -181,7 +204,8 @@ test.describe('User Management', () => {
     await expect(async () => {
       const getAllSegmentsResponse = await getAllSegmentsWithApi(
         request,
-        APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+        APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+        APIE2ELoginUserModel.apiE2EAppId
       );
       const getAllSegmentsResponseJson = await getAllSegmentsResponse.json();
 
@@ -200,7 +224,8 @@ test.describe('User Management', () => {
       const segmentUsersResponse = await getSingleSegmentUsersWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        segmentId
+        segmentId,
+        APIE2ELoginUserModel.apiE2EAppId
       );
       const segmentUsersResponseJson = await segmentUsersResponse.json();
 
@@ -218,7 +243,8 @@ test.describe('User Management', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       userId,
-      'Updated note'
+      'Updated note',
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const updateUserNoteResponseJson = await updateUserNoteResponse.json();
     expect(updateUserNoteResponse.status()).toBe(200);
@@ -227,7 +253,8 @@ test.describe('User Management', () => {
     const getUserSegmentsResponse = await getUserSegmentsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      userId
+      userId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     expect(getUserSegmentsResponse.status()).toBe(200);
     const getUserSegmentsResponseJson = await getUserSegmentsResponse.json();
@@ -238,7 +265,8 @@ test.describe('User Management', () => {
     const getUserResponse = await getUserWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      userId
+      userId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const getUserResponseJson = await getUserResponse.json();
     expect(getUserResponseJson.note).toBe('Updated note');
@@ -248,7 +276,8 @@ test.describe('User Management', () => {
       await getUserCustomAttributesWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        aliasId
+        aliasId,
+        APIE2ELoginUserModel.apiE2EAppId
       );
     const getUserCustomAttributesResponseJson =
       await getUserCustomAttributesResponse.json();
@@ -264,7 +293,8 @@ test.describe('User Management', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       aliasId,
-      [customAttribute]
+      [customAttribute],
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Get the custom attribute we want to delete from the previous GET response
@@ -281,7 +311,8 @@ test.describe('User Management', () => {
           source: customAttributeFromResponse.source || '',
           product_id: customAttributeFromResponse.product_id || '',
           name: customAttributeFromResponse.name
-        }
+        },
+        APIE2ELoginUserModel.apiE2EAppId
       );
 
     expect(deleteUserCustomAttributesWithBodyResponse.status()).toBe(200);
@@ -290,7 +321,8 @@ test.describe('User Management', () => {
       await getUserCustomAttributesWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        aliasId
+        aliasId,
+        APIE2ELoginUserModel.apiE2EAppId
       );
     const getUserCustomAttributesAfterDeleteResponseJson =
       await getUserCustomAttributesAfterDeleteResponse.json();
@@ -312,7 +344,8 @@ test.describe('User Management', () => {
     const getUserAfterDelteAttributeResponse = await getUserWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      userId
+      userId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const getUserAfterDelteAttributeResponseJson =
       await getUserAfterDelteAttributeResponse.json();

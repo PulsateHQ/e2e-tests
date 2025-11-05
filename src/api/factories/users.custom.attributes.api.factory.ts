@@ -1,20 +1,22 @@
 import { CustomAttribute } from '../models/custom-attribute.model';
 import { Headers } from '@_src/api/models/headers.model';
-import { apiUrls } from '@_src/api/utils/api.util';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
 export async function getUserCustomAttributesWithApi(
   request: APIRequestContext,
   authToken: string,
-  userAlias: string
+  userAlias: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userAlias}/custom_attributes`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userAlias}/custom_attributes`;
 
   const response = await request.get(url, { headers });
 
@@ -35,7 +37,8 @@ export async function setUserCustomAttributesWithApi(
   request: APIRequestContext,
   authToken: string,
   userAlias: string,
-  customAttributes: CustomAttribute[]
+  customAttributes: CustomAttribute[],
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -43,7 +46,8 @@ export async function setUserCustomAttributesWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userAlias}/custom_attributes`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userAlias}/custom_attributes`;
 
   const response = await request.post(url, {
     headers,
@@ -68,14 +72,16 @@ export async function deleteUserCustomAttributesWithApi(
     source: string;
     product_id: string;
     name: string;
-  }
+  },
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userAlias}/custom_attributes`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userAlias}/custom_attributes`;
 
   const response = await request.delete(url, {
     headers,

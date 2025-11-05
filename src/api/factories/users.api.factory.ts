@@ -1,6 +1,6 @@
 import { Headers } from '@_src/api/models/headers.model';
 import { UserRequest, UserResponse } from '@_src/api/models/user.model';
-import { apiUrls } from '@_src/api/utils/api.util';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -13,13 +13,15 @@ export async function getAllUsersWithApi(
     order?: string;
     page?: number;
     perPage?: number;
+    appId?: string;
   }
 ): Promise<APIResponse> {
   const {
     sort = 'created_at',
     order = 'desc',
     page = 1,
-    perPage = 50
+    perPage = 50,
+    appId
   } = options || {};
 
   const headers: Headers = {
@@ -27,7 +29,8 @@ export async function getAllUsersWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
 
   const response = await request.get(url, { headers });
 
@@ -49,14 +52,16 @@ export async function getAllUsersWithApi(
 export async function getUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}`;
 
   const response = await request.get(url, { headers });
 
@@ -77,14 +82,16 @@ export async function getUserWithApi(
 export async function deleteUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}`;
 
   const response = await request.delete(url, { headers });
 
@@ -144,7 +151,8 @@ export async function updateUserNoteWithApi(
   request: APIRequestContext,
   authToken: string,
   userId: string,
-  noteContent: string
+  noteContent: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -152,7 +160,8 @@ export async function updateUserNoteWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userId}/note`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}/note`;
 
   const payload = {
     content: noteContent
@@ -180,14 +189,16 @@ export async function updateUserNoteWithApi(
 export async function getUserSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userId}/segments`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}/segments`;
 
   const response = await request.get(url, { headers });
 
@@ -208,14 +219,16 @@ export async function getUserSegmentsWithApi(
 export async function getUserGeofenceEventsWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.users.v2}/${userId}/geofence_events`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}/geofence_events`;
 
   const response = await request.get(url, { headers });
 
@@ -236,7 +249,8 @@ export async function getUserGeofenceEventsWithApi(
 export async function createUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: UserRequest
+  payload: UserRequest,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -244,7 +258,8 @@ export async function createUserWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.users.v1}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v1}`;
 
   const response = await request.post(url, {
     headers,
@@ -264,7 +279,8 @@ export async function createUserWithApi(
 export async function upsertUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: UserRequest
+  payload: UserRequest,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -272,7 +288,8 @@ export async function upsertUserWithApi(
     'Content-Type': 'application/json'
   };
 
-  const url = `${apiUrls.users.v1}/upsert`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v1}/upsert`;
 
   const response = await request.put(url, {
     headers,
@@ -300,7 +317,8 @@ export async function uploadUsersWithSegmentCreationApi(
     numberOfUsers: number;
     segmentName: string;
     customTag: string;
-  }
+  },
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -331,7 +349,8 @@ export async function uploadUsersWithSegmentCreationApi(
 
   const csvContent = Buffer.from(csvRows.join('\n'));
 
-  const response = await request.post(`${apiUrls.users.v2}/upload`, {
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const response = await request.post(`${urls.users.v2}/upload`, {
     headers,
     multipart: {
       file: {

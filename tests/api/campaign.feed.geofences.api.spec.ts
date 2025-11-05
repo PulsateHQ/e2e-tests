@@ -1,9 +1,9 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
@@ -38,14 +38,16 @@ import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Geofence Feed Campaign', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
-
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN,
+      API_E2E_ACCESS_TOKEN_ADMIN,
+      'campaign.feed.geofences.api.spec.ts'
+    );
+
     const sdkCredentialsResponse = await getSdkCredentials(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -63,16 +65,23 @@ test.describe('Geofence Feed Campaign', () => {
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     await deleteAllGeofences(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
@@ -92,7 +101,8 @@ test.describe('Geofence Feed Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload()
+      geofencePayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
@@ -109,7 +119,8 @@ test.describe('Geofence Feed Campaign', () => {
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      campaignPayload
+      campaignPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
@@ -120,14 +131,16 @@ test.describe('Geofence Feed Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      'Active'
+      'Active',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     expect(getCampaignDetailsResponse.status).toBe('Active');
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -174,7 +187,8 @@ test.describe('Geofence Feed Campaign', () => {
       await getUserGeofenceEventsWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        firstUser.id
+        firstUser.id,
+        APIE2ELoginUserModel.apiE2EAppId
       );
 
     const getUserGeofenceEventsWithApiResponseJson =
@@ -278,7 +292,11 @@ test.describe('Geofence Feed Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      1
+      1,
+      undefined,
+      undefined,
+      undefined,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getCampaignStatsWithWaitResponseJson =

@@ -3,7 +3,7 @@ import {
   CreateCampaignPayload
 } from '@_src/api/models/campaign.model';
 import { Headers } from '@_src/api/models/headers.model';
-import { apiUrls } from '@_src/api/utils/api.util';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -15,13 +15,15 @@ export async function getCampaignsWithApi(
     order?: string;
     page?: number;
     perPage?: number;
+    appId?: string;
   }
 ): Promise<APIResponse> {
   const {
     sort = 'created_at',
     order = 'desc',
     page = 1,
-    perPage = 50
+    perPage = 50,
+    appId
   } = options || {};
 
   const headers: Headers = {
@@ -29,7 +31,8 @@ export async function getCampaignsWithApi(
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaigns.v2.base}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.base}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
 
   const response = await request.get(url, { headers });
 
@@ -52,7 +55,8 @@ export async function getCampaignsWithApi(
 export async function createCampaignWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: CreateCampaignPayload
+  payload: CreateCampaignPayload,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -60,7 +64,8 @@ export async function createCampaignWithApi(
     'Content-Type': 'application/json'
   };
 
-  const response = await request.post(apiUrls.campaigns.v2.base, {
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const response = await request.post(urls.campaigns.v2.base, {
     headers,
     data: JSON.stringify(payload)
   });
@@ -83,14 +88,16 @@ export async function createCampaignWithApi(
 export async function deleteCampaignWithApi(
   request: APIRequestContext,
   authToken: string,
-  campaignId: string
+  campaignId: string,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaigns.v2.base}/${campaignId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.base}/${campaignId}`;
 
   const response = await request.delete(url, { headers });
 
@@ -107,7 +114,8 @@ export async function deleteCampaignWithApi(
 export async function batchDeleteCampaignsWithApi(
   request: APIRequestContext,
   authToken: string,
-  resourceIds: string[]
+  resourceIds: string[],
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
@@ -119,8 +127,9 @@ export async function batchDeleteCampaignsWithApi(
     resource_ids: resourceIds
   };
 
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const response = await request.delete(
-    `${apiUrls.campaigns.v2.base}/batch_destroy`,
+    `${urls.campaigns.v2.base}/batch_destroy`,
     {
       headers,
       data: JSON.stringify(payload)
@@ -141,14 +150,16 @@ export async function getCampaignDetailsWithApi(
   request: APIRequestContext,
   authToken: string,
   campaignId: string,
-  expectedStatusCampaign: string
+  expectedStatusCampaign: string,
+  appId?: string
 ): Promise<CampaignDetailsResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaigns.v2.base}/${campaignId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.base}/${campaignId}`;
 
   let response: APIResponse;
 

@@ -1,8 +1,8 @@
 import {
   API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import {
   createCampaignWithApi,
@@ -43,14 +43,18 @@ import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Small In-App Campaign', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
-
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    // Create isolated company/app for this test file
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN,
+      API_E2E_ACCESS_TOKEN_ADMIN,
+      'campaign.small.inapp.api.spec.ts'
+    );
+
+    // Get SDK credentials using the new appId
     const sdkCredentialsResponse = await getSdkCredentials(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -66,12 +70,18 @@ test.describe('Small In-App Campaign', () => {
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
   test('should create an In-App Small Top campaign with a URL banner and click it', async ({
@@ -90,7 +100,8 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      createSegmentAllUsersPayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -102,7 +113,8 @@ test.describe('Small In-App Campaign', () => {
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallTopWithUrlPayload
+      createCampaignInAppSmallTopWithUrlPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
@@ -115,12 +127,14 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -170,7 +184,9 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      1
+      1,
+      undefined,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getCampaignStatsWithWaitResponseJson =
@@ -226,13 +242,15 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      createSegmentAllUsersPayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     await deleteAllDeeplinks(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const createDeeplinkResponse = await createDeeplinkWithApi(
@@ -241,7 +259,8 @@ test.describe('Small In-App Campaign', () => {
       {
         nickname: 'Plawright',
         target: `${apiUrls.campaigns.v2.base}`
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const updateDeeplinkResponse = await updateDeeplinkWithApi(
@@ -251,7 +270,8 @@ test.describe('Small In-App Campaign', () => {
       {
         nickname: 'Plawright Campaign Deeplink',
         target: `${apiUrls.campaigns.v2.base}`
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Preparing payload for campaign creation
@@ -264,7 +284,8 @@ test.describe('Small In-App Campaign', () => {
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallBottomWithDeeplinkPayload
+      createCampaignInAppSmallBottomWithDeeplinkPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
@@ -277,12 +298,14 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -332,7 +355,9 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      1
+      1,
+      undefined,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getCampaignStatsWithWaitResponseJson =
@@ -388,7 +413,8 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      createSegmentAllUsersPayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
@@ -400,7 +426,8 @@ test.describe('Small In-App Campaign', () => {
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallTopWithDismissPayload
+      createCampaignInAppSmallTopWithDismissPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
@@ -413,12 +440,14 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -468,7 +497,9 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      1
+      1,
+      undefined,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getCampaignStatsWithWaitResponseJson =
@@ -524,14 +555,16 @@ test.describe('Small In-App Campaign', () => {
     const createSegmentResponse = await createSegmentWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createSegmentAllUsersPayload()
+      createSegmentAllUsersPayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSegmentResponseJson = await createSegmentResponse.json();
 
     // Get users alias
     const getUsersResponse = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
     const getUsersResponseJson = await getUsersResponse.json();
 
@@ -569,7 +602,8 @@ test.describe('Small In-App Campaign', () => {
     const createCampaignResponse = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      createCampaignInAppSmallTopWithUrlPayload
+      createCampaignInAppSmallTopWithUrlPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createCampaignResponseJson = await createCampaignResponse.json();
 
@@ -582,7 +616,8 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      'Delivered'
+      'Delivered',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     // Start session for first user
@@ -656,7 +691,9 @@ test.describe('Small In-App Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      2
+      2,
+      undefined,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getCampaignStatsWithWaitResponseJson =

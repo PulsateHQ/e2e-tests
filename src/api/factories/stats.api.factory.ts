@@ -1,5 +1,5 @@
 import { Headers } from '@_src/api/models/headers.model';
-import { apiUrls } from '@_src/api/utils/api.util';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -8,14 +8,16 @@ export async function getInAppCampaignStatsWithApi(
   authToken: string,
   campaignId: string,
   expectedSend: number,
-  expectedInAppButtonClick?: number
+  expectedInAppButtonClick?: number,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaigns.v2.combinedStats}/${campaignId}/stats`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;
 
   let response: APIResponse;
 
@@ -51,14 +53,16 @@ export async function getCardCampaignStatsWithApi(
   expectedSend: number,
   expectedCardButtonClick?: number,
   expectedFrontImpression?: number,
-  expectedFrontButtonClickOne?: number
+  expectedFrontButtonClickOne?: number,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaigns.v2.combinedStats}/${campaignId}/stats`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;
 
   let response: APIResponse;
 
@@ -105,14 +109,17 @@ export async function getInAppCardCampaignStatsWithApi(
   campaignId: string,
   expectedSend: number,
   expectedInAppButtonClick?: number,
-  expectedCardButtonClick?: number
+  expectedCardButtonClick?: number,
+  expectedFrontImpression?: number,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaigns.v2.combinedStats}/${campaignId}/stats`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;
 
   let response: APIResponse;
 
@@ -154,14 +161,16 @@ export async function getCampaignBackCardStatsWithApi(
   expectedSend: number,
   expectedBackImpressions: number,
   expectedBackButtonClicksOne?: number,
-  expectedBackButtonClicksTwo?: number
+  expectedBackButtonClicksTwo?: number,
+  appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
     Authorization: `Token token=${authToken}`,
     Accept: 'application/json'
   };
 
-  const url = `${apiUrls.campaigns.v2.combinedStats}/${campaignId}/stats`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;
 
   let response: APIResponse;
 
