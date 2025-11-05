@@ -8,37 +8,17 @@ import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-r
 import { APIRequestContext } from '@playwright/test';
 
 /**
- * Extracts environment name from DOTENV_CONFIG_PATH
- * Examples: .env.tiger -> tiger, .env.sealion -> sealion
- */
-function extractEnvironmentName(): string {
-  const dotenvPath = process.env.DOTENV_CONFIG_PATH;
-  if (dotenvPath) {
-    const match = dotenvPath.match(/\.env\.([^./\\]+)/);
-    if (match && match[1]) {
-      return match[1];
-    }
-  }
-  return 'unknown';
-}
-
-/**
  * Generates identifiable company and app names for E2E tests
- * Format: e2e-api-tests-{env}-{testFile}-{timestamp}
+ * Format: e2e-api-tests-{type}-{timestamp}
  */
-function generateIdentifiableNames(
-  testFileName?: string
-): { companyName: string; appName: string } {
-  const env = extractEnvironmentName();
+function generateIdentifiableNames(testFileName?: string): {
+  companyName: string;
+  appName: string;
+} {
   const timestamp = Date.now();
-  const testFilePart = testFileName
-    ? testFileName.replace('.spec.ts', '').replace('.api.spec.ts', '')
-    : 'test';
-
-  const baseName = `e2e-api-tests-${env}-${testFilePart}-${timestamp}`;
   return {
-    companyName: `${baseName}-company`,
-    appName: `${baseName}-app`
+    companyName: `e2e-api-tests-company-${timestamp}`,
+    appName: `e2e-api-tests-app-${timestamp}`
   };
 }
 
@@ -60,8 +40,10 @@ export async function setupIsolatedCompany(
   testFileName?: string
 ): Promise<APIE2ELoginUserModel> {
   // Create activation code
-  const activationCodeResponse =
-    await superAdminsActivationCodesCreate(request, superAdminToken);
+  const activationCodeResponse = await superAdminsActivationCodesCreate(
+    request,
+    superAdminToken
+  );
   const activationCodeJson = await activationCodeResponse.json();
   const activationCode = activationCodeJson.activation_code;
 
@@ -89,11 +71,9 @@ export async function setupIsolatedCompany(
     companyRegistrationResponseJson.data.admin_access_token;
 
   // Update feature flags for the new app
-  await superAdminsFeatureFLagDefaultBatchUpdate(
-    request,
-    superAdminToken,
-    [appId]
-  );
+  await superAdminsFeatureFLagDefaultBatchUpdate(request, superAdminToken, [
+    appId
+  ]);
 
   return {
     apiE2EAccessTokenAdmin: adminAccessToken,
@@ -101,4 +81,3 @@ export async function setupIsolatedCompany(
     apiE2EAppId: appId
   };
 }
-

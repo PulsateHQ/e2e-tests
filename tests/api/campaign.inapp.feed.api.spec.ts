@@ -3,7 +3,6 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
@@ -42,6 +41,7 @@ import {
   userActions
 } from '@_src/api/test-data/mobile/update/update-user.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllDeeplinks,
@@ -540,8 +540,6 @@ test.describe('In-App Campaign with Feed', () => {
       createInAppCampaignResponseJson.id,
       1,
       undefined,
-      undefined,
-      undefined,
       APIE2ELoginUserModel.apiE2EAppId
     );
 
@@ -771,8 +769,11 @@ test.describe('In-App Campaign with Feed', () => {
         createInAppFeedCampaignResponseJson.id,
         1,
         1,
-        1,
-        undefined,
+        {
+          backButtonClicksOne: 1,
+          frontImpression: 1,
+          frontButtonClickOne: 1
+        },
         APIE2ELoginUserModel.apiE2EAppId
       );
 
@@ -826,21 +827,6 @@ test.describe('In-App Campaign with Feed', () => {
       'total_uniq',
       1
     );
-
-    // Front side statistics
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
-
-    // Back side statistics
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: front and back card stats are now validated in the factory with retry logic
   });
 });

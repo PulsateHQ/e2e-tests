@@ -253,9 +253,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
       1,
-      1,
-      1,
-      1,
+      {
+        cardButtonClick: 1,
+        frontImpression: 1,
+        frontButtonClickOne: 1
+      },
       APIE2ELoginUserModel.apiE2EAppId
     );
 
@@ -492,9 +494,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
       1,
-      1,
-      1,
-      1,
+      {
+        cardButtonClick: 1,
+        frontImpression: 1,
+        frontButtonClickOne: 1
+      },
       APIE2ELoginUserModel.apiE2EAppId
     );
 
@@ -810,8 +814,11 @@ test.describe('HTML Feed Campaign', () => {
         createCampaignResponseJson.id,
         1,
         1,
-        1,
-        undefined,
+        {
+          backButtonClicksOne: 1,
+          frontImpression: 1,
+          frontButtonClickOne: 1
+        },
         APIE2ELoginUserModel.apiE2EAppId
       );
 
@@ -836,20 +843,7 @@ test.describe('HTML Feed Campaign', () => {
       'total_uniq',
       1
     );
-
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
-
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: front and back stats are now validated in the factory with retry logic
   });
 
   test('should create HTML Feed campaign with expiration one hour time, verify Back Feed button visibility with two buttons', async ({
@@ -1174,8 +1168,13 @@ test.describe('HTML Feed Campaign', () => {
         createCampaignResponseJson.id,
         1,
         1,
-        0,
-        1,
+        {
+          backButtonClicksOne: 0,
+          backButtonClicksTwo: 1,
+          frontImpression: 1,
+          frontButtonClickOne: 0,
+          frontButtonClickTwo: 1
+        },
         APIE2ELoginUserModel.apiE2EAppId
       );
 
@@ -1200,26 +1199,7 @@ test.describe('HTML Feed Campaign', () => {
       'total_uniq',
       1
     );
-
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 0);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_two
-    ).toHaveProperty('total_uniq', 1);
-
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_one
-    ).toHaveProperty('total_uniq', 0);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_two
-    ).toHaveProperty('total_uniq', 1);
+    // Note: front and back stats are now validated in the factory with retry logic
   });
 
   test('should create an HTML Feed campaign with 2 users but only 1 user clicks the button', async ({
@@ -1385,9 +1365,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
       2,
-      1,
-      1,
-      1,
+      {
+        cardButtonClick: 1,
+        frontImpression: 1,
+        frontButtonClickOne: 1
+      },
       APIE2ELoginUserModel.apiE2EAppId
     );
 
@@ -1615,8 +1597,13 @@ test.describe('HTML Feed Campaign', () => {
         createCampaignResponseJson.id,
         2,
         1,
-        0,
-        1,
+        {
+          backButtonClicksOne: 0,
+          backButtonClicksTwo: 1,
+          frontImpression: 2,
+          frontButtonClickOne: 1,
+          frontButtonClickTwo: 1
+        },
         APIE2ELoginUserModel.apiE2EAppId
       );
 
@@ -1641,26 +1628,7 @@ test.describe('HTML Feed Campaign', () => {
       'total_uniq',
       2
     );
-
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 2);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_two
-    ).toHaveProperty('total_uniq', 1);
-
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_one
-    ).toHaveProperty('total_uniq', 0);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.back.back_button_click_two
-    ).toHaveProperty('total_uniq', 1);
+    // Note: front and back stats are now validated in the factory with retry logic
   });
 
   test('should create 2 HTML Feed campaign and validate number of feeds cards', async ({
@@ -1789,9 +1757,11 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createFirstCampaignResponseJson.id,
       1,
-      1,
-      1,
-      1,
+      {
+        cardButtonClick: 1,
+        frontImpression: 1,
+        frontButtonClickOne: 1
+      },
       APIE2ELoginUserModel.apiE2EAppId
     );
 

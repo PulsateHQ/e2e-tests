@@ -181,8 +181,6 @@ test.describe('Feed Post Campaign', () => {
       createCampaignResponseJson.id,
       1,
       undefined,
-      undefined,
-      undefined,
       APIE2ELoginUserModel.apiE2EAppId
     );
 

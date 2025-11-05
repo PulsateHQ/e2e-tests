@@ -1,7 +1,24 @@
+import {
+  BackCardStatsValidationOptions,
+  CardStatsValidationOptions
+} from '@_src/api/models/campaign.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
+
+/**
+ * Validates a stat value when provided (non-undefined)
+ * This allows conditional validation without explicit if statements in the calling code
+ */
+function validateStatWhenProvided(
+  actualValue: { total_uniq: number },
+  expectedValue: number | undefined
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  expectedValue !== undefined &&
+    expect(actualValue).toHaveProperty('total_uniq', expectedValue);
+}
 
 export async function getInAppCampaignStatsWithApi(
   request: APIRequestContext,
@@ -51,9 +68,7 @@ export async function getCardCampaignStatsWithApi(
   authToken: string,
   campaignId: string,
   expectedSend: number,
-  expectedCardButtonClick?: number,
-  expectedFrontImpression?: number,
-  expectedFrontButtonClickOne?: number,
+  options?: CardStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
@@ -80,24 +95,26 @@ export async function getCardCampaignStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
-    if (expectedCardButtonClick !== undefined) {
-      expect(responseJson.card.clicks).toHaveProperty(
-        'total_uniq',
-        expectedCardButtonClick
+
+    // Validate optional stats - validate all provided options
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.clicks,
+        options.cardButtonClick
       );
-    }
-    if (expectedFrontImpression !== undefined) {
-      expect(responseJson.card.front.front_impression).toHaveProperty(
-        'total_uniq',
-        expectedFrontImpression
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.front.front_impression,
+        options.frontImpression
       );
-    }
-    if (expectedFrontButtonClickOne !== undefined) {
-      expect(responseJson.card.front.front_button_click_one).toHaveProperty(
-        'total_uniq',
-        expectedFrontButtonClickOne
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.front.front_button_click_one,
+        options.frontButtonClickOne
       );
-    }
   }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;
@@ -160,8 +177,7 @@ export async function getCampaignBackCardStatsWithApi(
   campaignId: string,
   expectedSend: number,
   expectedBackImpressions: number,
-  expectedBackButtonClicksOne?: number,
-  expectedBackButtonClicksTwo?: number,
+  options?: BackCardStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
@@ -190,22 +206,43 @@ export async function getCampaignBackCardStatsWithApi(
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
 
-    // Back card specific validations
+    // Back card specific validations (required)
     expect(responseJson.card.back.back_impression).toHaveProperty(
       'total_uniq',
       expectedBackImpressions
     );
 
-    expect(responseJson.card.back.back_button_click_one).toHaveProperty(
-      'total_uniq',
-      expectedBackButtonClicksOne
-    );
-    if (expectedBackButtonClicksTwo !== undefined) {
-      expect(responseJson.card.back.back_button_click_two).toHaveProperty(
-        'total_uniq',
-        expectedBackButtonClicksTwo
+    // Validate optional stats - validate all provided options
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.back.back_button_click_one,
+        options.backButtonClicksOne
       );
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.back.back_button_click_two,
+        options.backButtonClicksTwo
+      );
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.front.front_impression,
+        options.frontImpression
+      );
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.front.front_button_click_one,
+        options.frontButtonClickOne
+      );
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.front.front_button_click_two,
+        options.frontButtonClickTwo
+      );
   }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;

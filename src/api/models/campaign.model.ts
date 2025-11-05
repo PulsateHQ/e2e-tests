@@ -276,3 +276,17 @@ export interface CampaignDetailsResponse {
   type_list: string[];
   updated_at: string;
 }
+
+export interface CardStatsValidationOptions {
+  cardButtonClick?: number;
+  frontImpression?: number;
+  frontButtonClickOne?: number;
+}
+
+export interface BackCardStatsValidationOptions {
+  backButtonClicksOne?: number;
+  backButtonClicksTwo?: number;
+  frontImpression?: number;
+  frontButtonClickOne?: number;
+  frontButtonClickTwo?: number;
+}

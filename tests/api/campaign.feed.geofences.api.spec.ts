@@ -3,7 +3,6 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
@@ -27,6 +26,7 @@ import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllGeofences,
@@ -293,9 +293,11 @@ test.describe('Geofence Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
       1,
-      undefined,
-      undefined,
-      undefined,
+      {
+        cardButtonClick: 1,
+        frontImpression: 1,
+        frontButtonClickOne: 1
+      },
       APIE2ELoginUserModel.apiE2EAppId
     );
 
@@ -312,15 +314,6 @@ test.describe('Geofence Feed Campaign', () => {
       'total_uniq',
       1
     );
-    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
-      'total_uniq',
-      1
-    );
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: clicks, front_impression, and front_button_click_one are now validated in the factory with retry logic
   });
 });
