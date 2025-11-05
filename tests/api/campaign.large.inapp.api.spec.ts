@@ -50,8 +50,7 @@ test.describe('Large In-App Campaign', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'campaign.large.inapp.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
 
     const sdkCredentialsResponse = await getSdkCredentials(

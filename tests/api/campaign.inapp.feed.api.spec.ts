@@ -25,6 +25,12 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
+import {
+  CampaignBasePart,
+  CampaignCallToAction,
+  CardResponsePart,
+  CardWithApiResponse
+} from '@_src/api/models/campaign.model';
 import { InAppEvents } from '@_src/api/models/mobile.users.model';
 import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
@@ -59,8 +65,7 @@ test.describe('In-App Feed Campaign', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'campaign.inapp.feed.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
 
     const sdkCredentialsResponse = await getSdkCredentials(
@@ -236,7 +241,8 @@ test.describe('In-App Feed Campaign', () => {
       createInAppFeedCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -246,25 +252,27 @@ test.describe('In-App Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createInAppFeedCampaignResponseJson.card_notification.front_parts
-        .call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    const campaignCallToAction = createInAppFeedCampaignResponseJson
+      .card_notification?.front_parts?.call_to_action as CampaignCallToAction;
+    expect(callToActionPart?.active).toBe(campaignCallToAction?.active);
+    expect(callToActionPart?.position).toBe(
+      (campaignCallToAction as CampaignBasePart & CampaignCallToAction)
+        ?.position
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
-    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
-    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
-    expect(buttonAttrs.destination).toBe(campaignButton.destination);
-    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
-    expect(buttonAttrs.label).toBe(campaignButton.label);
-    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
-    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+    const campaignButton = campaignCallToAction?.buttons?.[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton?.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton?.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton?.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton?.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton?.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton?.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton?.order_number);
 
     await createWebSdkStatistics(
       request,
@@ -432,7 +440,8 @@ test.describe('In-App Feed Campaign', () => {
       createFeedCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -692,7 +701,8 @@ test.describe('In-App Feed Campaign', () => {
       createInAppFeedCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(

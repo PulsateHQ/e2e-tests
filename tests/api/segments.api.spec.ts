@@ -37,8 +37,7 @@ test.describe('Segment Management', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'segments.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
   });
 

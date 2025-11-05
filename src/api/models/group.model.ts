@@ -11,6 +11,9 @@ export interface GroupResponse {
   resource_type: string;
   created_at: string;
   updated_at: string;
+  resource_ids?: {
+    segment_ids?: string[];
+  };
 }
 
 export interface AddResourcesToGroupPayload {

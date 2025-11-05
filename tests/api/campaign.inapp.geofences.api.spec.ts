@@ -49,8 +49,7 @@ test.describe('Geofence In-App Campaign', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'campaign.inapp.geofences.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
 
     const sdkCredentialsResponse = await getSdkCredentials(

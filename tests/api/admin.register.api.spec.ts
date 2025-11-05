@@ -34,8 +34,7 @@ test.describe('Company Registration and Admin Management', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'admin.register.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,

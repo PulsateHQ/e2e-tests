@@ -29,8 +29,7 @@ test.describe('Admin Invitation Management', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'invite.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
 
     await superAdminsFeatureFLagDefaultBatchUpdate(

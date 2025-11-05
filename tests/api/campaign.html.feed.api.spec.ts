@@ -25,6 +25,16 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
+import {
+  CampaignBasePart,
+  CampaignCallToAction,
+  CampaignHeadline,
+  CampaignImage,
+  CampaignTable,
+  CampaignText,
+  CardResponsePart,
+  CardWithApiResponse
+} from '@_src/api/models/campaign.model';
 import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import {
   createCampaignFeedOneButtonBackWithDismiss,
@@ -54,8 +64,7 @@ test.describe('HTML Feed Campaign', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'campaign.html.feed.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
 
     const sdkCredentialsResponse = await getSdkCredentials(
@@ -168,7 +177,8 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -178,34 +188,37 @@ test.describe('HTML Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createCampaignResponseJson.card_notification.front_parts.call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    const campaignCallToAction = createCampaignResponseJson.card_notification
+      ?.front_parts?.call_to_action as CampaignCallToAction;
+    expect(callToActionPart?.active).toBe(campaignCallToAction?.active);
+    expect(callToActionPart?.position).toBe(
+      (campaignCallToAction as CampaignBasePart & CampaignCallToAction)
+        ?.position
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
-    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
-    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
-    expect(buttonAttrs.destination).toBe(campaignButton.destination);
-    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
-    expect(buttonAttrs.label).toBe(campaignButton.label);
-    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
-    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+    const campaignButton = campaignCallToAction?.buttons[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton?.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton?.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton?.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton?.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton?.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton?.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton?.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignText =
-      createCampaignResponseJson.card_notification.front_parts.text;
-    expect(textPart.active).toBe(campaignText.active);
-    expect(textPart.position).toBe(campaignText.position);
-    expect(textPart.attrs[0].text).toBe(campaignText.text);
+    const campaignText = createCampaignResponseJson.card_notification
+      ?.front_parts?.text as CampaignText;
+    expect(textPart?.active).toBe(campaignText?.active);
+    expect(textPart?.position).toBe(campaignText?.position);
+    expect(textPart?.attrs[0]?.text).toBe(campaignText?.text);
 
     await createWebSdkStatistics(
       request,
@@ -386,7 +399,8 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -396,55 +410,58 @@ test.describe('HTML Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     const headlinePart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'headline'
-    );
+    ) as CardResponsePart;
 
     const imagePart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'image'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createCampaignResponseJson.card_notification.front_parts.call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    const campaignCallToAction = createCampaignResponseJson.card_notification
+      ?.front_parts?.call_to_action as CampaignCallToAction;
+    expect(callToActionPart?.active).toBe(campaignCallToAction?.active);
+    expect(callToActionPart?.position).toBe(
+      (campaignCallToAction as CampaignBasePart & CampaignCallToAction)
+        ?.position
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
-    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
-    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
-    expect(buttonAttrs.destination).toBe(campaignButton.destination);
-    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
-    expect(buttonAttrs.label).toBe(campaignButton.label);
-    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
-    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+    const campaignButton = campaignCallToAction?.buttons[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton?.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton?.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton?.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton?.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton?.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton?.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton?.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignText =
-      createCampaignResponseJson.card_notification.front_parts.text;
-    expect(textPart.active).toBe(campaignText.active);
-    expect(textPart.position).toBe(campaignText.position);
-    expect(textPart.attrs[0].text).toBe(campaignText.text);
+    const campaignText = createCampaignResponseJson.card_notification
+      ?.front_parts?.text as CampaignText;
+    expect(textPart?.active).toBe(campaignText?.active);
+    expect(textPart?.position).toBe(campaignText?.position);
+    expect(textPart?.attrs[0]?.text).toBe(campaignText?.text);
 
     // Validate headline part matches campaign configuration
-    const campaignHeadline =
-      createCampaignResponseJson.card_notification.front_parts.headline;
+    const campaignHeadline = createCampaignResponseJson.card_notification
+      ?.front_parts?.headline as CampaignHeadline;
     expect(headlinePart.active).toBe(campaignHeadline.active);
     expect(headlinePart.position).toBe(campaignHeadline.position);
-    expect(headlinePart.attrs[0].text).toBe(campaignHeadline.text);
+    expect(headlinePart?.attrs[0]?.text).toBe(campaignHeadline?.text);
 
     // Validate image part matches campaign configuration
-    const campaignImage =
-      createCampaignResponseJson.card_notification.front_parts.image;
-    expect(imagePart.active).toBe(campaignImage.active);
-    expect(imagePart.position).toBe(campaignImage.position);
+    const campaignImage = createCampaignResponseJson.card_notification
+      ?.front_parts?.image as CampaignImage;
+    expect(imagePart?.active).toBe(campaignImage?.active);
+    expect(imagePart?.position).toBe(campaignImage?.position);
 
     await createWebSdkStatistics(
       request,
@@ -601,7 +618,8 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -611,133 +629,158 @@ test.describe('HTML Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     const headlinePart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'headline'
-    );
+    ) as CardResponsePart;
 
     const imagePart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'image'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createCampaignResponseJson.card_notification.front_parts.call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    const campaignCallToAction = createCampaignResponseJson.card_notification
+      ?.front_parts?.call_to_action as CampaignCallToAction;
+    expect(callToActionPart?.active).toBe(campaignCallToAction?.active);
+    expect(callToActionPart?.position).toBe(
+      (campaignCallToAction as CampaignBasePart & CampaignCallToAction)
+        ?.position
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
-    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
-    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
-    expect(buttonAttrs.destination).toBe(campaignButton.destination);
-    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
-    expect(buttonAttrs.label).toBe(campaignButton.label);
-    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
-    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+    const campaignButton = campaignCallToAction?.buttons[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton?.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton?.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton?.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton?.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton?.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton?.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton?.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignText =
-      createCampaignResponseJson.card_notification.front_parts.text;
-    expect(textPart.active).toBe(campaignText.active);
-    expect(textPart.position).toBe(campaignText.position);
-    expect(textPart.attrs[0].text).toBe(campaignText.text);
+    const campaignText = createCampaignResponseJson.card_notification
+      ?.front_parts?.text as CampaignText;
+    expect(textPart?.active).toBe(campaignText?.active);
+    expect(textPart?.position).toBe(campaignText?.position);
+    expect(textPart?.attrs[0]?.text).toBe(campaignText?.text);
 
     // Validate headline part matches campaign configuration
-    const campaignHeadline =
-      createCampaignResponseJson.card_notification.front_parts.headline;
+    const campaignHeadline = createCampaignResponseJson.card_notification
+      ?.front_parts?.headline as CampaignHeadline;
     expect(headlinePart.active).toBe(campaignHeadline.active);
     expect(headlinePart.position).toBe(campaignHeadline.position);
-    expect(headlinePart.attrs[0].text).toBe(campaignHeadline.text);
+    expect(headlinePart?.attrs[0]?.text).toBe(campaignHeadline?.text);
 
     // Validate image part matches campaign configuration
-    const campaignImage =
-      createCampaignResponseJson.card_notification.front_parts.image;
-    expect(imagePart.active).toBe(campaignImage.active);
-    expect(imagePart.position).toBe(campaignImage.position);
+    const campaignImage = createCampaignResponseJson.card_notification
+      ?.front_parts?.image as CampaignImage;
+    expect(imagePart?.active).toBe(campaignImage?.active);
+    expect(imagePart?.position).toBe(campaignImage?.position);
 
     // Find parts in back card response
     const callToActionPartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     const headlinePartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'headline'
-    );
+    ) as CardResponsePart;
 
     const imagePartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'image'
-    );
+    ) as CardResponsePart;
 
     const headingPartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'heading'
-    );
+    ) as CardResponsePart;
 
     const tablePartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'table'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToActionBack =
-      createCampaignResponseJson.card_notification.back_parts.call_to_action;
-    expect(callToActionPartBack.active).toBe(campaignCallToActionBack.active);
-    expect(callToActionPartBack.position).toBe(
-      campaignCallToActionBack.position
+    const campaignCallToActionBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        call_to_action?: CampaignCallToAction;
+      }
+    )?.call_to_action as CampaignCallToAction;
+    expect(callToActionPartBack?.active).toBe(campaignCallToActionBack?.active);
+    expect(callToActionPartBack?.position).toBe(
+      (campaignCallToActionBack as CampaignBasePart & CampaignCallToAction)
+        ?.position
     );
 
     // Validate button attributes match exactly
     const buttonAttrsBack = callToActionPartBack.attrs[0];
-    const campaignButtonBack = campaignCallToActionBack.buttons[0];
-    expect(buttonAttrsBack.btn_color).toBe(campaignButtonBack.btn_color);
+    const campaignButtonBack = campaignCallToActionBack?.buttons[0];
+    expect(buttonAttrsBack.btn_color).toBe(campaignButtonBack?.btn_color);
     expect(buttonAttrsBack.destination_type).toBe(
-      campaignButtonBack.destination_type
+      campaignButtonBack?.destination_type
     );
-    expect(buttonAttrsBack.destination).toBe(campaignButtonBack.destination);
+    expect(buttonAttrsBack.destination).toBe(campaignButtonBack?.destination);
     expect(buttonAttrsBack.in_app_events).toBe(
-      campaignButtonBack.in_app_events
+      campaignButtonBack?.in_app_events
     );
-    expect(buttonAttrsBack.label).toBe(campaignButtonBack.label);
-    expect(buttonAttrsBack.txt_color).toBe(campaignButtonBack.txt_color);
-    expect(buttonAttrsBack.order_number).toBe(campaignButtonBack.order_number);
+    expect(buttonAttrsBack.label).toBe(campaignButtonBack?.label);
+    expect(buttonAttrsBack.txt_color).toBe(campaignButtonBack?.txt_color);
+    expect(buttonAttrsBack.order_number).toBe(campaignButtonBack?.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignTextBack =
-      createCampaignResponseJson.card_notification.back_parts.text;
-    expect(textPartBack.active).toBe(campaignTextBack.active);
-    expect(textPartBack.position).toBe(campaignTextBack.position);
-    expect(textPartBack.attrs[0].text).toBe(campaignTextBack.text);
+    const campaignTextBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        text?: CampaignText;
+      }
+    )?.text as CampaignText;
+    expect(textPartBack?.active).toBe(campaignTextBack?.active);
+    expect(textPartBack?.position).toBe(campaignTextBack?.position);
+    expect(textPartBack?.attrs[0]?.text).toBe(campaignTextBack?.text);
 
     // Validate headline part matches campaign configuration
-    const campaignHeadlineBack =
-      createCampaignResponseJson.card_notification.back_parts.headline;
-    expect(headlinePartBack.active).toBe(campaignHeadlineBack.active);
-    expect(headlinePartBack.position).toBe(campaignHeadlineBack.position);
-    expect(headlinePartBack.attrs[0].text).toBe(campaignHeadlineBack.text);
+    const campaignHeadlineBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        headline?: CampaignHeadline;
+      }
+    )?.headline as CampaignHeadline;
+    expect(headlinePartBack?.active).toBe(campaignHeadlineBack?.active);
+    expect(headlinePartBack?.position).toBe(campaignHeadlineBack?.position);
+    expect(headlinePartBack?.attrs[0]?.text).toBe(campaignHeadlineBack?.text);
 
     // Validate image part matches campaign configuration
-    const campaignImageBack =
-      createCampaignResponseJson.card_notification.back_parts.image;
-    expect(imagePartBack.active).toBe(campaignImageBack.active);
-    expect(imagePartBack.position).toBe(campaignImageBack.position);
+    const campaignImageBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        image?: CampaignImage;
+      }
+    )?.image as CampaignImage;
+    expect(imagePartBack?.active).toBe(campaignImageBack?.active);
+    expect(imagePartBack?.position).toBe(campaignImageBack?.position);
 
     // Validate table part matches campaign configuration
-    const campaignTableBack =
-      createCampaignResponseJson.card_notification.back_parts.table;
-    expect(tablePartBack.active).toBe(campaignTableBack.active);
-    expect(tablePartBack.position).toBe(campaignTableBack.position);
-    expect(tablePartBack.attrs[0].rows[0].value).toBe(
-      campaignTableBack.rows[0].value
+    const campaignTableBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        table?: CampaignTable;
+      }
+    )?.table as CampaignTable;
+    expect(tablePartBack?.active).toBe(campaignTableBack?.active);
+    expect(tablePartBack?.position).toBe(campaignTableBack?.position);
+
+    // Table data structure: attrs[0] contains table data with rows
+    const tableAttrs = tablePartBack?.attrs[0] as {
+      rows?: Array<{ value: string; label: string }>;
+      heading?: string;
+    };
+    expect(tableAttrs?.rows?.[0]?.value).toBe(
+      campaignTableBack?.rows[0]?.value
     );
-    expect(tablePartBack.attrs[0].rows[0].label).toBe(
-      campaignTableBack.rows[0].label
+    expect(tableAttrs?.rows?.[0]?.label).toBe(
+      campaignTableBack?.rows[0]?.label
     );
 
     expect(headingPartBack.active).toBe(campaignTableBack.active);
@@ -952,7 +995,8 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -962,139 +1006,151 @@ test.describe('HTML Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     const headlinePart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'headline'
-    );
+    ) as CardResponsePart;
 
     const imagePart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'image'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createCampaignResponseJson.card_notification.front_parts.call_to_action;
+    const campaignCallToAction = createCampaignResponseJson.card_notification
+      ?.front_parts?.call_to_action as CampaignCallToAction;
     // Button 1
     expect(callToActionPart.attrs[0].label).toBe(
-      campaignCallToAction.buttons[0].label
+      campaignCallToAction?.buttons[0]?.label
     );
     expect(callToActionPart.attrs[0].destination).toBe(
-      campaignCallToAction.buttons[0].destination
+      campaignCallToAction?.buttons[0]?.destination
     );
 
     // Button 2
     expect(callToActionPart.attrs[1].label).toBe(
-      campaignCallToAction.buttons[1].label
+      campaignCallToAction?.buttons[1]?.label
     );
     expect(callToActionPart.attrs[1].destination).toBe(
-      campaignCallToAction.buttons[1].destination
+      campaignCallToAction?.buttons[1]?.destination
     );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
-    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
-    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
-    expect(buttonAttrs.destination).toBe(campaignButton.destination);
-    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
-    expect(buttonAttrs.label).toBe(campaignButton.label);
-    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
-    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+    const campaignButton = campaignCallToAction?.buttons[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton?.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton?.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton?.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton?.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton?.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton?.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton?.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignText =
-      createCampaignResponseJson.card_notification.front_parts.text;
-    expect(textPart.active).toBe(campaignText.active);
-    expect(textPart.position).toBe(campaignText.position);
-    expect(textPart.attrs[0].text).toBe(campaignText.text);
+    const campaignText = createCampaignResponseJson.card_notification
+      ?.front_parts?.text as CampaignText;
+    expect(textPart?.active).toBe(campaignText?.active);
+    expect(textPart?.position).toBe(campaignText?.position);
+    expect(textPart?.attrs[0]?.text).toBe(campaignText?.text);
 
     // Validate headline part matches campaign configuration
-    const campaignHeadline =
-      createCampaignResponseJson.card_notification.front_parts.headline;
+    const campaignHeadline = createCampaignResponseJson.card_notification
+      ?.front_parts?.headline as CampaignHeadline;
     expect(headlinePart.active).toBe(campaignHeadline.active);
     expect(headlinePart.position).toBe(campaignHeadline.position);
-    expect(headlinePart.attrs[0].text).toBe(campaignHeadline.text);
+    expect(headlinePart?.attrs[0]?.text).toBe(campaignHeadline?.text);
 
     // Validate image part matches campaign configuration
-    const campaignImage =
-      createCampaignResponseJson.card_notification.front_parts.image;
-    expect(imagePart.active).toBe(campaignImage.active);
-    expect(imagePart.position).toBe(campaignImage.position);
+    const campaignImage = createCampaignResponseJson.card_notification
+      ?.front_parts?.image as CampaignImage;
+    expect(imagePart?.active).toBe(campaignImage?.active);
+    expect(imagePart?.position).toBe(campaignImage?.position);
 
     // Find parts in back card response
     const callToActionPartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     const headlinePartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'headline'
-    );
+    ) as CardResponsePart;
 
     const imagePartBack = getCardWithApiResponseJson.back.find(
       (part) => part.type === 'image'
     );
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToActionBack =
-      createCampaignResponseJson.card_notification.back_parts.call_to_action;
+    const campaignCallToActionBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        call_to_action?: CampaignCallToAction;
+      }
+    )?.call_to_action as CampaignCallToAction;
 
     // Button 1
     expect(callToActionPartBack.attrs[0].label).toBe(
-      campaignCallToActionBack.buttons[0].label
+      campaignCallToActionBack?.buttons[0]?.label
     );
     expect(callToActionPartBack.attrs[0].destination).toBe(
-      campaignCallToActionBack.buttons[0].destination
+      campaignCallToActionBack?.buttons[0]?.destination
     );
 
     // Button 2
     expect(callToActionPartBack.attrs[1].label).toBe(
-      campaignCallToActionBack.buttons[1].label
+      campaignCallToActionBack?.buttons[1]?.label
     );
     expect(callToActionPartBack.attrs[1].destination).toBe(
-      campaignCallToActionBack.buttons[1].destination
+      campaignCallToActionBack?.buttons[1]?.destination
     );
 
     // Validate button attributes match exactly
     const buttonAttrsBack = callToActionPartBack.attrs[0];
-    const campaignButtonBack = campaignCallToActionBack.buttons[0];
-    expect(buttonAttrsBack.btn_color).toBe(campaignButtonBack.btn_color);
+    const campaignButtonBack = campaignCallToActionBack?.buttons[0];
+    expect(buttonAttrsBack.btn_color).toBe(campaignButtonBack?.btn_color);
     expect(buttonAttrsBack.destination_type).toBe(
-      campaignButtonBack.destination_type
+      campaignButtonBack?.destination_type
     );
-    expect(buttonAttrsBack.destination).toBe(campaignButtonBack.destination);
+    expect(buttonAttrsBack.destination).toBe(campaignButtonBack?.destination);
     expect(buttonAttrsBack.in_app_events).toBe(
-      campaignButtonBack.in_app_events
+      campaignButtonBack?.in_app_events
     );
-    expect(buttonAttrsBack.label).toBe(campaignButtonBack.label);
-    expect(buttonAttrsBack.txt_color).toBe(campaignButtonBack.txt_color);
-    expect(buttonAttrsBack.order_number).toBe(campaignButtonBack.order_number);
+    expect(buttonAttrsBack.label).toBe(campaignButtonBack?.label);
+    expect(buttonAttrsBack.txt_color).toBe(campaignButtonBack?.txt_color);
+    expect(buttonAttrsBack.order_number).toBe(campaignButtonBack?.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignTextBack =
-      createCampaignResponseJson.card_notification.back_parts.text;
-    expect(textPartBack.active).toBe(campaignTextBack.active);
-    expect(textPartBack.position).toBe(campaignTextBack.position);
-    expect(textPartBack.attrs[0].text).toBe(campaignTextBack.text);
+    const campaignTextBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        text?: CampaignText;
+      }
+    )?.text as CampaignText;
+    expect(textPartBack?.active).toBe(campaignTextBack?.active);
+    expect(textPartBack?.position).toBe(campaignTextBack?.position);
+    expect(textPartBack?.attrs[0]?.text).toBe(campaignTextBack?.text);
 
     // Validate headline part matches campaign configuration
-    const campaignHeadlineBack =
-      createCampaignResponseJson.card_notification.back_parts.headline;
-    expect(headlinePartBack.active).toBe(campaignHeadlineBack.active);
-    expect(headlinePartBack.position).toBe(campaignHeadlineBack.position);
-    expect(headlinePartBack.attrs[0].text).toBe(campaignHeadlineBack.text);
+    const campaignHeadlineBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        headline?: CampaignHeadline;
+      }
+    )?.headline as CampaignHeadline;
+    expect(headlinePartBack?.active).toBe(campaignHeadlineBack?.active);
+    expect(headlinePartBack?.position).toBe(campaignHeadlineBack?.position);
+    expect(headlinePartBack?.attrs[0]?.text).toBe(campaignHeadlineBack?.text);
 
     // Validate image part matches campaign configuration
-    const campaignImageBack =
-      createCampaignResponseJson.card_notification.back_parts.image;
-    expect(imagePartBack.active).toBe(campaignImageBack.active);
-    expect(imagePartBack.position).toBe(campaignImageBack.position);
+    const campaignImageBack = (
+      createCampaignResponseJson.card_notification?.back_parts as unknown as {
+        image?: CampaignImage;
+      }
+    )?.image as CampaignImage;
+    expect(imagePartBack?.active).toBe(campaignImageBack?.active);
+    expect(imagePartBack?.position).toBe(campaignImageBack?.position);
 
     await createWebSdkStatistics(
       request,
@@ -1272,7 +1328,8 @@ test.describe('HTML Feed Campaign', () => {
       createCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -1282,34 +1339,37 @@ test.describe('HTML Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createCampaignResponseJson.card_notification.front_parts.call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    const campaignCallToAction = createCampaignResponseJson.card_notification
+      ?.front_parts?.call_to_action as CampaignCallToAction;
+    expect(callToActionPart?.active).toBe(campaignCallToAction?.active);
+    expect(callToActionPart?.position).toBe(
+      (campaignCallToAction as CampaignBasePart & CampaignCallToAction)
+        ?.position
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
-    expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
-    expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
-    expect(buttonAttrs.destination).toBe(campaignButton.destination);
-    expect(buttonAttrs.in_app_events).toBe(campaignButton.in_app_events);
-    expect(buttonAttrs.label).toBe(campaignButton.label);
-    expect(buttonAttrs.txt_color).toBe(campaignButton.txt_color);
-    expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
+    const campaignButton = campaignCallToAction?.buttons[0];
+    expect(buttonAttrs.btn_color).toBe(campaignButton?.btn_color);
+    expect(buttonAttrs.destination_type).toBe(campaignButton?.destination_type);
+    expect(buttonAttrs.destination).toBe(campaignButton?.destination);
+    expect(buttonAttrs.in_app_events).toBe(campaignButton?.in_app_events);
+    expect(buttonAttrs.label).toBe(campaignButton?.label);
+    expect(buttonAttrs.txt_color).toBe(campaignButton?.txt_color);
+    expect(buttonAttrs.order_number).toBe(campaignButton?.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignText =
-      createCampaignResponseJson.card_notification.front_parts.text;
-    expect(textPart.active).toBe(campaignText.active);
-    expect(textPart.position).toBe(campaignText.position);
-    expect(textPart.attrs[0].text).toBe(campaignText.text);
+    const campaignText = createCampaignResponseJson.card_notification
+      ?.front_parts?.text as CampaignText;
+    expect(textPart?.active).toBe(campaignText?.active);
+    expect(textPart?.position).toBe(campaignText?.position);
+    expect(textPart?.attrs[0]?.text).toBe(campaignText?.text);
 
     await createWebSdkStatistics(
       request,

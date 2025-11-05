@@ -21,6 +21,7 @@ export interface SegmentResponse {
   updated_at: string;
   groups: SegmentGroup[];
   custom_tag?: string;
+  groups_ids?: string[];
 }
 
 export interface SegmentListResponse {

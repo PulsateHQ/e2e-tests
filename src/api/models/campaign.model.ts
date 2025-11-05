@@ -277,6 +277,39 @@ export interface CampaignDetailsResponse {
   updated_at: string;
 }
 
+export interface CardResponsePart {
+  type: string;
+  active: boolean;
+  position: number;
+  attrs: Array<{
+    btn_color?: string;
+    destination_type?: string;
+    destination?: string;
+    in_app_events?: unknown;
+    label?: string;
+    txt_color?: string;
+    order_number?: number;
+    text?: string;
+    call_to_action?: unknown;
+    headline?: string;
+    image?: string;
+    table?: unknown;
+  }>;
+}
+
+export interface CardWithApiResponse {
+  guid: string;
+  is_campaign_unread: boolean;
+  type: string;
+  campaign_guid: string;
+  allow_reply: boolean;
+  front: CardResponsePart[];
+  back: CardResponsePart[];
+  inbox_item_guid: string;
+  last_interaction_at: string;
+  expiry_at: string | null;
+}
+
 export interface CardStatsValidationOptions {
   cardButtonClick?: number;
   frontImpression?: number;

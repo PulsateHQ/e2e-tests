@@ -41,8 +41,7 @@ test.describe('Feed Campaign', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'campaign.feed.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
 
     // Get SDK credentials using the new appId

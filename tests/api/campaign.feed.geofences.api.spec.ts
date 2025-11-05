@@ -22,6 +22,13 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
+import {
+  CampaignBasePart,
+  CampaignCallToAction,
+  CampaignText,
+  CardResponsePart,
+  CardWithApiResponse
+} from '@_src/api/models/campaign.model';
 import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
 import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
@@ -44,8 +51,7 @@ test.describe('Geofence Feed Campaign', () => {
     APIE2ELoginUserModel = await setupIsolatedCompany(
       request,
       SUPER_ADMIN_ACCESS_TOKEN,
-      API_E2E_ACCESS_TOKEN_ADMIN,
-      'campaign.feed.geofences.api.spec.ts'
+      API_E2E_ACCESS_TOKEN_ADMIN
     );
 
     const sdkCredentialsResponse = await getSdkCredentials(
@@ -208,7 +214,8 @@ test.describe('Geofence Feed Campaign', () => {
       createCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -218,20 +225,23 @@ test.describe('Geofence Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createCampaignResponseJson.card_notification.front_parts.call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    const campaignCallToAction = createCampaignResponseJson.card_notification
+      ?.front_parts?.call_to_action as CampaignCallToAction;
+    expect(callToActionPart?.active).toBe(campaignCallToAction?.active);
+    expect(callToActionPart?.position).toBe(
+      (campaignCallToAction as CampaignBasePart & CampaignCallToAction)
+        ?.position
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
+    const campaignButton = campaignCallToAction?.buttons?.[0];
     expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
     expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
     expect(buttonAttrs.destination).toBe(campaignButton.destination);
@@ -241,11 +251,11 @@ test.describe('Geofence Feed Campaign', () => {
     expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignText =
-      createCampaignResponseJson.card_notification.front_parts.text;
-    expect(textPart.active).toBe(campaignText.active);
-    expect(textPart.position).toBe(campaignText.position);
-    expect(textPart.attrs[0].text).toBe(campaignText.text);
+    const campaignText = createCampaignResponseJson.card_notification
+      ?.front_parts?.text as CampaignText;
+    expect(textPart?.active).toBe(campaignText?.active);
+    expect(textPart?.position).toBe(campaignText?.position);
+    expect(textPart?.attrs[0]?.text).toBe(campaignText?.text);
 
     await createWebSdkStatistics(
       request,
