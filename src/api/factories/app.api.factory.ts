@@ -23,13 +23,12 @@ export async function getAllApps(
 
   // Build query string from params
   const queryParams = new URLSearchParams();
-  if (params) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  params &&
     Object.entries(params).forEach(([key, value]) => {
-      if (value) {
-        queryParams.append(key, value);
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      value && queryParams.append(key, value);
     });
-  }
 
   const queryString = queryParams.toString();
   const url = queryString

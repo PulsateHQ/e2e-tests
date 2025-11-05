@@ -82,30 +82,30 @@ export async function postWebSdkStatisticsWithApi(
 
   // Optional properties - verify structure but don't fail if some are missing
   // We check if the property exists, not its specific value
-  if ('geofences' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'geofences' in responseJson &&
     expect(Array.isArray(responseJson.geofences)).toBeTruthy();
-  }
 
-  if ('polygonal_geofences' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'polygonal_geofences' in responseJson &&
     expect(Array.isArray(responseJson.polygonal_geofences)).toBeTruthy();
-  }
 
-  if ('beacons' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'beacons' in responseJson &&
     expect(Array.isArray(responseJson.beacons)).toBeTruthy();
-  }
 
   // These boolean flags might be optional too
-  if ('opted_out_of_push' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'opted_out_of_push' in responseJson &&
     expect(typeof responseJson.opted_out_of_push).toBe('boolean');
-  }
 
-  if ('opted_out_of_in_app' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'opted_out_of_in_app' in responseJson &&
     expect(typeof responseJson.opted_out_of_in_app).toBe('boolean');
-  }
 
-  if ('location_tracking_enabled' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'location_tracking_enabled' in responseJson &&
     expect(typeof responseJson.location_tracking_enabled).toBe('boolean');
-  }
 
   return response;
 }
@@ -141,30 +141,30 @@ export async function startWebSdkSessionWithApi(
 
   // Optional properties - verify structure but don't fail if some are missing
   // We check if the property exists, not its specific value
-  if ('geofences' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'geofences' in responseJson &&
     expect(Array.isArray(responseJson.geofences)).toBeTruthy();
-  }
 
-  if ('polygonal_geofences' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'polygonal_geofences' in responseJson &&
     expect(Array.isArray(responseJson.polygonal_geofences)).toBeTruthy();
-  }
 
-  if ('beacons' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'beacons' in responseJson &&
     expect(Array.isArray(responseJson.beacons)).toBeTruthy();
-  }
 
   // These boolean flags might be optional too
-  if ('opted_out_of_push' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'opted_out_of_push' in responseJson &&
     expect(typeof responseJson.opted_out_of_push).toBe('boolean');
-  }
 
-  if ('opted_out_of_in_app' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'opted_out_of_in_app' in responseJson &&
     expect(typeof responseJson.opted_out_of_in_app).toBe('boolean');
-  }
 
-  if ('location_tracking_enabled' in responseJson) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  'location_tracking_enabled' in responseJson &&
     expect(typeof responseJson.location_tracking_enabled).toBe('boolean');
-  }
 
   return response;
 }
