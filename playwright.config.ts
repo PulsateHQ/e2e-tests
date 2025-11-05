@@ -31,6 +31,8 @@ export default defineConfig({
     {
       name: 'api',
       testDir: './tests/api',
+      fullyParallel: true,
+      workers: 4,
       timeout: 120_000,
       expect: {
         timeout: 90_000
