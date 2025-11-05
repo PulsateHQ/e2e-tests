@@ -4,8 +4,8 @@ import {
   InAppCardStatsValidationOptions,
   InAppStatsValidationOptions
 } from '@_src/api/models/campaign.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { createAuthHeaders } from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -31,10 +31,7 @@ export async function getInAppCampaignStatsWithApi(
   options?: InAppStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;
@@ -69,10 +66,7 @@ export async function getCardCampaignStatsWithApi(
   options?: CardStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;
@@ -119,10 +113,7 @@ export async function getInAppCardCampaignStatsWithApi(
   options?: InAppCardStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;
@@ -170,10 +161,7 @@ export async function getCampaignBackCardStatsWithApi(
   options?: BackCardStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.campaigns.v2.combinedStats}/${campaignId}/stats`;

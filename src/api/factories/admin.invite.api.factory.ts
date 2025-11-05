@@ -1,9 +1,10 @@
-import { Headers } from '@_src/api/models/headers.model';
 import {
   InviteAdminRequest,
   InviteAdminResponse
 } from '@_src/api/models/invite.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { createAuthHeadersWithJson } from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -15,11 +16,7 @@ export async function inviteAdmin(
   managedAppId: string,
   roleAdmin: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const inviteData: InviteAdminRequest = {
     email,
@@ -37,7 +34,7 @@ export async function inviteAdmin(
     }
   );
 
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
 
   const responseJson = (await response.json()) as InviteAdminResponse;
 

@@ -1,6 +1,9 @@
-import { Headers } from '@_src/api/models/headers.model';
 import { UserRequest, UserResponse } from '@_src/api/models/user.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
@@ -25,10 +28,7 @@ export async function getAllUsersWithApi(
     appId
   } = options || {};
 
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
@@ -56,10 +56,7 @@ export async function getUserWithApi(
   userId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userId}`;
@@ -79,10 +76,7 @@ export async function deleteUserWithApi(
   userId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userId}`;
@@ -111,11 +105,7 @@ export async function unsubscribeUserWithApi(
   authToken: string,
   userId: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const url = `${apiUrls.users.v2}/${userId}/unsubscribe`;
 
@@ -148,11 +138,7 @@ export async function updateUserNoteWithApi(
   noteContent: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userId}/note`;
@@ -186,10 +172,7 @@ export async function getUserSegmentsWithApi(
   userId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userId}/segments`;
@@ -216,10 +199,7 @@ export async function getUserGeofenceEventsWithApi(
   userId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userId}/geofence_events`;
@@ -246,11 +226,7 @@ export async function createUserWithApi(
   payload: UserRequest,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v1}`;
@@ -276,11 +252,7 @@ export async function upsertUserWithApi(
   payload: UserRequest,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v1}/upsert`;
@@ -314,11 +286,7 @@ export async function uploadUsersWithSegmentCreationApi(
   },
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: '*/*',
-    ContentType: 'multipart/form-data'
-  };
+  const headers = createAuthHeaders(authToken, { accept: '*/*' });
 
   // Generate CSV content
   const csvRows = [

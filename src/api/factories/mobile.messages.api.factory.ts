@@ -1,5 +1,5 @@
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { createAuthHeaders } from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -10,10 +10,7 @@ export async function getInboxMessagesWithApi(
   alias: string,
   expectedTotalUnread: number
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const url = `${apiUrls.sdk.messages.v2.getInbox}?alias=${alias}`;
 
@@ -37,10 +34,7 @@ export async function getMessagesWithApi(
   alias: string,
   campaignGuid?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const url = `${apiUrls.sdk.messages.v2.getMessages}?alias=${alias}&campaign_guid=${campaignGuid}`;
 
@@ -62,10 +56,7 @@ export async function getInboxItemWithApi(
   authToken: string,
   campaignGuid: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const url = `${apiUrls.sdk.messages.v2.getInboxItem}?campaign_guid=${campaignGuid}`;
 

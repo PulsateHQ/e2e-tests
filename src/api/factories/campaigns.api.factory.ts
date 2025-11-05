@@ -2,8 +2,11 @@ import {
   CampaignDetailsResponse,
   CreateCampaignPayload
 } from '@_src/api/models/campaign.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -27,10 +30,7 @@ export async function getCampaignsWithApi(
     appId
   } = options || {};
 
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.campaigns.v2.base}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
@@ -53,11 +53,7 @@ export async function createCampaignWithApi(
   payload: CreateCampaignPayload,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const response = await request.post(urls.campaigns.v2.base, {
@@ -80,10 +76,7 @@ export async function deleteCampaignWithApi(
   campaignId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.campaigns.v2.base}/${campaignId}`;
@@ -101,11 +94,7 @@ export async function batchDeleteCampaignsWithApi(
   resourceIds: string[],
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const payload = {
     resource_ids: resourceIds
@@ -132,10 +121,7 @@ export async function getCampaignDetailsWithApi(
   expectedStatusCampaign: string,
   appId?: string
 ): Promise<CampaignDetailsResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.campaigns.v2.base}/${campaignId}`;

@@ -1,6 +1,9 @@
 import { CustomAttribute } from '../models/custom-attribute.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -11,10 +14,7 @@ export async function getUserCustomAttributesWithApi(
   userAlias: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userAlias}/custom_attributes`;
@@ -35,11 +35,7 @@ export async function setUserCustomAttributesWithApi(
   customAttributes: CustomAttribute[],
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userAlias}/custom_attributes`;
@@ -65,10 +61,7 @@ export async function deleteUserCustomAttributesWithApi(
   },
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.users.v2}/${userAlias}/custom_attributes`;

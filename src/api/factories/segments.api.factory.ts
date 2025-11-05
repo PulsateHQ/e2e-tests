@@ -1,7 +1,10 @@
-import { Headers } from '@_src/api/models/headers.model';
 import { CreateSegmentPayload } from '@_src/api/models/segment.model';
 import { generateCsvContentForAliases } from '@_src/api/test-data/cms/users/generate-user-aliases.payload';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -11,10 +14,7 @@ export async function getAllSegmentsWithApi(
   authToken: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}?show=all`;
@@ -36,10 +36,7 @@ export async function getSingleSegmentUsersWithApi(
   segmentId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}/${segmentId}/users`;
@@ -60,10 +57,7 @@ export async function getSingleSegmentWithApi(
   segmentId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}/${segmentId}`;
@@ -85,10 +79,7 @@ export async function getTotalAudienceForSegmentWithApi(
   expectedTotalAudience?: number,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}/total_audience`;
@@ -118,11 +109,7 @@ export async function getUserCountForAlias(
   alias: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}/users_count`;
@@ -169,10 +156,7 @@ export async function estimateSegmentsWithApi(
   segmentsIds: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}/estimate?segment_ids=${segmentsIds}`;
@@ -193,11 +177,7 @@ export async function createSegmentWithApi(
   payload: CreateSegmentPayload,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const response = await request.post(urls.segments.v2, {
@@ -228,11 +208,7 @@ export async function updateSegmentWithApi(
   payload: CreateSegmentPayload,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}/${segmentsIds}`;
@@ -265,11 +241,7 @@ export async function duplicateSegmentWithApi(
   segmentsIds: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.segments.v2}/${segmentsIds}/duplicate`;
@@ -305,11 +277,7 @@ export async function createSegmentFromFile(
 ): Promise<APIResponse> {
   const csvContent = generateCsvContentForAliases(aliases);
 
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: '*/*',
-    ContentType: 'multipart/form-data'
-  };
+  const headers = createAuthHeaders(authToken, { accept: '*/*' });
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const response = await request.post(`${urls.segments.v2}/create_from_file`, {
@@ -325,11 +293,8 @@ export async function createSegmentFromFile(
     }
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(response.status()).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('segment');
   expect(responseJson.segment).toBe(
     "Thank you for your submission. We are currently processing your list to create the segment. Processing large lists may require additional time. You will receive an email notification once the segment is ready. If you don't see the email, please check your spam or junk folder.<br /><br /><i>Please note: Users on the list who do not have online or mobile banking will be excluded from the segment.</i>"
@@ -344,11 +309,7 @@ export async function batchDeleteSegmentsWithApi(
   resourceIds: string[],
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const payload = {
     resource_ids: resourceIds

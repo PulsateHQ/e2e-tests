@@ -2,9 +2,10 @@ import {
   FeatureFlag,
   FeatureFlagsRequest
 } from '@_src/api/models/feature-flag.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { featureFlagsDefault } from '@_src/api/test-data/cms/feature-flags/default.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { createSuperAdminHeadersWithJson } from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -13,11 +14,7 @@ export async function superAdminsFeatureFLagDefaultBatchUpdate(
   authToken: string,
   appIds: string[]
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Cookie: `super_admin_token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createSuperAdminHeadersWithJson(authToken);
 
   const url = `${apiUrls.superAdmins.v2.base}/feature_flags/batch_update`;
 
@@ -33,12 +30,7 @@ export async function superAdminsFeatureFLagDefaultBatchUpdate(
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
@@ -47,11 +39,7 @@ export async function superAdminsActivationCodesCreate(
   request: APIRequestContext,
   authToken: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Cookie: `super_admin_token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createSuperAdminHeadersWithJson(authToken);
 
   const url = `${apiUrls.superAdmins.v2.base}/activation_codes`;
 
@@ -60,12 +48,7 @@ export async function superAdminsActivationCodesCreate(
     data: JSON.stringify({})
   });
 
-  const expectedStatusCode = 201;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 201);
 
   const responseBody = await response.json();
   expect(responseBody).toHaveProperty('activation_code');

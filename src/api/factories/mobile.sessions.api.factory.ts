@@ -1,6 +1,6 @@
-import { Headers } from '@_src/api/models/headers.model';
 import { StartMobileSessionPayload } from '@_src/api/models/mobile.sessions.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { createAuthHeadersWithJson } from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -10,11 +10,7 @@ export async function startMobileSessionsWithApi(
   authToken: string,
   payload: StartMobileSessionPayload
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const url = `${apiUrls.sdk.sessions.v4.start}`;
 
@@ -39,11 +35,7 @@ export async function startMobileSessionsForGeofenceWithApi(
   payload: StartMobileSessionPayload,
   geofenceName: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const url = `${apiUrls.sdk.sessions.v4.start}`;
 

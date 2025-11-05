@@ -3,8 +3,11 @@ import {
   CreateGroupPayload,
   UpdateGroupPayload
 } from '../models/group.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -21,10 +24,7 @@ export async function getAllGroupsWithApi(
 ): Promise<APIResponse> {
   const { resourceType = 'segments', page = 1, perPage = 1000 } = options || {};
 
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.groups.v2}?resource_type=${resourceType}&page=${page}&per_page=${perPage}`;
@@ -51,10 +51,7 @@ export async function getSingleGroupWithApi(
   groupId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.groups.v2}/${groupId}`;
@@ -78,11 +75,7 @@ export async function createGroupForSegmentWithApi(
   payload: CreateGroupPayload,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const response = await request.post(urls.groups.v2, {
@@ -106,11 +99,7 @@ export async function addResourcesToGroupWithApi(
   payload: AddResourcesToGroupPayload,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.groups.v2}/add_resources`;
@@ -132,11 +121,7 @@ export async function updateGroupWithApi(
   payload: UpdateGroupPayload,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.groups.v2}/${groupId}`;
@@ -165,11 +150,7 @@ export async function removeResourcesFromGroupWithApi(
   },
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.groups.v2}/remove_resources`;
@@ -190,10 +171,7 @@ export async function deleteGroupWithApi(
   groupId: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.groups.v2}/${groupId}`;

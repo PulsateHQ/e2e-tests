@@ -1,12 +1,12 @@
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
 export async function checkHealthWithApi(
   request: APIRequestContext
 ): Promise<APIResponse> {
-  const headers: Headers = {
+  const headers = {
     Accept: 'text/plain'
   };
 
@@ -15,12 +15,7 @@ export async function checkHealthWithApi(
   await expect(async () => {
     response = await request.get(apiUrls.health.v1.check, { headers });
     const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 200);
     expect(responseBody.trim()).toBe('OK');
   }).toPass({ timeout: 30_000 });
 
@@ -31,7 +26,7 @@ export async function checkHealthWithTimeout(
   request: APIRequestContext,
   timeoutMs: number = 5000
 ): Promise<APIResponse> {
-  const headers: Headers = {
+  const headers = {
     Accept: 'text/plain'
   };
 
@@ -44,12 +39,7 @@ export async function checkHealthWithTimeout(
 
     const responseTime = endTime - startTime;
     const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 200);
     expect(responseBody.trim()).toBe('OK');
     expect(
       responseTime,

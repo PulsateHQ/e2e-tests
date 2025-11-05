@@ -1,11 +1,12 @@
 import { UI_E2E_WEB_SDK_KEY } from '@_config/env.config';
-import { Headers } from '@_src/api/models/headers.model';
 import {
   WebSdkSessionPayload,
   WebSdkStatisticsAction,
   WebSdkStatisticsPayload
 } from '@_src/api/models/web.sdk.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { createWebSdkHeaders } from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -55,24 +56,14 @@ export async function postWebSdkStatisticsWithApi(
   sdkAppKey: string,
   payload: WebSdkStatisticsPayload
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    'x-key': `${sdkAppId}${sdkAppKey}`,
-    source: 'native'
-  };
+  const headers = createWebSdkHeaders(sdkAppId, sdkAppKey);
 
   const response = await request.post(apiUrls.webSdk.v1.statistics, {
     headers,
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   // Verify core response structure, but allow for variation
   const responseJson = await response.json();
@@ -114,24 +105,14 @@ export async function startWebSdkSessionWithApi(
   request: APIRequestContext,
   payload: WebSdkSessionPayload
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    'x-key': `${UI_E2E_WEB_SDK_KEY}`,
-    source: 'native'
-  };
+  const headers = createWebSdkHeaders(UI_E2E_WEB_SDK_KEY, '');
 
   const response = await request.post(apiUrls.webSdk.v1.start, {
     headers,
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   // Verify core response structure, but allow for variation
   const responseJson = await response.json();

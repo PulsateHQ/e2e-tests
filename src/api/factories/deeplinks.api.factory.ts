@@ -1,6 +1,9 @@
 import { DeeplinkPayload, DeeplinkResponse } from '../models/deeplink.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -10,10 +13,7 @@ export async function getAllDeeplinksWithApi(
   authToken: string,
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.deeplinks.v2}`;
@@ -35,11 +35,7 @@ export async function createDeeplinkWithApi(
   payload: DeeplinkPayload,
   appId?: string
 ): Promise<DeeplinkResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const response = await request.post(urls.deeplinks.v2, {
@@ -65,11 +61,7 @@ export async function updateDeeplinkWithApi(
   payload: DeeplinkPayload,
   appId?: string
 ): Promise<DeeplinkResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.deeplinks.v2}/${deeplinkId}`;
@@ -97,10 +89,7 @@ export async function deleteDeeplinksWithApi(
   deeplinkIds: string[],
   appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const url = `${urls.deeplinks.v2}/${deeplinkIds}`;
