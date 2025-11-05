@@ -33,6 +33,16 @@ export function createWebSdkSessionPayload(
   };
 }
 
+/**
+ * Creates and posts web SDK statistics with simplified parameters.
+ * @param request - Playwright API request context
+ * @param sdkAppId - SDK app ID
+ * @param sdkAppKey - SDK app key
+ * @param alias - User alias
+ * @param campaignGuid - Campaign GUID
+ * @param action - Statistics action to record
+ * @returns Promise resolving to the API response
+ */
 export async function createWebSdkStatistics(
   request: APIRequestContext,
   sdkAppId: string,
@@ -50,6 +60,14 @@ export async function createWebSdkStatistics(
   return postWebSdkStatisticsWithApi(request, sdkAppId, sdkAppKey, payload);
 }
 
+/**
+ * Posts web SDK statistics to the API.
+ * @param request - Playwright API request context
+ * @param sdkAppId - SDK app ID
+ * @param sdkAppKey - SDK app key
+ * @param payload - Statistics payload
+ * @returns Promise resolving to the API response
+ */
 export async function postWebSdkStatisticsWithApi(
   request: APIRequestContext,
   sdkAppId: string,
@@ -101,6 +119,12 @@ export async function postWebSdkStatisticsWithApi(
   return response;
 }
 
+/**
+ * Starts a web SDK session.
+ * @param request - Playwright API request context
+ * @param payload - Web SDK session payload
+ * @returns Promise resolving to the API response
+ */
 export async function startWebSdkSessionWithApi(
   request: APIRequestContext,
   payload: WebSdkSessionPayload

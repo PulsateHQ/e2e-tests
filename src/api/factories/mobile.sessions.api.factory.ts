@@ -5,6 +5,13 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Starts a mobile SDK session with retry logic.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Mobile session start payload
+ * @returns Promise resolving to the API response
+ */
 export async function startMobileSessionsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -29,6 +36,14 @@ export async function startMobileSessionsWithApi(
   return response!;
 }
 
+/**
+ * Starts a mobile SDK session and verifies a specific geofence is present.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Mobile session start payload
+ * @param geofenceName - Name of the geofence to verify is present
+ * @returns Promise resolving to the API response
+ */
 export async function startMobileSessionsForGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,

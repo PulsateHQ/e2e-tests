@@ -4,6 +4,14 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves inbox messages for a user with expected total unread count.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param alias - User alias
+ * @param expectedTotalUnread - Expected total unread messages count
+ * @returns Promise resolving to the API response with inbox messages
+ */
 export async function getInboxMessagesWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -28,6 +36,14 @@ export async function getInboxMessagesWithApi(
   return response!;
 }
 
+/**
+ * Retrieves messages for a user, optionally filtered by campaign.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param alias - User alias
+ * @param campaignGuid - Optional campaign GUID to filter messages
+ * @returns Promise resolving to the API response with messages
+ */
 export async function getMessagesWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -51,6 +67,13 @@ export async function getMessagesWithApi(
   return response;
 }
 
+/**
+ * Retrieves a specific inbox item by campaign GUID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignGuid - Campaign GUID to get inbox item for
+ * @returns Promise resolving to the API response with inbox item
+ */
 export async function getInboxItemWithApi(
   request: APIRequestContext,
   authToken: string,

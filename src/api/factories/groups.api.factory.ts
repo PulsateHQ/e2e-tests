@@ -1,6 +1,9 @@
 import {
   AddResourcesToGroupPayload,
   CreateGroupPayload,
+  GetAllGroupsOptions,
+  GroupListResponse,
+  GroupResponse,
   UpdateGroupPayload
 } from '../models/group.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
@@ -8,10 +11,21 @@ import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves all groups with optional filtering and pagination.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Optional query parameters for resource type, pagination
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to a list of groups with metadata
+ */
 export async function getAllGroupsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -41,6 +55,14 @@ export async function getAllGroupsWithApi(
   return responseJson;
 }
 
+/**
+ * Retrieves a single group by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param groupId - ID of the group to retrieve
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the group details
+ */
 export async function getSingleGroupWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -64,6 +86,14 @@ export async function getSingleGroupWithApi(
   return responseJson;
 }
 
+/**
+ * Creates a new group for a segment.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Group creation payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function createGroupForSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -88,6 +118,14 @@ export async function createGroupForSegmentWithApi(
   return response;
 }
 
+/**
+ * Adds resources (segments) to an existing group.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Payload containing group ID and resource IDs to add
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function addResourcesToGroupWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -109,6 +147,15 @@ export async function addResourcesToGroupWithApi(
   return response;
 }
 
+/**
+ * Updates an existing group by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param groupId - ID of the group to update
+ * @param payload - Group update payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function updateGroupWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -136,6 +183,14 @@ export async function updateGroupWithApi(
   return response;
 }
 
+/**
+ * Removes resources (segments) from a group.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Payload containing group ID and resource IDs to remove
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function removeResourcesFromGroupWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -160,6 +215,14 @@ export async function removeResourcesFromGroupWithApi(
   return response;
 }
 
+/**
+ * Deletes a group by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param groupId - ID of the group to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function deleteGroupWithApi(
   request: APIRequestContext,
   authToken: string,

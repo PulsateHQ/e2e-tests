@@ -8,6 +8,14 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves custom attributes for a user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userAlias - User alias to get custom attributes for
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with custom attributes
+ */
 export async function getUserCustomAttributesWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -28,6 +36,15 @@ export async function getUserCustomAttributesWithApi(
   return response;
 }
 
+/**
+ * Sets custom attributes for a user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userAlias - User alias to set custom attributes for
+ * @param customAttributes - Array of custom attributes to set
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function setUserCustomAttributesWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -50,6 +67,15 @@ export async function setUserCustomAttributesWithApi(
   return response;
 }
 
+/**
+ * Deletes a specific custom attribute for a user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userAlias - User alias
+ * @param params - Parameters identifying the custom attribute to delete (source, product_id, name)
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function deleteUserCustomAttributesWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -71,12 +97,7 @@ export async function deleteUserCustomAttributesWithApi(
     data: params
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }

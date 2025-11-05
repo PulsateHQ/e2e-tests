@@ -18,6 +18,16 @@ import {
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Lists all geofences with pagination and ordering options.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param page - Page number (default: 1)
+ * @param perPage - Number of items per page (default: 1000)
+ * @param order - Sort order: 'asc' or 'desc' (default: 'desc')
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to a list of geofences with metadata
+ */
 export async function listGeofencesWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -54,6 +64,14 @@ export async function listGeofencesWithApi(
   return responseJson;
 }
 
+/**
+ * Creates a new geofence.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Geofence creation payload (defaults to generated payload if not provided)
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function createGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -84,6 +102,15 @@ export async function createGeofenceWithApi(
   return response;
 }
 
+/**
+ * Updates an existing geofence by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param geofenceId - ID of the geofence to update
+ * @param payload - Geofence update payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function updateGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -116,6 +143,14 @@ export async function updateGeofenceWithApi(
   return response;
 }
 
+/**
+ * Deletes multiple geofences in a single batch operation.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param resourceIds - Array of geofence IDs to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function batchDestroyGeofencesWithApi(
   request: APIRequestContext,
   authToken: string,

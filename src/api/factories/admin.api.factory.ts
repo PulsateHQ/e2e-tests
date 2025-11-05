@@ -15,6 +15,13 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Registers a new company via super admin API.
+ * @param request - Playwright API request context
+ * @param authToken - Super admin authentication token
+ * @param registrationData - Company registration data
+ * @returns Promise resolving to the API response
+ */
 export async function registerCompany(
   request: APIRequestContext,
   authToken: string,
@@ -31,6 +38,13 @@ export async function registerCompany(
   return response;
 }
 
+/**
+ * Registers a new admin user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param registrationData - Admin registration data
+ * @returns Promise resolving to the API response with admin details
+ */
 export async function registerAdmin(
   request: APIRequestContext,
   authToken: string,
@@ -71,6 +85,13 @@ export async function registerAdmin(
   return response;
 }
 
+/**
+ * Retrieves all admins for a specific app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID to get admins for
+ * @returns Promise resolving to the API response with admin list
+ */
 export async function getAllAdmins(
   request: APIRequestContext,
   authToken: string,
@@ -130,6 +151,14 @@ export async function getAllAdmins(
   return response;
 }
 
+/**
+ * Retrieves a single admin by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID
+ * @param adminId - Admin ID to retrieve
+ * @returns Promise resolving to the API response with admin details
+ */
 export async function getAdminById(
   request: APIRequestContext,
   authToken: string,
@@ -170,6 +199,12 @@ export async function getAdminById(
   return response;
 }
 
+/**
+ * Retrieves information about the current authenticated admin.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @returns Promise resolving to the API response with admin info
+ */
 export async function getWhoAmI(
   request: APIRequestContext,
   authToken: string
@@ -189,6 +224,15 @@ export async function getWhoAmI(
   return response;
 }
 
+/**
+ * Updates admin privileges for a specific admin.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID
+ * @param adminId - Admin ID to update
+ * @param updateData - Admin privilege update data
+ * @returns Promise resolving to the API response
+ */
 export async function updateAdminPrivileges(
   request: APIRequestContext,
   authToken: string,
@@ -242,6 +286,15 @@ export async function updateAdminPrivileges(
   return response;
 }
 
+/**
+ * Attempts to update admin privileges with invalid authentication (for testing unauthorized scenarios).
+ * @param request - Playwright API request context
+ * @param invalidAuthToken - Invalid authentication token
+ * @param appId - App ID
+ * @param adminId - Admin ID to update
+ * @param updateData - Admin privilege update data
+ * @returns Promise resolving to the API response with 401 status
+ */
 export async function updateAdminPrivilegesUnauthorized(
   request: APIRequestContext,
   invalidAuthToken: string,
@@ -274,6 +327,14 @@ export async function updateAdminPrivilegesUnauthorized(
   return response;
 }
 
+/**
+ * Deletes an admin by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID
+ * @param adminId - Admin ID to delete
+ * @returns Promise resolving to the API response
+ */
 export async function deleteAdmin(
   request: APIRequestContext,
   authToken: string,
@@ -299,6 +360,12 @@ export async function deleteAdmin(
   return response;
 }
 
+/**
+ * Logs out the current admin session.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @returns Promise resolving to the API response
+ */
 export async function logoutAdmin(
   request: APIRequestContext,
   authToken: string

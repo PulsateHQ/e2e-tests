@@ -8,10 +8,20 @@ import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves all deeplinks for the app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to a list of deeplinks with metadata
+ */
 export async function getAllDeeplinksWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -32,6 +42,14 @@ export async function getAllDeeplinksWithApi(
   return responseJson;
 }
 
+/**
+ * Creates a new deeplink.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Deeplink creation payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the created deeplink response
+ */
 export async function createDeeplinkWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -57,6 +75,15 @@ export async function createDeeplinkWithApi(
   return responseJson;
 }
 
+/**
+ * Updates an existing deeplink by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param deeplinkId - ID of the deeplink to update
+ * @param payload - Deeplink update payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the updated deeplink response
+ */
 export async function updateDeeplinkWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -86,6 +113,14 @@ export async function updateDeeplinkWithApi(
   return responseJson;
 }
 
+/**
+ * Deletes one or more deeplinks by IDs.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param deeplinkIds - Array of deeplink IDs to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function deleteDeeplinksWithApi(
   request: APIRequestContext,
   authToken: string,

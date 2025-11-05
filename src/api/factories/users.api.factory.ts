@@ -9,11 +9,21 @@ import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves a list of users with optional filtering and pagination.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Optional query parameters for sorting, ordering, pagination, and app filtering
+ * @returns Promise resolving to a list of users with metadata
+ */
 export async function getAllUsersWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -43,6 +53,14 @@ export async function getAllUsersWithApi(
   return responseJson;
 }
 
+/**
+ * Retrieves a single user by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to retrieve
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function getUserWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -63,6 +81,14 @@ export async function getUserWithApi(
   return response;
 }
 
+/**
+ * Deletes a user by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function deleteUserWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -76,15 +102,8 @@ export async function deleteUserWithApi(
 
   const response = await request.delete(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty(
     'success',
     'User has been deleted successfully'
@@ -93,6 +112,13 @@ export async function deleteUserWithApi(
   return response;
 }
 
+/**
+ * Unsubscribes a user from notifications.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to unsubscribe
+ * @returns Promise resolving to the API response
+ */
 export async function unsubscribeUserWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -107,15 +133,8 @@ export async function unsubscribeUserWithApi(
     data: {}
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty(
     'success',
     'User has been unsubscribed successfully'
@@ -124,6 +143,15 @@ export async function unsubscribeUserWithApi(
   return response;
 }
 
+/**
+ * Updates a user's note.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to update
+ * @param noteContent - Content of the note to set
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function updateUserNoteWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -145,20 +173,22 @@ export async function updateUserNoteWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('success', 'Note updated successfully');
   expect(responseJson).toHaveProperty('note', noteContent);
 
   return response;
 }
 
+/**
+ * Retrieves all segments associated with a user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with user segments
+ */
 export async function getUserSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -172,20 +202,22 @@ export async function getUserSegmentsWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
   return response;
 }
 
+/**
+ * Retrieves geofence events for a user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with geofence events
+ */
 export async function getUserGeofenceEventsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -199,20 +231,22 @@ export async function getUserGeofenceEventsWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
   return response;
 }
 
+/**
+ * Creates a new user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - User creation payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function createUserWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -229,16 +263,19 @@ export async function createUserWithApi(
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
 
+/**
+ * Creates or updates a user (upsert operation).
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - User payload for upsert
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function upsertUserWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -255,16 +292,19 @@ export async function upsertUserWithApi(
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
 
+/**
+ * Uploads users via CSV file and optionally creates a segment.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Configuration object with numberOfUsers, segmentName, and customTag
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function uploadUsersWithSegmentCreationApi(
   request: APIRequestContext,
   authToken: string,

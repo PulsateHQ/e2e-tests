@@ -23,6 +23,16 @@ function validateStatWhenProvided(
     expect(actualValue).toHaveProperty('total_uniq', expectedValue);
 }
 
+/**
+ * Retrieves In-App campaign statistics with retry logic for eventual consistency.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign
+ * @param expectedSend - Expected number of sends
+ * @param options - Optional validation options for In-App stats
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function getInAppCampaignStatsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -58,6 +68,16 @@ export async function getInAppCampaignStatsWithApi(
   return response!;
 }
 
+/**
+ * Retrieves card campaign statistics with retry logic for eventual consistency.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign
+ * @param expectedSend - Expected number of sends
+ * @param options - Optional validation options for card stats
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function getCardCampaignStatsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -105,6 +125,16 @@ export async function getCardCampaignStatsWithApi(
   return response!;
 }
 
+/**
+ * Retrieves In-App and Card combined campaign statistics with retry logic.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign
+ * @param expectedSend - Expected number of sends
+ * @param options - Optional validation options for In-App and Card stats
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function getInAppCardCampaignStatsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -152,6 +182,17 @@ export async function getInAppCardCampaignStatsWithApi(
   return response!;
 }
 
+/**
+ * Retrieves back card campaign statistics with retry logic for eventual consistency.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign
+ * @param expectedSend - Expected number of sends
+ * @param expectedBackImpressions - Expected number of back card impressions
+ * @param options - Optional validation options for back and front card stats
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function getCampaignBackCardStatsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -170,16 +211,9 @@ export async function getCampaignBackCardStatsWithApi(
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
+    validateStatusCode(response, 200);
 
-    const responseJson = JSON.parse(responseBody);
-
-    // Basic validations
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    const responseJson = await response.json();
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);

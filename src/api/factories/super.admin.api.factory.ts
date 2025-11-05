@@ -9,6 +9,13 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Updates feature flags for multiple apps in batch via super admin API.
+ * @param request - Playwright API request context
+ * @param authToken - Super admin authentication token
+ * @param appIds - Array of app IDs to update feature flags for
+ * @returns Promise resolving to the API response
+ */
 export async function superAdminsFeatureFLagDefaultBatchUpdate(
   request: APIRequestContext,
   authToken: string,
@@ -35,6 +42,12 @@ export async function superAdminsFeatureFLagDefaultBatchUpdate(
   return response;
 }
 
+/**
+ * Creates a new activation code via super admin API.
+ * @param request - Playwright API request context
+ * @param authToken - Super admin authentication token
+ * @returns Promise resolving to the API response with activation code
+ */
 export async function superAdminsActivationCodesCreate(
   request: APIRequestContext,
   authToken: string

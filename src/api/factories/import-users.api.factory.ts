@@ -4,6 +4,13 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Imports users from a CSV file.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Object containing csvContent (Buffer) and app_id (string)
+ * @returns Promise resolving to the API response
+ */
 export async function importUsersWithApi(
   request: APIRequestContext,
   authToken: string,

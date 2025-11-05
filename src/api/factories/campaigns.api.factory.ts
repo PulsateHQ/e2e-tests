@@ -10,10 +10,20 @@ import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves a list of campaigns with optional filtering and pagination.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Optional query parameters for sorting, ordering, pagination, and app filtering
+ * @returns Promise resolving to a list of campaigns with metadata
+ */
 export async function getCampaignsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -44,6 +54,14 @@ export async function getCampaignsWithApi(
   return responseJson;
 }
 
+/**
+ * Creates a new campaign with the provided payload.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Campaign creation payload containing campaign details
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the created campaign response
+ */
 export async function createCampaignWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -59,7 +77,8 @@ export async function createCampaignWithApi(
   });
 
   validateStatusCode(response, 201);
-  const responseJson = await parseJsonResponse<CampaignCreateResponse>(response);
+  const responseJson =
+    await parseJsonResponse<CampaignCreateResponse>(response);
 
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name', payload.name);
@@ -67,6 +86,14 @@ export async function createCampaignWithApi(
   return responseJson;
 }
 
+/**
+ * Deletes a campaign by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function deleteCampaignWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -85,6 +112,14 @@ export async function deleteCampaignWithApi(
   return response;
 }
 
+/**
+ * Deletes multiple campaigns in a single batch operation.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param resourceIds - Array of campaign IDs to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function batchDeleteCampaignsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -111,6 +146,15 @@ export async function batchDeleteCampaignsWithApi(
   return response;
 }
 
+/**
+ * Retrieves campaign details by ID with retry logic until the expected status is reached.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign to retrieve
+ * @param expectedStatusCampaign - Expected status value to wait for (e.g., 'Delivered')
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the campaign details response
+ */
 export async function getCampaignDetailsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -128,7 +172,8 @@ export async function getCampaignDetailsWithApi(
   await expect(async () => {
     response = await request.get(url, { headers });
     validateStatusCode(response, 200);
-    const responseJson = await parseJsonResponse<CampaignDetailsResponse>(response);
+    const responseJson =
+      await parseJsonResponse<CampaignDetailsResponse>(response);
 
     expect(responseJson).toHaveProperty('id');
     expect(responseJson).toHaveProperty('name');

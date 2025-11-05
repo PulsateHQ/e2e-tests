@@ -11,10 +11,20 @@ import {
   createAuthHeaders,
   createAuthHeadersWithJson
 } from '@_src/api/utils/headers.util';
-import { parseJsonResponse, validateStatusCode } from '@_src/api/utils/response.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves all segments for the app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to a list of segments with metadata
+ */
 export async function getAllSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -36,6 +46,14 @@ export async function getAllSegmentsWithApi(
   return responseJson;
 }
 
+/**
+ * Retrieves all users in a specific segment.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param segmentId - ID of the segment
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to a list of users in the segment with metadata
+ */
 export async function getSingleSegmentUsersWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -57,6 +75,14 @@ export async function getSingleSegmentUsersWithApi(
   return responseJson;
 }
 
+/**
+ * Retrieves a single segment by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param segmentId - ID of the segment to retrieve
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the segment details
+ */
 export async function getSingleSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -79,6 +105,14 @@ export async function getSingleSegmentWithApi(
   return responseJson;
 }
 
+/**
+ * Retrieves total audience count for segments with retry logic.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param expectedTotalAudience - Optional expected total audience count for validation
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the total audience response
+ */
 export async function getTotalAudienceForSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -95,7 +129,8 @@ export async function getTotalAudienceForSegmentWithApi(
   await expect(async () => {
     response = await request.get(url, { headers });
     validateStatusCode(response, 200);
-    const responseJson = await parseJsonResponse<SegmentTotalAudienceResponse>(response);
+    const responseJson =
+      await parseJsonResponse<SegmentTotalAudienceResponse>(response);
 
     // Validate optional stats - validate all provided options
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -109,6 +144,14 @@ export async function getTotalAudienceForSegmentWithApi(
   return await parseJsonResponse<SegmentTotalAudienceResponse>(response!);
 }
 
+/**
+ * Gets the user count for a segment matching a specific alias.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param alias - User alias to match
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with user count
+ */
 export async function getUserCountForAlias(
   request: APIRequestContext,
   authToken: string,
@@ -142,20 +185,21 @@ export async function getUserCountForAlias(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('users_count');
 
   return response;
 }
 
+/**
+ * Estimates the user count range (min/max) for given segment IDs.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param segmentsIds - Comma-separated segment IDs to estimate
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with min/max estimates
+ */
 export async function estimateSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -177,6 +221,14 @@ export async function estimateSegmentsWithApi(
   return response;
 }
 
+/**
+ * Creates a new segment with the provided payload.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Segment creation payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function createSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -191,15 +243,8 @@ export async function createSegmentWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('segment');
   expect(responseJson.segment).toHaveProperty('name', payload.name);
   expect(responseJson.segment).toHaveProperty('groups');
@@ -207,6 +252,15 @@ export async function createSegmentWithApi(
   return response;
 }
 
+/**
+ * Updates an existing segment by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param segmentsIds - ID of the segment to update
+ * @param payload - Segment update payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function updateSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -224,15 +278,8 @@ export async function updateSegmentWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('name', payload.name);
   expect(responseJson).toHaveProperty('groups');
   expect(responseJson).toHaveProperty('id');
@@ -241,6 +288,14 @@ export async function updateSegmentWithApi(
   return response;
 }
 
+/**
+ * Duplicates an existing segment by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param segmentsIds - ID of the segment to duplicate
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with duplicated segment
+ */
 export async function duplicateSegmentWithApi(
   request: APIRequestContext,
   authToken: string,
@@ -256,15 +311,8 @@ export async function duplicateSegmentWithApi(
     headers
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('name');
   expect(responseJson).toHaveProperty('groups');
   expect(responseJson).toHaveProperty('id');
@@ -273,6 +321,16 @@ export async function duplicateSegmentWithApi(
   return response;
 }
 
+/**
+ * Creates a segment from a CSV file containing user aliases.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param segmentName - Name for the new segment
+ * @param customTag - Custom tag for the segment
+ * @param aliases - Array of user aliases to include in the segment
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function createSegmentFromFile(
   request: APIRequestContext,
   authToken: string,
@@ -309,6 +367,14 @@ export async function createSegmentFromFile(
   return response;
 }
 
+/**
+ * Deletes multiple segments in a single batch operation.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param resourceIds - Array of segment IDs to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function batchDeleteSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,

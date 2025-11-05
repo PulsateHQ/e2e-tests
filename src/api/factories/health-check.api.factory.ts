@@ -3,6 +3,11 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Checks the health status of the API with retry logic.
+ * @param request - Playwright API request context
+ * @returns Promise resolving to the API response
+ */
 export async function checkHealthWithApi(
   request: APIRequestContext
 ): Promise<APIResponse> {
@@ -22,6 +27,12 @@ export async function checkHealthWithApi(
   return response!;
 }
 
+/**
+ * Checks the health status of the API and validates response time.
+ * @param request - Playwright API request context
+ * @param timeoutMs - Maximum allowed response time in milliseconds (default: 5000)
+ * @returns Promise resolving to the API response
+ */
 export async function checkHealthWithTimeout(
   request: APIRequestContext,
   timeoutMs: number = 5000

@@ -15,6 +15,13 @@ import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves all apps with optional query parameters.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param params - Optional query parameters for filtering
+ * @returns Promise resolving to the API response with app list
+ */
 export async function getAllApps(
   request: APIRequestContext,
   authToken: string,
@@ -68,6 +75,13 @@ export async function getAllApps(
   return response;
 }
 
+/**
+ * Creates a new app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param name - Name of the app to create
+ * @returns Promise resolving to the API response with created app
+ */
 export async function createApp(
   request: APIRequestContext,
   authToken: string,
@@ -96,6 +110,15 @@ export async function createApp(
   return response;
 }
 
+/**
+ * Deletes an app by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - ID of the app to delete
+ * @param name - App name for verification
+ * @param password - Password for verification
+ * @returns Promise resolving to the API response
+ */
 export async function deleteApp(
   request: APIRequestContext,
   authToken: string,
@@ -119,6 +142,13 @@ export async function deleteApp(
   return response;
 }
 
+/**
+ * Retrieves SDK credentials for an app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID to get credentials for
+ * @returns Promise resolving to the API response with SDK credentials
+ */
 export async function getSdkCredentials(
   request: APIRequestContext,
   authToken: string,
