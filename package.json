@@ -48,8 +48,6 @@
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/faker": "^5.5.9",
     "@types/node": "^22.5.5",
-    "allure-commandline": "^2.27.0",
-    "allure-playwright": "^3.0.9",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.2",
     "eslint": "^9.12.0",

@@ -1,102 +1,109 @@
-import { Headers } from '@_src/api/models/headers.model';
-import { UserRequest, UserResponse } from '@_src/api/models/user.model';
-import { apiUrls } from '@_src/api/utils/api.util';
+import {
+  GetAllUsersOptions,
+  UserListResponse,
+  UserRequest,
+  UserResponse
+} from '@_src/api/models/user.model';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves a list of users with optional filtering and pagination.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Optional query parameters for sorting, ordering, pagination, and app filtering
+ * @returns Promise resolving to a list of users with metadata
+ */
 export async function getAllUsersWithApi(
   request: APIRequestContext,
   authToken: string,
-  options?: {
-    sort?: string;
-    order?: string;
-    page?: number;
-    perPage?: number;
-  }
-): Promise<APIResponse> {
+  options?: GetAllUsersOptions
+): Promise<UserListResponse> {
   const {
     sort = 'created_at',
     order = 'desc',
     page = 1,
-    perPage = 50
+    perPage = 50,
+    appId
   } = options || {};
 
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.users.v2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  validateStatusCode(response, 200);
+  const responseJson = await parseJsonResponse<UserListResponse>(response);
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
-  return response;
+  return responseJson;
 }
 
+/**
+ * Retrieves a single user by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to retrieve
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function getUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.users.v2}/${userId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}`;
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson: UserResponse = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await parseJsonResponse<UserResponse>(response);
   expect(responseJson).toHaveProperty('id', userId);
 
   return response;
 }
 
+/**
+ * Deletes a user by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function deleteUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.users.v2}/${userId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}`;
 
   const response = await request.delete(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty(
     'success',
     'User has been deleted successfully'
@@ -105,16 +112,19 @@ export async function deleteUserWithApi(
   return response;
 }
 
+/**
+ * Unsubscribes a user from notifications.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to unsubscribe
+ * @returns Promise resolving to the API response
+ */
 export async function unsubscribeUserWithApi(
   request: APIRequestContext,
   authToken: string,
   userId: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const url = `${apiUrls.users.v2}/${userId}/unsubscribe`;
 
@@ -123,15 +133,8 @@ export async function unsubscribeUserWithApi(
     data: {}
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty(
     'success',
     'User has been unsubscribed successfully'
@@ -140,19 +143,26 @@ export async function unsubscribeUserWithApi(
   return response;
 }
 
+/**
+ * Updates a user's note.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user to update
+ * @param noteContent - Content of the note to set
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function updateUserNoteWithApi(
   request: APIRequestContext,
   authToken: string,
   userId: string,
-  noteContent: string
+  noteContent: string,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
-  const url = `${apiUrls.users.v2}/${userId}/note`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}/note`;
 
   const payload = {
     content: noteContent
@@ -163,132 +173,138 @@ export async function updateUserNoteWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('success', 'Note updated successfully');
   expect(responseJson).toHaveProperty('note', noteContent);
 
   return response;
 }
 
+/**
+ * Retrieves all segments associated with a user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with user segments
+ */
 export async function getUserSegmentsWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.users.v2}/${userId}/segments`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}/segments`;
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
   return response;
 }
 
+/**
+ * Retrieves geofence events for a user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param userId - ID of the user
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response with geofence events
+ */
 export async function getUserGeofenceEventsWithApi(
   request: APIRequestContext,
   authToken: string,
-  userId: string
+  userId: string,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.users.v2}/${userId}/geofence_events`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v2}/${userId}/geofence_events`;
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
   return response;
 }
 
+/**
+ * Creates a new user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - User creation payload
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function createUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: UserRequest
+  payload: UserRequest,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
-  const url = `${apiUrls.users.v1}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v1}`;
 
   const response = await request.post(url, {
     headers,
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
 
+/**
+ * Creates or updates a user (upsert operation).
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - User payload for upsert
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function upsertUserWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: UserRequest
+  payload: UserRequest,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
-  const url = `${apiUrls.users.v1}/upsert`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.users.v1}/upsert`;
 
   const response = await request.put(url, {
     headers,
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
 
+/**
+ * Uploads users via CSV file and optionally creates a segment.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Configuration object with numberOfUsers, segmentName, and customTag
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function uploadUsersWithSegmentCreationApi(
   request: APIRequestContext,
   authToken: string,
@@ -300,13 +316,10 @@ export async function uploadUsersWithSegmentCreationApi(
     numberOfUsers: number;
     segmentName: string;
     customTag: string;
-  }
+  },
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: '*/*',
-    ContentType: 'multipart/form-data'
-  };
+  const headers = createAuthHeaders(authToken, { accept: '*/*' });
 
   // Generate CSV content
   const csvRows = [
@@ -331,7 +344,8 @@ export async function uploadUsersWithSegmentCreationApi(
 
   const csvContent = Buffer.from(csvRows.join('\n'));
 
-  const response = await request.post(`${apiUrls.users.v2}/upload`, {
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const response = await request.post(`${urls.users.v2}/upload`, {
     headers,
     multipart: {
       file: {
@@ -345,14 +359,9 @@ export async function uploadUsersWithSegmentCreationApi(
     }
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
 
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('upload');
 
   return response;

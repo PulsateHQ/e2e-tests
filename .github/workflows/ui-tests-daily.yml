@@ -8,9 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  ALLURE_RESULTS_DIR: allure-results
-  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-  AWS_CLOUDFRONT_DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}
   ENVIRONMENT: sealion
 
 permissions:
@@ -48,7 +45,6 @@ jobs:
           echo WEB_SDK_API_URL=${{ vars.WEB_SDK_API_URL }} >> .env.sealion
           echo API_E2E_APP_ID=${{ vars.API_E2E_APP_ID }} >> .env.sealion
           echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env.sealion
-          echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
           echo SUPER_ADMIN_ACCESS_TOKEN=${{ secrets.SUPER_ADMIN_ACCESS_TOKEN }} >> .env.sealion
           echo UI_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.UI_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
           echo UI_E2E_APP_ID=${{ secrets.UI_E2E_APP_ID }} >> .env.sealion
@@ -177,7 +173,6 @@ jobs:
           echo WEB_SDK_API_URL=${{ vars.WEB_SDK_API_URL }} >> .env.sealion
           echo API_E2E_APP_ID=${{ vars.API_E2E_APP_ID }} >> .env.sealion
           echo SDK_API_URL=${{ vars.SDK_API_URL }} >> .env.sealion
-          echo API_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.API_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
           echo SUPER_ADMIN_ACCESS_TOKEN=${{ secrets.SUPER_ADMIN_ACCESS_TOKEN }} >> .env.sealion
           echo UI_E2E_ACCESS_TOKEN_ADMIN=${{ secrets.UI_E2E_ACCESS_TOKEN_ADMIN }} >> .env.sealion
           echo UI_E2E_APP_ID=${{ secrets.UI_E2E_APP_ID }} >> .env.sealion
@@ -190,10 +185,6 @@ jobs:
         env:
           DOTENV_CONFIG_PATH: .env.sealion
         run: |
-          # Create allure-results directory
-          mkdir -p allure-results
-
-          # Run the tests
           npx dotenv -e .env.sealion -- npx playwright test --project=ui
 
       - name: Archive test results
@@ -204,131 +195,13 @@ jobs:
           path: |
             playwright-report/
             test-results/
-            allure-results/
-
-  reports:
-    needs: [test, setup-dependencies]
-    if: always() && needs.test.result != 'skipped'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          registry-url: 'https://npm.pkg.github.com'
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-cache
-        with:
-          path: |
-            node_modules
-          key: node_modules-${{ hashFiles('package-lock.json') }}
-      - name: Install dependencies (if cache miss)
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: npm ci
-      - name: Download test results
-        uses: actions/download-artifact@v4
-        with:
-          name: ui-test-results
-          path: downloaded-artifacts
-
-      - name: Prepare directories and restore artifacts
-        run: |
-          # Create required directories
-          mkdir -p allure-results allure-report playwright-report test-results
-
-          # Move files to their correct locations with better error handling
-          if [ -d "downloaded-artifacts/allure-results" ] && [ "$(ls -A downloaded-artifacts/allure-results)" ]; then
-            cp -r downloaded-artifacts/allure-results/* allure-results/
-            echo "Restored allure-results artifacts"
-          else
-            echo "No allure-results artifacts found"
-          fi
-
-          if [ -d "downloaded-artifacts/playwright-report" ] && [ "$(ls -A downloaded-artifacts/playwright-report)" ]; then
-            cp -r downloaded-artifacts/playwright-report/* playwright-report/
-            echo "Restored playwright-report artifacts"
-          else
-            echo "No playwright-report artifacts found"
-          fi
-
-          if [ -d "downloaded-artifacts/test-results" ] && [ "$(ls -A downloaded-artifacts/test-results)" ]; then
-            cp -r downloaded-artifacts/test-results/* test-results/
-            echo "Restored test-results artifacts"
-          else
-            echo "No test-results artifacts found"
-          fi
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Download previous history
-        run: |
-          AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
-          echo "Attempting to download previous Allure history from S3..."
-          if aws s3 cp "s3://$AWS_S3_BUCKET_CLEAN/ui-daily/history" "allure-results/history" --recursive; then
-            echo "Successfully downloaded previous Allure history"
-          else
-            echo "No previous history found or download failed - continuing without history"
-          fi
-
-      - name: Create Allure executor configuration
-        run: |
-          echo '{
-            "name": "GitHub Actions",
-            "type": "github",
-            "buildOrder": ${{ github.run_number }},
-            "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-            "reportUrl": "${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html",
-            "reportName": "Daily UI Tests - ${{ env.ENVIRONMENT }}",
-            "buildName": "Run #${{ github.run_number }} - ${{ env.ENVIRONMENT }} UI Daily"
-          }' > allure-results/executor.json
-
-      - name: Create Allure environment properties
-        run: |
-          echo "Environment=${{ env.ENVIRONMENT }}
-          Browser=Firefox
-          Node_Version=$(node -v)
-          Playwright_Version=$(npx playwright --version)" > allure-results/environment.properties
-
-      - name: Generate Allure report
-        run: |
-          echo "Generating Allure report..."
-          npx allure generate allure-results --clean -o allure-report
-
-          # Verify report was generated
-          if [ -f "allure-report/index.html" ]; then
-            echo "Allure report generated successfully"
-            echo "Report size: $(du -sh allure-report | cut -f1)"
-          else
-            echo "Error: Allure report generation failed - index.html not found"
-            exit 1
-          fi
-
-      - name: Upload report to S3 bucket
-        run: |
-          AWS_S3_BUCKET_CLEAN=$(echo "$AWS_S3_BUCKET" | xargs)
-          echo "Uploading Allure report to S3 bucket: $AWS_S3_BUCKET_CLEAN"
-          if aws s3 sync allure-report "s3://$AWS_S3_BUCKET_CLEAN/ui-daily" --delete; then
-            echo "Successfully uploaded Allure report to S3"
-            echo "Report available at: ${{ env.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html"
-          else
-            echo "Failed to upload Allure report to S3"
-            exit 1
-          fi
 
   notify:
-    needs: [health-check, test, reports]
+    needs: [health-check, test]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Slack Notification - Health Check Results
+      - name: Slack Notification - Health Check Failed
         if: needs.health-check.result != 'success'
         uses: slackapi/slack-github-action@v2.0.0
         with:
@@ -336,7 +209,7 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "🚨 Health Check Failed",
+              "text": "🚨 Daily UI Tests - Health Check Failed",
               "blocks": [
                 {
                   "type": "section",
@@ -348,20 +221,21 @@ jobs:
               ]
             }
 
-      - name: Slack Notification - Daily UI Test Results
+      - name: Slack Notification - Daily UI Tests Failed
+        if: needs.health-check.result == 'success' && needs.test.result != 'success'
         uses: slackapi/slack-github-action@v2.0.0
         with:
           webhook-type: webhook-trigger
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
-              "text": "Daily UI Test Results 🧪",
+              "text": "❌ Daily UI Tests Failed",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "📊 *Daily UI Test Results - ${{ env.ENVIRONMENT }}*\n\n🌍 *Environment*: `${{ env.ENVIRONMENT }}`\n📅 *Trigger*: Scheduled Daily Run\n\n*Step Results:*\n🏥 *Health Check*: ${{ needs.health-check.result == 'success' && '✅ Passed' || '❌ Failed' }}\n🧪 *UI Tests*: ${{ needs.test.result == 'success' && '✅ Passed' || needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n📋 *Reports*: ${{ needs.reports.result == 'success' && '✅ Generated' || '❌ Failed' }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\n📈 *Allure Report*: <${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION }}/ui-daily/index.html|View Test Report>"
+                    "text": "❌ *Daily UI Tests Failed - ${{ env.ENVIRONMENT }}*\n\n🌍 *Environment*: `${{ env.ENVIRONMENT }}`\n📅 *Trigger*: Scheduled Daily Run\n\n*Step Results:*\n🏥 *Health Check*: ✅ Passed\n🧪 *UI Tests*: ${{ needs.test.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}\n\n🔗 *Run*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
                   }
                 }
               ]
