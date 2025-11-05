@@ -13,7 +13,7 @@ export default defineConfig({
   },
   fullyParallel: false,
   retries: 1,
-  workers: 3,
+  workers: 1,
   reporter: [
     ['html'],
     ['github'],
