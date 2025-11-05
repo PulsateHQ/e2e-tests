@@ -58,15 +58,11 @@ async function deleteAllResourcesWithBatch<T extends { id: string }>(config: {
   await test.step(`Deleting all ${resourceName}`, async () => {
     const getResourcesResponse = await getAllResources(request, token, appId);
     const initialCount = getResourcesResponse.data.length;
+    const resourceIds = getResourcesResponse.data.map(
+      (resource) => resource.id
+    );
 
-    if (initialCount > 0) {
-      await batchDeleteResources(
-        request,
-        token,
-        getResourcesResponse.data.map((resource) => resource.id),
-        appId
-      );
-    }
+    await batchDeleteResources(request, token, resourceIds, appId);
 
     const getResourcesResponseAfterDeletion = await getAllResources(
       request,
@@ -77,10 +73,7 @@ async function deleteAllResourcesWithBatch<T extends { id: string }>(config: {
 
     expect(finalCount).toBe(0);
 
-    await test.step(
-      `Deleted ${initialCount} ${resourceName}, ${finalCount} remaining.`,
-      async () => {}
-    );
+    await test.step(`Deleted ${initialCount} ${resourceName}, ${finalCount} remaining.`, async () => {});
   });
 }
 
@@ -131,10 +124,7 @@ async function deleteAllResourcesWithLoop<T extends { id: string }>(config: {
 
     expect(finalCount).toBe(0);
 
-    await test.step(
-      `Deleted ${initialCount} ${resourceName}, ${finalCount} remaining.`,
-      async () => {}
-    );
+    await test.step(`Deleted ${initialCount} ${resourceName}, ${finalCount} remaining.`, async () => {});
   });
 }
 

@@ -11,7 +11,7 @@ import { APIRequestContext } from '@playwright/test';
  * Generates identifiable company and app names for E2E tests
  * Format: e2e-api-tests-{type}-{timestamp}
  */
-function generateIdentifiableNames(testFileName?: string): {
+function generateIdentifiableNames(): {
   companyName: string;
   appName: string;
 } {
@@ -30,14 +30,12 @@ function generateIdentifiableNames(testFileName?: string): {
  * @param request - Playwright API request context
  * @param superAdminToken - Super admin access token for creating activation codes and updating feature flags
  * @param adminToken - Admin access token for registering the company
- * @param testFileName - Optional test file name for identification (e.g., 'campaign.feed.api.spec.ts')
  * @returns Promise resolving to APIE2ELoginUserModel with isolated credentials
  */
 export async function setupIsolatedCompany(
   request: APIRequestContext,
   superAdminToken: string,
-  adminToken: string,
-  testFileName?: string
+  adminToken: string
 ): Promise<APIE2ELoginUserModel> {
   // Create activation code
   const activationCodeResponse = await superAdminsActivationCodesCreate(
@@ -48,7 +46,7 @@ export async function setupIsolatedCompany(
   const activationCode = activationCodeJson.activation_code;
 
   // Generate identifiable names
-  const { companyName, appName } = generateIdentifiableNames(testFileName);
+  const { companyName, appName } = generateIdentifiableNames();
 
   // Generate company payload with custom names
   const registrationData = {

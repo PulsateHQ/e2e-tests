@@ -19,12 +19,12 @@ import {
 } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
   deleteAllUsers
 } from '@_src/api/utils/data.manager.util';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Company Registration and Admin Management', () => {
@@ -115,7 +115,10 @@ test.describe('Company Registration and Admin Management', () => {
     const createAppResponseJson = await createAppResponse.json();
 
     // Get apps count before deletion
-    const beforeDeleteAppResponse = await getAllAppsWithApi(request, adminAccessToken);
+    const beforeDeleteAppResponse = await getAllAppsWithApi(
+      request,
+      adminAccessToken
+    );
     const beforeDeleteAppJson = await beforeDeleteAppResponse.json();
     const beforeDeleteCount = beforeDeleteAppJson.data.length;
 
@@ -128,7 +131,10 @@ test.describe('Company Registration and Admin Management', () => {
     );
 
     // Verify apps count after deletion
-    const afterDeleteAppResponse = await getAllAppsWithApi(request, adminAccessToken);
+    const afterDeleteAppResponse = await getAllAppsWithApi(
+      request,
+      adminAccessToken
+    );
     const afterDeleteAppJson = await afterDeleteAppResponse.json();
     expect(afterDeleteAppJson.data.length).toBe(beforeDeleteCount - 1);
 

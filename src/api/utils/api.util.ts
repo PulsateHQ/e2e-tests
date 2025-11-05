@@ -123,7 +123,7 @@ export const apiUrls = {
  * @param appId - The app ID to use in the URLs
  * @returns API URLs object with the specified appId
  */
-export function getApiUrlsForApp(appId: string) {
+export function getApiUrlsForApp(appId: string): typeof apiUrls {
   return {
     ...apiUrls,
     deeplinks: {

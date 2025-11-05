@@ -31,7 +31,8 @@ export async function parseJsonResponse<T>(response: APIResponse): Promise<T> {
  * @param response - The API response to parse
  * @returns The response body as a string
  */
-export async function parseTextResponse(response: APIResponse): Promise<string> {
+export async function parseTextResponse(
+  response: APIResponse
+): Promise<string> {
   return await response.text();
 }
-

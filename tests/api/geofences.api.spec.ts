@@ -2,7 +2,6 @@ import {
   API_E2E_ACCESS_TOKEN_ADMIN,
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   batchDestroyGeofencesWithApi,
   createGeofenceWithApi,
@@ -12,6 +11,7 @@ import {
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllGeofences,

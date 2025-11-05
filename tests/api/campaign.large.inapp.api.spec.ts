@@ -3,7 +3,6 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
@@ -33,6 +32,7 @@ import {
   userActions
 } from '@_src/api/test-data/mobile/update/update-user.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllDeeplinks,

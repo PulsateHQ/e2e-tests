@@ -2,7 +2,6 @@ import { UpdateMobileUserPayload } from '@_src/api/models/mobile.users.model';
 import { apiUrls } from '@_src/api/utils/api.util';
 import { createAuthHeadersWithJson } from '@_src/api/utils/headers.util';
 import { validateStatusCode } from '@_src/api/utils/response.util';
-import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
 /**
