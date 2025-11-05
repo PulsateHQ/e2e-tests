@@ -11,6 +11,9 @@ export interface GroupResponse {
   resource_type: string;
   created_at: string;
   updated_at: string;
+  resource_ids?: {
+    segment_ids?: string[];
+  };
 }
 
 export interface AddResourcesToGroupPayload {
@@ -22,4 +25,20 @@ export interface UpdateGroupPayload {
   group: {
     name: string;
   };
+}
+
+export interface GroupListResponse {
+  data: GroupResponse[];
+  metadata: {
+    page: number;
+    per_page: number;
+    total_pages: number;
+    data_count: number;
+  };
+}
+
+export interface GetAllGroupsOptions {
+  resourceType?: string;
+  page?: number;
+  perPage?: number;
 }

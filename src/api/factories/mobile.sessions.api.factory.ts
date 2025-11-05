@@ -1,19 +1,23 @@
-import { Headers } from '@_src/api/models/headers.model';
 import { StartMobileSessionPayload } from '@_src/api/models/mobile.sessions.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { createAuthHeadersWithJson } from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Starts a mobile SDK session with retry logic.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Mobile session start payload
+ * @returns Promise resolving to the API response
+ */
 export async function startMobileSessionsWithApi(
   request: APIRequestContext,
   authToken: string,
   payload: StartMobileSessionPayload
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const url = `${apiUrls.sdk.sessions.v4.start}`;
 
@@ -24,32 +28,29 @@ export async function startMobileSessionsWithApi(
       headers,
       data: JSON.stringify(payload)
     });
-    const responseBody = await response.text();
-    const expectedStatusCode = 201;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 201);
+    const responseJson = await response.json();
     expect(responseJson).toHaveProperty('geofences');
   }).toPass({ timeout: 20_000 });
 
   return response!;
 }
 
+/**
+ * Starts a mobile SDK session and verifies a specific geofence is present.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Mobile session start payload
+ * @param geofenceName - Name of the geofence to verify is present
+ * @returns Promise resolving to the API response
+ */
 export async function startMobileSessionsForGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,
   payload: StartMobileSessionPayload,
   geofenceName: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const url = `${apiUrls.sdk.sessions.v4.start}`;
 
@@ -60,15 +61,8 @@ export async function startMobileSessionsForGeofenceWithApi(
       headers,
       data: JSON.stringify(payload)
     });
-    const responseBody = await response.text();
-    const expectedStatusCode = 201;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 201);
+    const responseJson = await response.json();
     expect(responseJson).toHaveProperty('geofences');
 
     const geofences = responseJson.geofences as Array<{ name: string }>;

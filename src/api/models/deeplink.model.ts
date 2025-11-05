@@ -32,3 +32,13 @@ export interface DeeplinkResponse extends DeeplinkPayload {
    */
   updated_at?: string;
 }
+
+export interface DeeplinkListResponse {
+  data: DeeplinkResponse[];
+  metadata?: {
+    page?: number;
+    per_page?: number;
+    total_pages?: number;
+    data_count?: number;
+  };
+}

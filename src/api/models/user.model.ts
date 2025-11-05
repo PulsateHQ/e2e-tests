@@ -80,3 +80,21 @@ export interface UserRequest {
   device: Device;
   custom_tags: CustomTag[];
 }
+
+export interface UserListResponse {
+  data: UserResponse[];
+  metadata: {
+    page: number;
+    per_page: number;
+    total_pages: number;
+    data_count: number;
+  };
+}
+
+export interface GetAllUsersOptions {
+  sort?: string;
+  order?: string;
+  page?: number;
+  perPage?: number;
+  appId?: string;
+}

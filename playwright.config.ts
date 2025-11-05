@@ -13,7 +13,7 @@ export default defineConfig({
   },
   fullyParallel: false,
   retries: 3,
-  workers: 1,
+  workers: 4,
   reporter: [
     ['html'],
     ['github'],
@@ -31,6 +31,8 @@ export default defineConfig({
     {
       name: 'api',
       testDir: './tests/api',
+      fullyParallel: true,
+      workers: 4,
       timeout: 120_000,
       expect: {
         timeout: 90_000
@@ -42,6 +44,7 @@ export default defineConfig({
     {
       name: 'ui',
       testDir: './tests/ui',
+      workers: 1,
       timeout: 120_000,
       expect: {
         timeout: 60_000

@@ -1,8 +1,4 @@
-import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
-  SUPER_ADMIN_ACCESS_TOKEN
-} from '@_config/env.config';
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
 import {
   deleteAdmin,
   getAdminById,
@@ -14,6 +10,7 @@ import { inviteAdmin } from '@_src/api/factories/admin.invite.api.factory';
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateAdminPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -22,34 +19,41 @@ import {
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker';
 
-test.describe('Admin Invite', () => {
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+test.describe('Admin Invitation Management', () => {
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN
+    );
+
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-      [API_E2E_APP_ID]
+      [APIE2ELoginUserModel.apiE2EAppId]
     );
   });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
-  test('should invinte new admin, edit privilages and delete admin', async ({
+  test('should invite new admin, edit privileges and delete admin', async ({
     request
   }) => {
     const inviteAdminResponse = await inviteAdmin(

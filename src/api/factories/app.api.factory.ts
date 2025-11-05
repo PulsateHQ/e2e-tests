@@ -6,30 +6,37 @@ import {
   SdkCredentialsResponse
 } from '../models/app.model';
 import { GetAllAppsResponse } from '../models/app.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
-export async function getAllApps(
+/**
+ * Retrieves all apps with optional query parameters.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param params - Optional query parameters for filtering
+ * @returns Promise resolving to the API response with app list
+ */
+export async function getAllAppsWithApi(
   request: APIRequestContext,
   authToken: string,
   params?: GetAllAppsParams
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   // Build query string from params
   const queryParams = new URLSearchParams();
-  if (params) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  params &&
     Object.entries(params).forEach(([key, value]) => {
-      if (value) {
-        queryParams.append(key, value);
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      value && queryParams.append(key, value);
     });
-  }
 
   const queryString = queryParams.toString();
   const url = queryString
@@ -40,7 +47,7 @@ export async function getAllApps(
     headers
   });
 
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
 
   const responseJson = (await response.json()) as GetAllAppsResponse;
 
@@ -68,15 +75,19 @@ export async function getAllApps(
   return response;
 }
 
+/**
+ * Creates a new app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param name - Name of the app to create
+ * @returns Promise resolving to the API response with created app
+ */
 export async function createApp(
   request: APIRequestContext,
   authToken: string,
   name: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   // Create form data that matches CreateAppRequest interface
   const formData: Record<string, string> = {
@@ -89,7 +100,7 @@ export async function createApp(
     multipart: formData
   });
 
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
 
   const responseJson = (await response.json()) as AppResponse;
   expect(responseJson).toHaveProperty('id');
@@ -99,6 +110,15 @@ export async function createApp(
   return response;
 }
 
+/**
+ * Deletes an app by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - ID of the app to delete
+ * @param name - App name for verification
+ * @param password - Password for verification
+ * @returns Promise resolving to the API response
+ */
 export async function deleteApp(
   request: APIRequestContext,
   authToken: string,
@@ -106,11 +126,7 @@ export async function deleteApp(
   name: string,
   password: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const deleteData: DeleteAppRequest = {
     name,
@@ -122,19 +138,23 @@ export async function deleteApp(
     data: JSON.stringify(deleteData)
   });
 
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
   return response;
 }
 
+/**
+ * Retrieves SDK credentials for an app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID to get credentials for
+ * @returns Promise resolving to the API response with SDK credentials
+ */
 export async function getSdkCredentials(
   request: APIRequestContext,
   authToken: string,
   appId: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   const url = `${apiUrls.apps.v2.base}/${appId}/sdk_credentials`;
 
@@ -142,7 +162,7 @@ export async function getSdkCredentials(
     headers
   });
 
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
 
   const responseJson = (await response.json()) as SdkCredentialsResponse;
 

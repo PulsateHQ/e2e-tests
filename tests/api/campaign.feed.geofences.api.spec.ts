@@ -1,14 +1,10 @@
-import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
-  SUPER_ADMIN_ACCESS_TOKEN
-} from '@_config/env.config';
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
-import { createGeofenceWithApi } from '@_src/api/factories/geofence.factory';
+import { createGeofenceWithApi } from '@_src/api/factories/geofences.api.factory';
 import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
 import { getCardWithApi } from '@_src/api/factories/mobile.notifications.api.factory';
@@ -23,10 +19,18 @@ import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
 } from '@_src/api/models/admin.model';
+import {
+  CampaignBasePart,
+  CampaignCallToAction,
+  CampaignText,
+  CardResponsePart,
+  CardWithApiResponse
+} from '@_src/api/models/campaign.model';
 import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
-import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllGeofences,
@@ -38,14 +42,14 @@ import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Geofence Feed Campaign', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
-
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN
+    );
+
     const sdkCredentialsResponse = await getSdkCredentials(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -63,16 +67,23 @@ test.describe('Geofence Feed Campaign', () => {
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     await deleteAllGeofences(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
@@ -92,7 +103,8 @@ test.describe('Geofence Feed Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload()
+      createGeofencePayload(),
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
 
@@ -106,12 +118,12 @@ test.describe('Geofence Feed Campaign', () => {
     );
 
     // Create Campaign
-    const createCampaignResponse = await createCampaignWithApi(
+    const createCampaignResponseJson = await createCampaignWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      campaignPayload
+      campaignPayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    const createCampaignResponseJson = await createCampaignResponse.json();
 
     // Assert Campaign Created
     expect(createCampaignResponseJson.name).toBe(campaignPayload.name);
@@ -120,16 +132,17 @@ test.describe('Geofence Feed Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      'Active'
+      'Active',
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     expect(getCampaignDetailsResponse.status).toBe('Active');
 
-    const getUsersResponse = await getAllUsersWithApi(
+    const getUsersResponseJson = await getAllUsersWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      { appId: APIE2ELoginUserModel.apiE2EAppId }
     );
-    const getUsersResponseJson = await getUsersResponse.json();
 
     // First user - will perform actions
     const firstUser = getUsersResponseJson.data[0];
@@ -174,7 +187,8 @@ test.describe('Geofence Feed Campaign', () => {
       await getUserGeofenceEventsWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        firstUser.id
+        firstUser.id,
+        APIE2ELoginUserModel.apiE2EAppId
       );
 
     const getUserGeofenceEventsWithApiResponseJson =
@@ -196,7 +210,8 @@ test.describe('Geofence Feed Campaign', () => {
       createCampaignResponseJson.guid
     );
 
-    const getCardWithApiResponseJson = await getCardWithApiResponse.json();
+    const getCardWithApiResponseJson =
+      (await getCardWithApiResponse.json()) as CardWithApiResponse;
 
     // Validate card matches campaign configuration
     expect(getCardWithApiResponseJson.campaign_guid).toBe(
@@ -206,20 +221,23 @@ test.describe('Geofence Feed Campaign', () => {
     // Find parts in card response
     const callToActionPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'call_to_action'
-    );
+    ) as CardResponsePart;
     const textPart = getCardWithApiResponseJson.front.find(
       (part) => part.type === 'text'
-    );
+    ) as CardResponsePart;
 
     // Validate call to action part matches campaign configuration
-    const campaignCallToAction =
-      createCampaignResponseJson.card_notification.front_parts.call_to_action;
-    expect(callToActionPart.active).toBe(campaignCallToAction.active);
-    expect(callToActionPart.position).toBe(campaignCallToAction.position);
+    const campaignCallToAction = createCampaignResponseJson.card_notification
+      ?.front_parts?.call_to_action as CampaignCallToAction;
+    expect(callToActionPart?.active).toBe(campaignCallToAction?.active);
+    expect(callToActionPart?.position).toBe(
+      (campaignCallToAction as CampaignBasePart & CampaignCallToAction)
+        ?.position
+    );
 
     // Validate button attributes match exactly
     const buttonAttrs = callToActionPart.attrs[0];
-    const campaignButton = campaignCallToAction.buttons[0];
+    const campaignButton = campaignCallToAction?.buttons?.[0];
     expect(buttonAttrs.btn_color).toBe(campaignButton.btn_color);
     expect(buttonAttrs.destination_type).toBe(campaignButton.destination_type);
     expect(buttonAttrs.destination).toBe(campaignButton.destination);
@@ -229,11 +247,11 @@ test.describe('Geofence Feed Campaign', () => {
     expect(buttonAttrs.order_number).toBe(campaignButton.order_number);
 
     // Validate text part matches campaign configuration
-    const campaignText =
-      createCampaignResponseJson.card_notification.front_parts.text;
-    expect(textPart.active).toBe(campaignText.active);
-    expect(textPart.position).toBe(campaignText.position);
-    expect(textPart.attrs[0].text).toBe(campaignText.text);
+    const campaignText = createCampaignResponseJson.card_notification
+      ?.front_parts?.text as CampaignText;
+    expect(textPart?.active).toBe(campaignText?.active);
+    expect(textPart?.position).toBe(campaignText?.position);
+    expect(textPart?.attrs[0]?.text).toBe(campaignText?.text);
 
     await createWebSdkStatistics(
       request,
@@ -278,7 +296,13 @@ test.describe('Geofence Feed Campaign', () => {
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
-      1
+      1,
+      {
+        cardButtonClick: 1,
+        frontImpression: 1,
+        frontButtonClickOne: 1
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     const getCampaignStatsWithWaitResponseJson =
@@ -294,15 +318,6 @@ test.describe('Geofence Feed Campaign', () => {
       'total_uniq',
       1
     );
-    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
-      'total_uniq',
-      1
-    );
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: clicks, front_impression, and front_button_click_one are now validated in the factory with retry logic
   });
 });

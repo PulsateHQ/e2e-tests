@@ -1,17 +1,14 @@
-import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  SUPER_ADMIN_ACCESS_TOKEN
-} from '@_config/env.config';
-import { API_E2E_APP_ID } from '@_config/env.config';
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
 import {
   batchDestroyGeofencesWithApi,
   createGeofenceWithApi,
   listGeofencesWithApi,
   updateGeofenceWithApi
-} from '@_src/api/factories/geofence.factory';
+} from '@_src/api/factories/geofences.api.factory';
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllGeofences,
@@ -21,47 +18,55 @@ import {
 import { expect, test } from '@playwright/test';
 
 test.describe('Geofences Management', () => {
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN
+    );
+
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-      [API_E2E_APP_ID]
+      [APIE2ELoginUserModel.apiE2EAppId]
     );
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     await deleteAllGeofences(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
-  test('should create multiple geofences, update one, remove a single one, and validate the total number of geofences in the end', async ({
+  test('should create multiple geofences, update one, remove one, and validate count', async ({
     request
   }) => {
     // Arrange
     const firstGeofencePayload = {
-      ...geofencePayload(),
+      ...createGeofencePayload(),
       name: 'First Geofence'
     };
     const secondGeofencePayload = {
-      ...geofencePayload(),
+      ...createGeofencePayload(),
       name: 'Second Geofence'
     };
     const thirdGeofencePayload = {
-      ...geofencePayload(),
+      ...createGeofencePayload(),
       name: 'Third Geofence'
     };
 
@@ -69,18 +74,21 @@ test.describe('Geofences Management', () => {
     const createFirstGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstGeofencePayload
+      firstGeofencePayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createFirstGeofenceResponseJson =
       await createFirstGeofenceResponse.json();
     const firstGeofenceId = createFirstGeofenceResponseJson.id;
 
-    const listGeofencesResponseAfterCreation = await listGeofencesWithApi(
+    const listGeofencesResponseJsonAfterCreation = await listGeofencesWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      1,
+      1000,
+      'desc',
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    const listGeofencesResponseJsonAfterCreation =
-      await listGeofencesResponseAfterCreation.json();
 
     const updateGeofenceResponse = await updateGeofenceWithApi(
       request,
@@ -90,14 +98,16 @@ test.describe('Geofences Management', () => {
         ...createFirstGeofenceResponseJson,
         name: 'Updated First Geofence',
         radius: '1000'
-      }
+      },
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const updateGeofenceResponseJson = await updateGeofenceResponse.json();
 
     const createSecondGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      secondGeofencePayload
+      secondGeofencePayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createSecondGeofenceResponseJson =
       await createSecondGeofenceResponse.json();
@@ -105,7 +115,8 @@ test.describe('Geofences Management', () => {
     const createThirdGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      thirdGeofencePayload
+      thirdGeofencePayload,
+      APIE2ELoginUserModel.apiE2EAppId
     );
     const createThirdGeofenceResponseJson =
       await createThirdGeofenceResponse.json();
@@ -113,15 +124,18 @@ test.describe('Geofences Management', () => {
     const batchDeleteGeofencesResponse = await batchDestroyGeofencesWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      [firstGeofenceId]
+      [firstGeofenceId],
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
-    const listGeofencesResponseAfterDeletion = await listGeofencesWithApi(
+    const listGeofencesResponseJsonAfterDeletion = await listGeofencesWithApi(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      1,
+      1000,
+      'desc',
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    const listGeofencesResponseJsonAfterDeletion =
-      await listGeofencesResponseAfterDeletion.json();
 
     // Assert
     expect(createFirstGeofenceResponse.status()).toBe(201);
@@ -130,7 +144,6 @@ test.describe('Geofences Management', () => {
       firstGeofencePayload.name
     );
 
-    expect(listGeofencesResponseAfterCreation.status()).toBe(200);
     expect(listGeofencesResponseJsonAfterCreation.data.length).toBe(1);
 
     expect(updateGeofenceResponse.status()).toBe(200);
@@ -151,7 +164,6 @@ test.describe('Geofences Management', () => {
 
     expect(batchDeleteGeofencesResponse.status()).toBe(200);
 
-    expect(listGeofencesResponseAfterDeletion.status()).toBe(200);
     expect(listGeofencesResponseJsonAfterDeletion.data.length).toBe(2);
   });
 });

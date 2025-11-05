@@ -1,8 +1,4 @@
-import {
-  API_E2E_ACCESS_TOKEN_ADMIN,
-  API_E2E_APP_ID,
-  SUPER_ADMIN_ACCESS_TOKEN
-} from '@_config/env.config';
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
 import {
   getAdminById,
   getAllAdmins,
@@ -12,7 +8,7 @@ import {
 import {
   createApp,
   deleteApp,
-  getAllApps
+  getAllAppsWithApi
 } from '@_src/api/factories/app.api.factory';
 import {
   superAdminsActivationCodesCreate,
@@ -20,6 +16,7 @@ import {
 } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllSegments,
@@ -27,34 +24,40 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Company registration and admin management', () => {
-  const APIE2ELoginUserModel: APIE2ELoginUserModel = {
-    apiE2EAccessTokenAdmin: `${API_E2E_ACCESS_TOKEN_ADMIN}`,
-    apiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`,
-    apiE2EAppId: `${API_E2E_APP_ID}`
-  };
+test.describe('Company Registration and Admin Management', () => {
+  let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
+    APIE2ELoginUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN
+    );
     await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenSuperAdmin,
-      [API_E2E_APP_ID]
+      [APIE2ELoginUserModel.apiE2EAppId]
     );
   });
 
   test.beforeEach(async ({ request }) => {
     await deleteAllCampaigns(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
-    await deleteAllUsers(request, APIE2ELoginUserModel.apiE2EAccessTokenAdmin);
+    await deleteAllUsers(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
     await deleteAllSegments(
       request,
-      APIE2ELoginUserModel.apiE2EAccessTokenAdmin
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId
     );
   });
 
-  test('should complete end-to-end company registration flow with admin setup and app management', async ({
+  test('should complete company registration flow with admin and app management', async ({
     request
   }) => {
     // Arrange
@@ -107,7 +110,10 @@ test.describe('Company registration and admin management', () => {
     const createAppResponseJson = await createAppResponse.json();
 
     // Get apps count before deletion
-    const beforeDeleteAppResponse = await getAllApps(request, adminAccessToken);
+    const beforeDeleteAppResponse = await getAllAppsWithApi(
+      request,
+      adminAccessToken
+    );
     const beforeDeleteAppJson = await beforeDeleteAppResponse.json();
     const beforeDeleteCount = beforeDeleteAppJson.data.length;
 
@@ -120,7 +126,10 @@ test.describe('Company registration and admin management', () => {
     );
 
     // Verify apps count after deletion
-    const afterDeleteAppResponse = await getAllApps(request, adminAccessToken);
+    const afterDeleteAppResponse = await getAllAppsWithApi(
+      request,
+      adminAccessToken
+    );
     const afterDeleteAppJson = await afterDeleteAppResponse.json();
     expect(afterDeleteAppJson.data.length).toBe(beforeDeleteCount - 1);
 

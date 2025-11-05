@@ -115,3 +115,40 @@ export const apiUrls = {
     }
   }
 };
+
+/**
+ * Generates API URLs with a dynamic appId.
+ * Use this for parallel test execution where each test has its own isolated app.
+ *
+ * @param appId - The app ID to use in the URLs
+ * @returns API URLs object with the specified appId
+ */
+export function getApiUrlsForApp(appId: string): typeof apiUrls {
+  return {
+    ...apiUrls,
+    deeplinks: {
+      v2: `${BASE_URL}/api/v2/apps/${appId}/deeplinks`
+    },
+    users: {
+      v1: `${BASE_URL}/api/v1/apps/${appId}/users`,
+      v2: `${BASE_URL}/api/v2/apps/${appId}/users`,
+      import: `${BASE_URL}/api/v2/import_users_for_single_app`
+    },
+    segments: {
+      v1: `${BASE_URL}/api/v1/apps/${appId}/segments`,
+      v2: `${BASE_URL}/api/v2/apps/${appId}/segments`
+    },
+    groups: {
+      v2: `${BASE_URL}/api/v2/apps/${appId}/groups`
+    },
+    geofences: {
+      v2: `${BASE_URL}/api/v2/apps/${appId}/geofences`
+    },
+    campaigns: {
+      v2: {
+        base: `${BASE_URL}/api/v2/apps/${appId}/campaigns`,
+        combinedStats: `${BASE_URL}/api/v2/apps/${appId}/campaigns`
+      }
+    }
+  };
+}
