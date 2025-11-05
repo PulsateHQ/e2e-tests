@@ -5,7 +5,7 @@ import {
   GeofenceResponse,
   UpdateGeofencePayload
 } from '@_src/api/models/geofence.model';
-import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
 import {
   createAuthHeaders,
@@ -75,7 +75,7 @@ export async function listGeofencesWithApi(
 export async function createGeofenceWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: GeofencePayload = geofencePayload(),
+  payload: GeofencePayload = createGeofencePayload(),
   appId?: string
 ): Promise<APIResponse> {
   const headers = createAuthHeadersWithJson(authToken);

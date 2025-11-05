@@ -393,7 +393,7 @@ test.describe('Small In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Small Top campaign with a dismiss banner, but not click the banner button, but swipe to dismiss', async ({
+  test('should create In-App Small Top campaign with dismiss banner and swipe to dismiss', async ({
     request
   }) => {
     const numberOfUsers = 1;

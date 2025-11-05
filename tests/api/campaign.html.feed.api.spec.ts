@@ -518,7 +518,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: front_impression and front_button_click_one are now validated in the factory with retry logic
   });
 
-  test('should create HTML Feed campaign with expiration one hour time, verify Back Feed button visibility, and validate dismiss functionality', async ({
+  test('should create HTML Feed campaign with expiration and validate back button and dismiss', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -840,7 +840,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: front and back stats are now validated in the factory with retry logic
   });
 
-  test('should create HTML Feed campaign with expiration one hour time, verify Back Feed button visibility with two buttons', async ({
+  test('should create HTML Feed campaign with expiration and validate back button with two buttons', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -1379,7 +1379,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: clicks, front_impression, and front_button_click_one are now validated in the factory with retry logic
   });
 
-  test('should create HTML Feed campaign with  2 users and all of them clicks different buttons', async ({
+  test('should create HTML Feed campaign with 2 users clicking different buttons', async ({
     request
   }) => {
     const numberOfUsers = 2;

@@ -139,7 +139,7 @@ export async function getTotalAudienceForSegmentWithApi(
         'total_audience',
         expectedTotalAudience
       );
-  }).toPass({ timeout: 60_000, intervals: [1000, 2000, 5000] });
+  }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return await parseJsonResponse<SegmentTotalAudienceResponse>(response!);
 }

@@ -11,7 +11,7 @@ import {
 import {
   batchDestroyGeofencesWithApi,
   listGeofencesWithApi
-} from '@_src/api/factories/geofence.factory';
+} from '@_src/api/factories/geofences.api.factory';
 import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
 import {
   batchDeleteSegmentsWithApi,

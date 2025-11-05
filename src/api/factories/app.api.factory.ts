@@ -22,7 +22,7 @@ import { APIRequestContext, APIResponse } from '@playwright/test';
  * @param params - Optional query parameters for filtering
  * @returns Promise resolving to the API response with app list
  */
-export async function getAllApps(
+export async function getAllAppsWithApi(
   request: APIRequestContext,
   authToken: string,
   params?: GetAllAppsParams

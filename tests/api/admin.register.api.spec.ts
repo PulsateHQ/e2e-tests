@@ -11,7 +11,7 @@ import {
 import {
   createApp,
   deleteApp,
-  getAllApps
+  getAllAppsWithApi
 } from '@_src/api/factories/app.api.factory';
 import {
   superAdminsActivationCodesCreate,
@@ -27,7 +27,7 @@ import {
 import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Company registration and admin management', () => {
+test.describe('Company Registration and Admin Management', () => {
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
@@ -62,7 +62,7 @@ test.describe('Company registration and admin management', () => {
     );
   });
 
-  test('should complete end-to-end company registration flow with admin setup and app management', async ({
+  test('should complete company registration flow with admin and app management', async ({
     request
   }) => {
     // Arrange
@@ -115,7 +115,7 @@ test.describe('Company registration and admin management', () => {
     const createAppResponseJson = await createAppResponse.json();
 
     // Get apps count before deletion
-    const beforeDeleteAppResponse = await getAllApps(request, adminAccessToken);
+    const beforeDeleteAppResponse = await getAllAppsWithApi(request, adminAccessToken);
     const beforeDeleteAppJson = await beforeDeleteAppResponse.json();
     const beforeDeleteCount = beforeDeleteAppJson.data.length;
 
@@ -128,7 +128,7 @@ test.describe('Company registration and admin management', () => {
     );
 
     // Verify apps count after deletion
-    const afterDeleteAppResponse = await getAllApps(request, adminAccessToken);
+    const afterDeleteAppResponse = await getAllAppsWithApi(request, adminAccessToken);
     const afterDeleteAppJson = await afterDeleteAppResponse.json();
     expect(afterDeleteAppJson.data.length).toBe(beforeDeleteCount - 1);
 

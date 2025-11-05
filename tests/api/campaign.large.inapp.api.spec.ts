@@ -724,7 +724,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Large campaign with two buttons where one user clicks deeplink and another dismisses', async ({
+  test('should create In-App Large campaign with two buttons and different user actions', async ({
     request
   }) => {
     const numberOfUsers = 2;

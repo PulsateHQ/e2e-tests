@@ -60,7 +60,7 @@ test.describe('Segment Management', () => {
     );
   });
 
-  test('should create multiple segments, update one, remove a single one, and validate the total number of segments in the end', async ({
+  test('should create multiple segments, update one, remove one, and validate count', async ({
     request
   }) => {
     // Arrange

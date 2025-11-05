@@ -8,10 +8,10 @@ import {
   createGeofenceWithApi,
   listGeofencesWithApi,
   updateGeofenceWithApi
-} from '@_src/api/factories/geofence.factory';
+} from '@_src/api/factories/geofences.api.factory';
 import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import {
   deleteAllCampaigns,
   deleteAllGeofences,
@@ -58,20 +58,20 @@ test.describe('Geofences Management', () => {
     );
   });
 
-  test('should create multiple geofences, update one, remove a single one, and validate the total number of geofences in the end', async ({
+  test('should create multiple geofences, update one, remove one, and validate count', async ({
     request
   }) => {
     // Arrange
     const firstGeofencePayload = {
-      ...geofencePayload(),
+      ...createGeofencePayload(),
       name: 'First Geofence'
     };
     const secondGeofencePayload = {
-      ...geofencePayload(),
+      ...createGeofencePayload(),
       name: 'Second Geofence'
     };
     const thirdGeofencePayload = {
-      ...geofencePayload(),
+      ...createGeofencePayload(),
       name: 'Third Geofence'
     };
 

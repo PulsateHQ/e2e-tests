@@ -8,7 +8,7 @@ import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
-import { createGeofenceWithApi } from '@_src/api/factories/geofence.factory';
+import { createGeofenceWithApi } from '@_src/api/factories/geofences.api.factory';
 import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
 import { startMobileSessionsForGeofenceWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
 import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
@@ -26,7 +26,7 @@ import {
   createCampaignInAppLargeButtonWithUrl,
   createCampaignInAppSmallTopWithUrl
 } from '@_src/api/test-data/cms/campaign/create-inapp-campaign.payload';
-import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import {
   updateMobileInAppUserPayload,
@@ -41,7 +41,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Geofence InApp Campaign', () => {
+test.describe('Geofence In-App Campaign', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -103,7 +103,7 @@ test.describe('Geofence InApp Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload(),
+      createGeofencePayload(),
       APIE2ELoginUserModel.apiE2EAppId
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
@@ -289,7 +289,7 @@ test.describe('Geofence InApp Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload(),
+      createGeofencePayload(),
       APIE2ELoginUserModel.apiE2EAppId
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();

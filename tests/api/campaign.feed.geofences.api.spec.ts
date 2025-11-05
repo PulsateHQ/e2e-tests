@@ -7,7 +7,7 @@ import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
 } from '@_src/api/factories/campaigns.api.factory';
-import { createGeofenceWithApi } from '@_src/api/factories/geofence.factory';
+import { createGeofenceWithApi } from '@_src/api/factories/geofences.api.factory';
 import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
 import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
 import { getCardWithApi } from '@_src/api/factories/mobile.notifications.api.factory';
@@ -24,7 +24,7 @@ import {
 } from '@_src/api/models/admin.model';
 import { WebSdkStatisticsAction } from '@_src/api/models/web.sdk.model';
 import { createCampaignFeedOneButtonToUrl } from '@_src/api/test-data/cms/campaign/create-feed-campaign.payload';
-import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
+import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { startMobileSessionInAppPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
@@ -101,7 +101,7 @@ test.describe('Geofence Feed Campaign', () => {
     const createGeofenceResponse = await createGeofenceWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      geofencePayload(),
+      createGeofencePayload(),
       APIE2ELoginUserModel.apiE2EAppId
     );
     const createGeofenceResponseJson = await createGeofenceResponse.json();
