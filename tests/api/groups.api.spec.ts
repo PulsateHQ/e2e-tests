@@ -144,7 +144,8 @@ test.describe('Groups Management', () => {
     const getSingleGroupAfterAddResourcesResponse = await getSingleGroupWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstGroupId
+      firstGroupId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     expect(getSingleGroupAfterAddResourcesResponse.status()).toBe(200);
@@ -181,7 +182,8 @@ test.describe('Groups Management', () => {
     const getSingleGroupAfterUpdateResponse = await getSingleGroupWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-      firstGroupId
+      firstGroupId,
+      APIE2ELoginUserModel.apiE2EAppId
     );
 
     expect(getSingleGroupAfterUpdateResponse.status()).toBe(200);
@@ -208,7 +210,8 @@ test.describe('Groups Management', () => {
       await getSingleGroupWithApi(
         request,
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
-        firstGroupId
+        firstGroupId,
+        APIE2ELoginUserModel.apiE2EAppId
       );
 
     expect(getSingleGroupAfterRemoveResourcesResponse.status()).toBe(200);

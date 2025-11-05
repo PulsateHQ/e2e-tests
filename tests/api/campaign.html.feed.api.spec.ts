@@ -3,7 +3,6 @@ import {
   SUPER_ADMIN_ACCESS_TOKEN
 } from '@_config/env.config';
 import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
-import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
@@ -37,6 +36,7 @@ import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/cr
 import { startMobileSessionFeedPayload } from '@_src/api/test-data/mobile/sessions/start-session.payload';
 import { updateMobileFeedUserPayload } from '@_src/api/test-data/mobile/update/update-user.payload';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';
 import {
   deleteAllCampaigns,
   deleteAllDeeplinks,
@@ -1385,9 +1385,9 @@ test.describe('HTML Feed Campaign', () => {
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
       createCampaignResponseJson.id,
       2,
-      undefined,
-      undefined,
-      undefined,
+      1,
+      1,
+      1,
       APIE2ELoginUserModel.apiE2EAppId
     );
 
@@ -1404,16 +1404,7 @@ test.describe('HTML Feed Campaign', () => {
       'total_uniq',
       2
     );
-    expect(getCampaignStatsWithWaitResponseJson.card.clicks).toHaveProperty(
-      'total_uniq',
-      1
-    );
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: clicks, front_impression, and front_button_click_one are now validated in the factory with retry logic
   });
 
   test('should create HTML Feed campaign with  2 users and all of them clicks different buttons', async ({
