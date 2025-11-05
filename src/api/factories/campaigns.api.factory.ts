@@ -4,6 +4,7 @@ import {
 } from '@_src/api/models/campaign.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -36,15 +37,9 @@ export async function getCampaignsWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
@@ -70,15 +65,9 @@ export async function createCampaignWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 201;
+  validateStatusCode(response, 201);
+  const responseJson = await response.json();
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name', payload.name);
 
@@ -101,12 +90,7 @@ export async function deleteCampaignWithApi(
 
   const response = await request.delete(url, { headers });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
@@ -136,12 +120,7 @@ export async function batchDeleteCampaignsWithApi(
     }
   );
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
@@ -165,20 +144,14 @@ export async function getCampaignDetailsWithApi(
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
+    validateStatusCode(response, 200);
+    const responseJson = (await response.json()) as CampaignDetailsResponse;
 
-    const responseJson = JSON.parse(responseBody) as CampaignDetailsResponse;
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
     expect(responseJson).toHaveProperty('id');
     expect(responseJson).toHaveProperty('name');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('status', expectedStatusCampaign);
   }).toPass({ timeout: 60_000 });
 
-  return JSON.parse(await response.text()) as CampaignDetailsResponse;
+  return (await response!.json()) as CampaignDetailsResponse;
 }

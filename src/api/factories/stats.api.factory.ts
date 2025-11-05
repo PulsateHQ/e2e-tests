@@ -6,6 +6,7 @@ import {
 } from '@_src/api/models/campaign.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -42,15 +43,8 @@ export async function getInAppCampaignStatsWithApi(
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 200);
+    const responseJson = await response.json();
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
@@ -87,15 +81,8 @@ export async function getCardCampaignStatsWithApi(
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 200);
+    const responseJson = await response.json();
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
@@ -144,15 +131,8 @@ export async function getInAppCardCampaignStatsWithApi(
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 200);
+    const responseJson = await response.json();
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);

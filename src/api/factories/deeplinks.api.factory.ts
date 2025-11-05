@@ -1,6 +1,7 @@
 import { DeeplinkPayload, DeeplinkResponse } from '../models/deeplink.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -19,15 +20,9 @@ export async function getAllDeeplinksWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
@@ -52,15 +47,9 @@ export async function createDeeplinkWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 201;
+  validateStatusCode(response, 201);
+  const responseJson = (await response.json()) as DeeplinkResponse;
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('nickname', payload.nickname);
   expect(responseJson).toHaveProperty('target', payload.target);
@@ -90,15 +79,9 @@ export async function updateDeeplinkWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  validateStatusCode(response, 200);
+  const responseJson = (await response.json()) as DeeplinkResponse;
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('nickname', payload.nickname);
   expect(responseJson).toHaveProperty('target', payload.target);
@@ -124,12 +107,7 @@ export async function deleteDeeplinksWithApi(
 
   const response = await request.delete(url, { headers });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }

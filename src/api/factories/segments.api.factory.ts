@@ -2,6 +2,7 @@ import { Headers } from '@_src/api/models/headers.model';
 import { CreateSegmentPayload } from '@_src/api/models/segment.model';
 import { generateCsvContentForAliases } from '@_src/api/test-data/cms/users/generate-user-aliases.payload';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -20,15 +21,8 @@ export async function getAllSegmentsWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
@@ -52,15 +46,8 @@ export async function getSingleSegmentUsersWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
 
@@ -83,15 +70,8 @@ export async function getSingleSegmentWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('created_at');
   expect(responseJson).toHaveProperty('groups');
@@ -117,15 +97,8 @@ export async function getTotalAudienceForSegmentWithApi(
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 200);
+    const responseJson = await response.json();
 
     // Validate optional stats - validate all provided options
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -206,15 +179,8 @@ export async function estimateSegmentsWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('max');
   expect(responseJson).toHaveProperty('min');
 
@@ -394,16 +360,9 @@ export async function batchDeleteSegmentsWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
 
-  const expectedStatusCode = 200;
-
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('resources_count');
 
   return response;

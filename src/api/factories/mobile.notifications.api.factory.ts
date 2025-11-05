@@ -1,5 +1,6 @@
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -20,15 +21,8 @@ export async function getCardWithApi(
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
-
-    const responseJson = JSON.parse(responseBody);
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
+    validateStatusCode(response, 200);
+    const responseJson = await response.json();
     expect(responseJson).toHaveProperty('guid');
     expect(responseJson).toHaveProperty('is_campaign_unread');
     expect(responseJson).toHaveProperty('type');

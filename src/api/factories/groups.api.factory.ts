@@ -5,6 +5,7 @@ import {
 } from '../models/group.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -30,14 +31,8 @@ export async function getAllGroupsWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
   expect(responseJson.metadata).toMatchObject({
@@ -66,14 +61,8 @@ export async function getSingleGroupWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name');
   expect(responseJson).toHaveProperty('resource_type');
@@ -101,14 +90,8 @@ export async function createGroupForSegmentWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name', payload.group.name);
   expect(responseJson).toHaveProperty('resource_type', 'Mobile::App::Segment');
@@ -137,12 +120,7 @@ export async function addResourcesToGroupWithApi(
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
@@ -168,14 +146,8 @@ export async function updateGroupWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson).toHaveProperty('id', groupId);
   expect(responseJson).toHaveProperty('name', payload.group.name);
   expect(responseJson).toHaveProperty('resource_type', 'Mobile::App::Segment');
@@ -207,12 +179,7 @@ export async function removeResourcesFromGroupWithApi(
     data: JSON.stringify(payload)
   });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
@@ -233,12 +200,7 @@ export async function deleteGroupWithApi(
 
   const response = await request.delete(url, { headers });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }

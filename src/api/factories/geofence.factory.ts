@@ -8,6 +8,7 @@ import {
 import { Headers } from '@_src/api/models/headers.model';
 import { geofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
@@ -29,15 +30,8 @@ export async function listGeofencesWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson: GeofenceListResponse = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = (await response.json()) as GeofenceListResponse;
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
@@ -77,15 +71,8 @@ export async function createGeofenceWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 201;
-
-  const responseJson: GeofenceResponse = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 201);
+  const responseJson = (await response.json()) as GeofenceResponse;
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name', payload.name);
   expect(responseJson).toHaveProperty('location', payload.location);
@@ -119,15 +106,8 @@ export async function updateGeofenceWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson: GeofenceResponse = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = (await response.json()) as GeofenceResponse;
   expect(responseJson).toHaveProperty('id', payload.id);
   expect(responseJson).toHaveProperty('name', payload.name);
   expect(responseJson).toHaveProperty('location', payload.location);
@@ -165,15 +145,9 @@ export async function batchDestroyGeofencesWithApi(
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toEqual({});
 
   return response;

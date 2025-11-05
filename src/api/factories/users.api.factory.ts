@@ -1,6 +1,7 @@
 import { Headers } from '@_src/api/models/headers.model';
 import { UserRequest, UserResponse } from '@_src/api/models/user.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker/locale/en';
 import { APIRequestContext, APIResponse } from '@playwright/test';
@@ -65,15 +66,8 @@ export async function getUserWithApi(
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-
-  const responseJson: UserResponse = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = (await response.json()) as UserResponse;
   expect(responseJson).toHaveProperty('id', userId);
 
   return response;
@@ -364,14 +358,9 @@ export async function uploadUsersWithSegmentCreationApi(
     }
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
 
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('upload');
 
   return response;
