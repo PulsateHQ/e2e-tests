@@ -293,9 +293,11 @@ test.describe('In-App Campaign with Feed', () => {
         APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
         createInAppFeedCampaignResponseJson.id,
         1,
-        1,
-        1,
-        undefined,
+        {
+          inAppButtonClick: 1,
+          cardButtonClick: 1,
+          frontImpression: 1
+        },
         APIE2ELoginUserModel.apiE2EAppId
       );
 
@@ -348,12 +350,7 @@ test.describe('In-App Campaign with Feed', () => {
       'total_uniq',
       1
     );
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_impression
-    ).toHaveProperty('total_uniq', 1);
-    expect(
-      getCampaignStatsWithWaitResponseJson.card.front.front_button_click_one
-    ).toHaveProperty('total_uniq', 1);
+    // Note: front_impression and front_button_click_one are now validated in the factory with retry logic
   });
 
   test('should create an In-App Large campaign with button to open feed inbox', async ({

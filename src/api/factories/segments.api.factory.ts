@@ -127,12 +127,13 @@ export async function getTotalAudienceForSegmentWithApi(
       `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
     ).toBe(expectedStatusCode);
 
-    if (expectedTotalAudience !== undefined) {
+    // Validate optional stats - validate all provided options
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    expectedTotalAudience !== undefined &&
       expect(responseJson).toHaveProperty(
         'total_audience',
         expectedTotalAudience
       );
-    }
   }).toPass({ timeout: 60_000, intervals: [1000, 2000, 5000] });
 
   return response!;
@@ -345,21 +346,18 @@ export async function createSegmentFromFile(
   };
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
-  const response = await request.post(
-    `${urls.segments.v2}/create_from_file`,
-    {
-      headers,
-      multipart: {
-        file: {
-          name: 'segment_file_with_aliases.csv',
-          mimeType: 'text/csv',
-          buffer: csvContent
-        },
-        segment_name: segmentName,
-        custom_tag: customTag
-      }
+  const response = await request.post(`${urls.segments.v2}/create_from_file`, {
+    headers,
+    multipart: {
+      file: {
+        name: 'segment_file_with_aliases.csv',
+        mimeType: 'text/csv',
+        buffer: csvContent
+      },
+      segment_name: segmentName,
+      custom_tag: customTag
     }
-  );
+  });
 
   const responseBody = await response.text();
   const expectedStatusCode = 200;
@@ -391,13 +389,10 @@ export async function batchDeleteSegmentsWithApi(
   };
 
   const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
-  const response = await request.delete(
-    `${urls.segments.v2}/batch_destroy`,
-    {
-      headers,
-      data: JSON.stringify(payload)
-    }
-  );
+  const response = await request.delete(`${urls.segments.v2}/batch_destroy`, {
+    headers,
+    data: JSON.stringify(payload)
+  });
 
   const responseBody = await response.text();
 

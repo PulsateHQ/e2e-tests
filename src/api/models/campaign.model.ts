@@ -290,3 +290,13 @@ export interface BackCardStatsValidationOptions {
   frontButtonClickOne?: number;
   frontButtonClickTwo?: number;
 }
+
+export interface InAppStatsValidationOptions {
+  inAppButtonClick?: number;
+}
+
+export interface InAppCardStatsValidationOptions {
+  inAppButtonClick?: number;
+  cardButtonClick?: number;
+  frontImpression?: number;
+}

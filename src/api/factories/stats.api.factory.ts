@@ -1,6 +1,8 @@
 import {
   BackCardStatsValidationOptions,
-  CardStatsValidationOptions
+  CardStatsValidationOptions,
+  InAppCardStatsValidationOptions,
+  InAppStatsValidationOptions
 } from '@_src/api/models/campaign.model';
 import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
@@ -25,7 +27,7 @@ export async function getInAppCampaignStatsWithApi(
   authToken: string,
   campaignId: string,
   expectedSend: number,
-  expectedInAppButtonClick?: number,
+  options?: InAppStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
@@ -52,12 +54,14 @@ export async function getInAppCampaignStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
-    if (expectedInAppButtonClick !== undefined) {
-      expect(responseJson.in_app.clicks).toHaveProperty(
-        'total_uniq',
-        expectedInAppButtonClick
+
+    // Validate optional stats - validate all provided options
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.in_app.clicks,
+        options.inAppButtonClick
       );
-    }
   }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;
@@ -125,9 +129,7 @@ export async function getInAppCardCampaignStatsWithApi(
   authToken: string,
   campaignId: string,
   expectedSend: number,
-  expectedInAppButtonClick?: number,
-  expectedCardButtonClick?: number,
-  expectedFrontImpression?: number,
+  options?: InAppCardStatsValidationOptions,
   appId?: string
 ): Promise<APIResponse> {
   const headers: Headers = {
@@ -154,18 +156,26 @@ export async function getInAppCardCampaignStatsWithApi(
     expect(responseJson).toHaveProperty('export_url');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('send', expectedSend);
-    if (expectedInAppButtonClick !== undefined) {
-      expect(responseJson.in_app.clicks).toHaveProperty(
-        'total_uniq',
-        expectedInAppButtonClick
+
+    // Validate optional stats - validate all provided options
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.in_app.clicks,
+        options.inAppButtonClick
       );
-    }
-    if (expectedCardButtonClick !== undefined) {
-      expect(responseJson.card.clicks).toHaveProperty(
-        'total_uniq',
-        expectedCardButtonClick
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.clicks,
+        options.cardButtonClick
       );
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    options &&
+      validateStatWhenProvided(
+        responseJson.card.front.front_impression,
+        options.frontImpression
+      );
   }).toPass({ timeout: 60_000, intervals: [500, 1000, 2000, 5000] });
 
   return response!;
