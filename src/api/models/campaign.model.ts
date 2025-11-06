@@ -276,3 +276,115 @@ export interface CampaignDetailsResponse {
   type_list: string[];
   updated_at: string;
 }
+
+export interface CardResponsePart {
+  type: string;
+  active: boolean;
+  position: number;
+  attrs: Array<{
+    btn_color?: string;
+    destination_type?: string;
+    destination?: string;
+    in_app_events?: unknown;
+    label?: string;
+    txt_color?: string;
+    order_number?: number;
+    text?: string;
+    call_to_action?: unknown;
+    headline?: string;
+    image?: string;
+    table?: unknown;
+  }>;
+}
+
+export interface CardWithApiResponse {
+  guid: string;
+  is_campaign_unread: boolean;
+  type: string;
+  campaign_guid: string;
+  allow_reply: boolean;
+  front: CardResponsePart[];
+  back: CardResponsePart[];
+  inbox_item_guid: string;
+  last_interaction_at: string;
+  expiry_at: string | null;
+}
+
+export interface CardStatsValidationOptions {
+  cardButtonClick?: number;
+  frontImpression?: number;
+  frontButtonClickOne?: number;
+}
+
+export interface BackCardStatsValidationOptions {
+  backButtonClicksOne?: number;
+  backButtonClicksTwo?: number;
+  frontImpression?: number;
+  frontButtonClickOne?: number;
+  frontButtonClickTwo?: number;
+}
+
+export interface InAppStatsValidationOptions {
+  inAppButtonClick?: number;
+}
+
+export interface InAppCardStatsValidationOptions {
+  inAppButtonClick?: number;
+  cardButtonClick?: number;
+  frontImpression?: number;
+}
+
+export interface CampaignListResponse {
+  data: CampaignDetailsResponse[];
+  bulk_actions: unknown;
+  metadata: {
+    page: number;
+    per_page: number;
+    total_pages: number;
+    data_count: number;
+  };
+}
+
+export interface CampaignCreateResponse {
+  id: string;
+  name: string;
+  guid?: string;
+  card_notification?: {
+    front_parts?: {
+      call_to_action?: unknown;
+      text?: unknown;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+export interface GetCampaignsOptions {
+  sort?: string;
+  order?: string;
+  page?: number;
+  perPage?: number;
+  appId?: string;
+}
+
+export interface CampaignStatsResponse {
+  export_url: string;
+  type: string;
+  send: number;
+  card?: {
+    clicks: { total_uniq: number };
+    front: {
+      front_impression: { total_uniq: number };
+      front_button_click_one: { total_uniq: number };
+      front_button_click_two?: { total_uniq: number };
+    };
+  };
+  back?: {
+    back_button_clicks_one: { total_uniq: number };
+    back_button_clicks_two?: { total_uniq: number };
+  };
+  in_app?: {
+    clicks: { total_uniq: number };
+  };
+}

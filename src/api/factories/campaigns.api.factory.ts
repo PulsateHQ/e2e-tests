@@ -1,173 +1,185 @@
 import {
+  CampaignCreateResponse,
   CampaignDetailsResponse,
-  CreateCampaignPayload
+  CampaignListResponse,
+  CreateCampaignPayload,
+  GetCampaignsOptions
 } from '@_src/api/models/campaign.model';
-import { Headers } from '@_src/api/models/headers.model';
-import { apiUrls } from '@_src/api/utils/api.util';
+import { apiUrls, getApiUrlsForApp } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
+import {
+  parseJsonResponse,
+  validateStatusCode
+} from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Retrieves a list of campaigns with optional filtering and pagination.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Optional query parameters for sorting, ordering, pagination, and app filtering
+ * @returns Promise resolving to a list of campaigns with metadata
+ */
 export async function getCampaignsWithApi(
   request: APIRequestContext,
   authToken: string,
-  options?: {
-    sort?: string;
-    order?: string;
-    page?: number;
-    perPage?: number;
-  }
-): Promise<APIResponse> {
+  options?: GetCampaignsOptions
+): Promise<CampaignListResponse> {
   const {
     sort = 'created_at',
     order = 'desc',
     page = 1,
-    perPage = 50
+    perPage = 50,
+    appId
   } = options || {};
 
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.campaigns.v2.base}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.base}?sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
 
   const response = await request.get(url, { headers });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
+  validateStatusCode(response, 200);
+  const responseJson = await parseJsonResponse<CampaignListResponse>(response);
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('bulk_actions');
   expect(responseJson).toHaveProperty('metadata');
 
-  return response;
+  return responseJson;
 }
 
+/**
+ * Creates a new campaign with the provided payload.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param payload - Campaign creation payload containing campaign details
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the created campaign response
+ */
 export async function createCampaignWithApi(
   request: APIRequestContext,
   authToken: string,
-  payload: CreateCampaignPayload
-): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  payload: CreateCampaignPayload,
+  appId?: string
+): Promise<CampaignCreateResponse> {
+  const headers = createAuthHeadersWithJson(authToken);
 
-  const response = await request.post(apiUrls.campaigns.v2.base, {
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const response = await request.post(urls.campaigns.v2.base, {
     headers,
     data: JSON.stringify(payload)
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 201;
+  validateStatusCode(response, 201);
+  const responseJson =
+    await parseJsonResponse<CampaignCreateResponse>(response);
 
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
   expect(responseJson).toHaveProperty('id');
   expect(responseJson).toHaveProperty('name', payload.name);
 
-  return response;
+  return responseJson;
 }
 
+/**
+ * Deletes a campaign by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function deleteCampaignWithApi(
   request: APIRequestContext,
   authToken: string,
-  campaignId: string
+  campaignId: string,
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.campaigns.v2.base}/${campaignId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.base}/${campaignId}`;
 
   const response = await request.delete(url, { headers });
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
 
+/**
+ * Deletes multiple campaigns in a single batch operation.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param resourceIds - Array of campaign IDs to delete
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the API response
+ */
 export async function batchDeleteCampaignsWithApi(
   request: APIRequestContext,
   authToken: string,
-  resourceIds: string[]
+  resourceIds: string[],
+  appId?: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const payload = {
     resource_ids: resourceIds
   };
 
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
   const response = await request.delete(
-    `${apiUrls.campaigns.v2.base}/batch_destroy`,
+    `${urls.campaigns.v2.base}/batch_destroy`,
     {
       headers,
       data: JSON.stringify(payload)
     }
   );
 
-  const expectedStatusCode = 200;
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
 
   return response;
 }
 
+/**
+ * Retrieves campaign details by ID with retry logic until the expected status is reached.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param campaignId - ID of the campaign to retrieve
+ * @param expectedStatusCampaign - Expected status value to wait for (e.g., 'Delivered')
+ * @param appId - Optional app ID for app-specific API endpoints
+ * @returns Promise resolving to the campaign details response
+ */
 export async function getCampaignDetailsWithApi(
   request: APIRequestContext,
   authToken: string,
   campaignId: string,
-  expectedStatusCampaign: string
+  expectedStatusCampaign: string,
+  appId?: string
 ): Promise<CampaignDetailsResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
-  const url = `${apiUrls.campaigns.v2.base}/${campaignId}`;
+  const urls = appId ? getApiUrlsForApp(appId) : apiUrls;
+  const url = `${urls.campaigns.v2.base}/${campaignId}`;
 
   let response: APIResponse;
 
   await expect(async () => {
     response = await request.get(url, { headers });
-    const responseBody = await response.text();
-    const expectedStatusCode = 200;
+    validateStatusCode(response, 200);
+    const responseJson =
+      await parseJsonResponse<CampaignDetailsResponse>(response);
 
-    const responseJson = JSON.parse(responseBody) as CampaignDetailsResponse;
-
-    expect(
-      response.status(),
-      `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-    ).toBe(expectedStatusCode);
     expect(responseJson).toHaveProperty('id');
     expect(responseJson).toHaveProperty('name');
     expect(responseJson).toHaveProperty('type');
     expect(responseJson).toHaveProperty('status', expectedStatusCampaign);
   }).toPass({ timeout: 60_000 });
 
-  return JSON.parse(await response.text()) as CampaignDetailsResponse;
+  return await parseJsonResponse<CampaignDetailsResponse>(response!);
 }

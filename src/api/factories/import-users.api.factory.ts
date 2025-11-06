@@ -1,17 +1,23 @@
 import { apiUrls } from '@_src/api/utils/api.util';
+import { createAuthHeaders } from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Imports users from a CSV file.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param options - Object containing csvContent (Buffer) and app_id (string)
+ * @returns Promise resolving to the API response
+ */
 export async function importUsersWithApi(
   request: APIRequestContext,
   authToken: string,
   { csvContent, app_id }: { csvContent: Buffer; app_id: string }
 ): Promise<APIResponse> {
   const response = await request.post(apiUrls.users.import, {
-    headers: {
-      Authorization: `Token token=${authToken}`,
-      Accept: '*/*'
-    },
+    headers: createAuthHeaders(authToken, { accept: '*/*' }),
     multipart: {
       file: {
         name: 'import.data.users.csv',
@@ -22,14 +28,8 @@ export async function importUsersWithApi(
     }
   });
 
-  const responseBody = await response.text();
-  const expectedStatusCode = 200;
-  const responseJson = JSON.parse(responseBody);
-
-  expect(
-    response.status(),
-    `Expected status: ${expectedStatusCode} and observed: ${response.status()}`
-  ).toBe(expectedStatusCode);
+  validateStatusCode(response, 200);
+  const responseJson = await response.json();
   expect(responseJson.app_id).toBe(app_id);
   expect(responseJson.file).toBe('manual upload');
 

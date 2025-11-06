@@ -6,39 +6,51 @@ import {
   UpdateAdminPrivilegesResponse,
   WhoAmIResponse
 } from '../models/admin.model';
-import { Headers } from '@_src/api/models/headers.model';
 import { apiUrls } from '@_src/api/utils/api.util';
+import {
+  createAuthHeaders,
+  createAuthHeadersWithJson
+} from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * Registers a new company via super admin API.
+ * @param request - Playwright API request context
+ * @param authToken - Super admin authentication token
+ * @param registrationData - Company registration data
+ * @returns Promise resolving to the API response
+ */
 export async function registerCompany(
   request: APIRequestContext,
   authToken: string,
   registrationData: CompanyAdminRegistrationRequest
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const response = await request.post(apiUrls.admins.v2.register, {
     headers,
-    data: registrationData
+    data: JSON.stringify(registrationData)
   });
 
-  expect(response.status()).toBe(201);
+  validateStatusCode(response, 201);
   return response;
 }
 
+/**
+ * Registers a new admin user.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param registrationData - Admin registration data
+ * @returns Promise resolving to the API response with admin details
+ */
 export async function registerAdmin(
   request: APIRequestContext,
   authToken: string,
   registrationData: CompanyAdminRegistrationRequest
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Authorization: `Token token=${authToken}`,
-    Accept: 'application/json'
-  };
+  const headers = createAuthHeaders(authToken);
 
   const response = await request.post(apiUrls.admins.v2.register, {
     headers,
@@ -48,7 +60,7 @@ export async function registerAdmin(
   const responseJson = await response.json();
 
   // Validate response status and structure
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('message');
   expect(responseJson).toHaveProperty('path');
@@ -73,15 +85,19 @@ export async function registerAdmin(
   return response;
 }
 
+/**
+ * Retrieves all admins for a specific app.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID to get admins for
+ * @returns Promise resolving to the API response with admin list
+ */
 export async function getAllAdmins(
   request: APIRequestContext,
   authToken: string,
   appId: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   const response = await request.get(
     `${apiUrls.apps.v2.base}/${appId}/admins`,
@@ -93,7 +109,7 @@ export async function getAllAdmins(
   const responseJson = (await response.json()) as AdminListResponse;
 
   // Validate response structure
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
   expect(responseJson).toHaveProperty('data');
   expect(responseJson).toHaveProperty('metadata');
   expect(Array.isArray(responseJson.data)).toBe(true);
@@ -135,16 +151,21 @@ export async function getAllAdmins(
   return response;
 }
 
+/**
+ * Retrieves a single admin by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID
+ * @param adminId - Admin ID to retrieve
+ * @returns Promise resolving to the API response with admin details
+ */
 export async function getAdminById(
   request: APIRequestContext,
   authToken: string,
   appId: string,
   adminId: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   const response = await request.get(
     `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}`,
@@ -155,7 +176,7 @@ export async function getAdminById(
 
   const responseJson = (await response.json()) as AdminDetailResponse;
 
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
 
   // Validate admin object properties
   expect(responseJson).toHaveProperty('id');
@@ -178,14 +199,17 @@ export async function getAdminById(
   return response;
 }
 
+/**
+ * Retrieves information about the current authenticated admin.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @returns Promise resolving to the API response with admin info
+ */
 export async function getWhoAmI(
   request: APIRequestContext,
   authToken: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   const response = await request.get(apiUrls.admins.v2.whoami, {
     headers
@@ -193,13 +217,22 @@ export async function getWhoAmI(
 
   const responseJson = (await response.json()) as WhoAmIResponse;
 
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
   expect(responseJson).toHaveProperty('success');
   expect(typeof responseJson.success).toBe('boolean');
 
   return response;
 }
 
+/**
+ * Updates admin privileges for a specific admin.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID
+ * @param adminId - Admin ID to update
+ * @param updateData - Admin privilege update data
+ * @returns Promise resolving to the API response
+ */
 export async function updateAdminPrivileges(
   request: APIRequestContext,
   authToken: string,
@@ -207,11 +240,7 @@ export async function updateAdminPrivileges(
   adminId: string,
   updateData: UpdateAdminPrivilegesRequest
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`,
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(authToken);
 
   const response = await request.put(
     `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}/update_privileges`,
@@ -224,7 +253,7 @@ export async function updateAdminPrivileges(
   const responseJson = (await response.json()) as UpdateAdminPrivilegesResponse;
 
   // Validate response status and message
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
   expect(responseJson.message).toBe('Admin was successfully updated');
 
   // Validate admin object structure
@@ -257,6 +286,15 @@ export async function updateAdminPrivileges(
   return response;
 }
 
+/**
+ * Attempts to update admin privileges with invalid authentication (for testing unauthorized scenarios).
+ * @param request - Playwright API request context
+ * @param invalidAuthToken - Invalid authentication token
+ * @param appId - App ID
+ * @param adminId - Admin ID to update
+ * @param updateData - Admin privilege update data
+ * @returns Promise resolving to the API response with 401 status
+ */
 export async function updateAdminPrivilegesUnauthorized(
   request: APIRequestContext,
   invalidAuthToken: string,
@@ -264,11 +302,7 @@ export async function updateAdminPrivilegesUnauthorized(
   adminId: string,
   updateData: UpdateAdminPrivilegesRequest
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${invalidAuthToken}`,
-    'Content-Type': 'application/json'
-  };
+  const headers = createAuthHeadersWithJson(invalidAuthToken);
 
   const response = await request.put(
     `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}/update_privileges`,
@@ -281,7 +315,7 @@ export async function updateAdminPrivilegesUnauthorized(
   const responseJson = await response.json();
 
   // Validate unauthorized response
-  expect(response.status()).toBe(401);
+  validateStatusCode(response, 401);
   expect(responseJson).toHaveProperty('errors');
   expect(Array.isArray(responseJson.errors)).toBe(true);
   expect(responseJson.errors.length).toBeGreaterThan(0);
@@ -293,16 +327,21 @@ export async function updateAdminPrivilegesUnauthorized(
   return response;
 }
 
+/**
+ * Deletes an admin by ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID
+ * @param adminId - Admin ID to delete
+ * @returns Promise resolving to the API response
+ */
 export async function deleteAdmin(
   request: APIRequestContext,
   authToken: string,
   appId: string,
   adminId: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   const response = await request.delete(
     `${apiUrls.apps.v2.base}/${appId}/admins/${adminId}`,
@@ -314,21 +353,24 @@ export async function deleteAdmin(
   const responseJson = await response.json();
 
   // Validate response status and message
-  expect(response.status()).toBe(200);
+  validateStatusCode(response, 200);
   expect(responseJson).toHaveProperty('message');
   expect(responseJson.message).toBe('Request performed successfully');
 
   return response;
 }
 
+/**
+ * Logs out the current admin session.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @returns Promise resolving to the API response
+ */
 export async function logoutAdmin(
   request: APIRequestContext,
   authToken: string
 ): Promise<APIResponse> {
-  const headers: Headers = {
-    Accept: 'application/json',
-    Authorization: `Token token=${authToken}`
-  };
+  const headers = createAuthHeaders(authToken);
 
   const response = await request.delete(apiUrls.admins.v2.logout, {
     headers

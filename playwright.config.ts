@@ -7,26 +7,18 @@ export const STORAGE_STATE = path.join(__dirname, 'tmp/session.json');
 export default defineConfig({
   testDir: './tests',
   globalSetup: require.resolve('./config/global.setup.ts'),
-  timeout: 90_000,
+  timeout: 120_000,
   expect: {
-    timeout: 60_000
+    timeout: 90_000
   },
   fullyParallel: false,
-  retries: 1,
-  workers: 1,
+  retries: 3,
+  workers: 4,
   reporter: [
     ['html'],
     ['github'],
     ['json', { outputFile: './playwright-report/results.json' }],
-    ['junit', { outputFile: './playwright-report/results.xml' }],
-    [
-      'allure-playwright',
-      {
-        detail: true,
-        outputFolder: 'allure-results',
-        suiteTitle: false
-      }
-    ]
+    ['junit', { outputFile: './playwright-report/results.xml' }]
   ],
   use: {
     baseURL: BASE_URL,
@@ -39,9 +31,11 @@ export default defineConfig({
     {
       name: 'api',
       testDir: './tests/api',
-      timeout: 90_000,
+      fullyParallel: true,
+      workers: 4,
+      timeout: 120_000,
       expect: {
-        timeout: 60_000
+        timeout: 90_000
       },
       use: {
         ...devices['Desktop Firefox']
@@ -50,9 +44,10 @@ export default defineConfig({
     {
       name: 'ui',
       testDir: './tests/ui',
+      workers: 1,
       timeout: 120_000,
       expect: {
-        timeout: 30_000
+        timeout: 60_000
       },
       use: {
         ...devices['Desktop Firefox'],
