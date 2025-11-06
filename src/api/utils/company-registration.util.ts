@@ -9,16 +9,17 @@ import { APIRequestContext } from '@playwright/test';
 
 /**
  * Generates identifiable company and app names for E2E tests
- * Format: e2e-api-tests-{type}-{timestamp}
+ * Format: {prefix}-company-{timestamp} and {prefix}-app-{timestamp}
+ * @param prefix - Optional prefix for company/app names (default: 'e2e-api-tests')
  */
-function generateIdentifiableNames(): {
+function generateIdentifiableNames(prefix: string = 'e2e-api-tests'): {
   companyName: string;
   appName: string;
 } {
   const timestamp = Date.now();
   return {
-    companyName: `e2e-api-tests-company-${timestamp}`,
-    appName: `e2e-api-tests-app-${timestamp}`
+    companyName: `${prefix}-company-${timestamp}`,
+    appName: `${prefix}-app-${timestamp}`
   };
 }
 
@@ -45,8 +46,9 @@ export async function setupIsolatedCompany(
   const activationCodeJson = await activationCodeResponse.json();
   const activationCode = activationCodeJson.activation_code;
 
-  // Generate identifiable names
-  const { companyName, appName } = generateIdentifiableNames();
+  // Generate identifiable names with sender-company prefix
+  const { companyName, appName } =
+    generateIdentifiableNames('e2e-sender-company');
 
   // Generate company payload with custom names - store this to preserve password
   const registrationData = {
@@ -108,8 +110,10 @@ export async function setupIsolatedCompanyForReceivingNotifications(
   const activationCodeJson = await activationCodeResponse.json();
   const activationCode = activationCodeJson.activation_code;
 
-  // Generate identifiable names
-  const { companyName, appName } = generateIdentifiableNames();
+  // Generate identifiable names with receiver-company prefix
+  const { companyName, appName } = generateIdentifiableNames(
+    'e2e-receiver-company'
+  );
 
   // Generate company payload with custom names - store this to preserve password
   const registrationData = {
