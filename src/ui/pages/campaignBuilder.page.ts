@@ -194,6 +194,9 @@ export class CampaignBuilderPage extends BasePage {
     } else {
       await this.twoButtonsOption.click();
     }
+    
+    // Wait for the button text input to be available after selecting count
+    await this.getButtonTextInput(1).waitFor({ state: 'visible' });
   }
 
   getCTAButton(type: CTAButtonType, buttonIndex: number = 0): Locator {
@@ -221,10 +224,12 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   getButtonTextInput(buttonNumber: 1 | 2): Locator {
+    // Find the button text input by placeholder
+    // Since button number selection determines which input is visible, use nth index
+    // Button 1 is index 0, Button 2 is index 1
     return this.page
-      .locator(`div`)
-      .filter({ hasText: new RegExp(`Button ${buttonNumber}$`) })
-      .getByPlaceholder('Button Text');
+      .getByPlaceholder('Button Text')
+      .nth(buttonNumber - 1);
   }
 
   buttonOneTextInput = this.getButtonTextInput(1);
@@ -232,9 +237,10 @@ export class CampaignBuilderPage extends BasePage {
 
   async enterButtonText(text: string, buttonIndex?: number): Promise<void> {
     if (buttonIndex === 2) {
+      await this.buttonTwoTextInput.waitFor({ state: 'visible' });
       await this.buttonTwoTextInput.fill(text);
     } else {
-      await this.buttonOneTextInput.click();
+      await this.buttonOneTextInput.waitFor({ state: 'visible' });
       await this.buttonOneTextInput.fill(text);
     }
   }

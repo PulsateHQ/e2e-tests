@@ -1,27 +1,20 @@
+import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
+import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
 import {
-  SUPER_ADMIN_ACCESS_TOKEN,
-  UI_E2E_ACCESS_TOKEN_ADMIN,
-  UI_E2E_APP_ID,
-  UI_E2E_LOGIN_ADMIN,
-  UI_E2E_PASSWORD_ADMIN
-} from '@_config/env.config';
-import { registerCompany } from '@_src/api/factories/admin.api.factory';
-import {
-  createDeeplinkWithApiForUi,
-  deleteDeeplinksWithApiForUi
+  createDeeplinkWithApi,
+  deleteDeeplinksWithApi
 } from '@_src/api/factories/deeplinks.api.factory';
+import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
+import { apiUrls } from '@_src/api/utils/api.util';
 import {
-  superAdminsActivationCodesCreate,
-  superAdminsFeatureFLagDefaultBatchUpdate
-} from '@_src/api/factories/super.admin.api.factory';
-import { startWebSdkSessionWithApi } from '@_src/api/factories/web.sdk.api.factory';
-import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+  setupIsolatedCompany,
+  setupIsolatedCompanyForReceivingNotifications
+} from '@_src/api/utils/company-registration.util';
+import { createWebSdkHeaders } from '@_src/api/utils/headers.util';
+import { validateStatusCode } from '@_src/api/utils/response.util';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import {
-  E2EAdminAuthDataModel,
-  E2EAdminLoginCredentialsModel
-} from '@_src/ui/models/admin.model';
+import { E2EAdminLoginCredentialsModel } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
@@ -36,71 +29,67 @@ test.describe('In-App Campaign Creation', () => {
     );
   });
 
-  const E2EAdminLoginCredentialsModel: E2EAdminLoginCredentialsModel = {
-    userEmail: `${UI_E2E_LOGIN_ADMIN}`,
-    userPassword: `${UI_E2E_PASSWORD_ADMIN}`,
-    uiE2EAppId: `${UI_E2E_APP_ID}`
-  };
+  // Creator company - isolated per test file (like API tests)
+  let APIE2ECreatorUserModel: APIE2ELoginUserModel;
+  let E2EAdminLoginCredentials: E2EAdminLoginCredentialsModel;
+  let creatorSdkAppId: string;
+  let creatorSdkAppKey: string;
 
-  const E2EAdminAuthDataModel: E2EAdminAuthDataModel = {
-    uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
-    uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
-  };
-
-  let adminAliasForCampaignReciver: string;
-  let appIdForCampaignReciver: string;
-  let adminUserNameForCampaignReciver: string;
-  let adminPasswordForCampaignReciver: string;
+  // Receiver company - created per test for campaign delivery
+  let APIE2EReceiverUserModel: APIE2ELoginUserModel;
   let deeplinkNickname: string;
   let deeplinkId: string;
 
+  test.beforeAll(async ({ request }) => {
+    // Create isolated creator company/app (like API tests pattern)
+    APIE2ECreatorUserModel = await setupIsolatedCompany(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN
+    );
+
+    // Get SDK credentials for creator's app (needed for Web SDK session)
+    const sdkCredentialsResponse = await getSdkCredentials(
+      request,
+      APIE2ECreatorUserModel.apiE2EAccessTokenAdmin,
+      APIE2ECreatorUserModel.apiE2EAppId
+    );
+    const sdkCredentialsJson = await sdkCredentialsResponse.json();
+    creatorSdkAppId = sdkCredentialsJson.app_id;
+    creatorSdkAppKey = sdkCredentialsJson.app_key;
+
+    // Setup creator login credentials
+    E2EAdminLoginCredentials = {
+      userEmail: APIE2ECreatorUserModel.username!,
+      userPassword: APIE2ECreatorUserModel.password!,
+      uiE2EAppId: APIE2ECreatorUserModel.apiE2EAppId
+    };
+  });
+
   test.beforeEach(async ({ request }) => {
-    // Arrange
-    const supserAdminActivationCodeCreateResponse =
-      await superAdminsActivationCodesCreate(
+    // Create isolated receiver company/app for campaign delivery
+    // Uses only SUPER_ADMIN_ACCESS_TOKEN for complete isolation (same as creator)
+    APIE2EReceiverUserModel =
+      await setupIsolatedCompanyForReceivingNotifications(
         request,
-        E2EAdminAuthDataModel.uiE2EAccessTokenSuperAdmin
+        SUPER_ADMIN_ACCESS_TOKEN
       );
-    const supserAdminActivationCodeCreateResponseJson =
-      await supserAdminActivationCodeCreateResponse.json();
-    const activationCode =
-      supserAdminActivationCodeCreateResponseJson.activation_code;
-    const registrationData = generateCompanyPayload(activationCode);
 
-    const companyRegistrationResponse = await registerCompany(
-      request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
-      registrationData
-    );
-
-    const companyRegistrationResponseJson =
-      await companyRegistrationResponse.json();
-
-    appIdForCampaignReciver =
-      companyRegistrationResponseJson.data.recent_mobile_app_id;
-
-    adminAliasForCampaignReciver =
-      companyRegistrationResponseJson.data._id.$oid;
-
-    adminUserNameForCampaignReciver = registrationData.username;
-
-    adminPasswordForCampaignReciver = registrationData.password;
-
-    await startWebSdkSessionWithApi(request, {
-      alias: adminAliasForCampaignReciver,
-      guid: adminAliasForCampaignReciver,
-      device: {
-        type: 'web',
-        location_permission: false,
-        push_permission: false
-      }
+    // Setup Web SDK session for receiver using creator's app SDK credentials
+    // This ensures the user is created in the creator's app (where segments are created)
+    const headers = createWebSdkHeaders(creatorSdkAppId, creatorSdkAppKey);
+    const webSdkResponse = await request.post(apiUrls.webSdk.v1.start, {
+      headers,
+      data: JSON.stringify({
+        alias: APIE2EReceiverUserModel.companyAlias!,
+        guid: APIE2EReceiverUserModel.companyAlias!,
+        device: {
+          type: 'web',
+          location_permission: false,
+          push_permission: false
+        }
+      })
     });
-
-    await superAdminsFeatureFLagDefaultBatchUpdate(
-      request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenSuperAdmin,
-      [appIdForCampaignReciver]
-    );
+    validateStatusCode(webSdkResponse, 200);
   });
 
   test('should create a new in-app full-screen campaign with URL button', async ({
@@ -111,11 +100,11 @@ test.describe('In-App Campaign Creation', () => {
     dashboardPage,
     accountSettingsPage
   }) => {
-    await loginPage.login(E2EAdminLoginCredentialsModel);
+    await loginPage.login(E2EAdminLoginCredentials);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -210,8 +199,8 @@ test.describe('In-App Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -227,11 +216,11 @@ test.describe('In-App Campaign Creation', () => {
     dashboardPage,
     accountSettingsPage
   }) => {
-    await loginPage.login(E2EAdminLoginCredentialsModel);
+    await loginPage.login(E2EAdminLoginCredentials);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -323,8 +312,8 @@ test.describe('In-App Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -341,23 +330,24 @@ test.describe('In-App Campaign Creation', () => {
     accountSettingsPage,
     request
   }) => {
-    const deeplinkResponse = await createDeeplinkWithApiForUi(
+    const deeplinkResponse = await createDeeplinkWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      APIE2ECreatorUserModel.apiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
         target: `https://www.${faker.internet.domainName()}`
-      }
+      },
+      APIE2ECreatorUserModel.apiE2EAppId
     );
 
     deeplinkNickname = deeplinkResponse.nickname;
     deeplinkId = deeplinkResponse.id;
 
-    await loginPage.login(E2EAdminLoginCredentialsModel);
+    await loginPage.login(E2EAdminLoginCredentials);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -449,8 +439,8 @@ test.describe('In-App Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -460,10 +450,11 @@ test.describe('In-App Campaign Creation', () => {
       30_000
     );
 
-    await deleteDeeplinksWithApiForUi(
+    await deleteDeeplinksWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
-      [deeplinkId]
+      APIE2ECreatorUserModel.apiE2EAccessTokenAdmin,
+      [deeplinkId],
+      APIE2ECreatorUserModel.apiE2EAppId
     );
   });
 
@@ -476,11 +467,11 @@ test.describe('In-App Campaign Creation', () => {
     accountSettingsPage
     // feedPage
   }) => {
-    await loginPage.login(E2EAdminLoginCredentialsModel);
+    await loginPage.login(E2EAdminLoginCredentials);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -573,8 +564,8 @@ test.describe('In-App Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);

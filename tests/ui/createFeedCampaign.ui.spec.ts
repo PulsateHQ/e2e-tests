@@ -7,8 +7,8 @@ import {
 } from '@_config/env.config';
 import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import {
-  createDeeplinkWithApiForUi,
-  deleteDeeplinksWithApiForUi
+  createDeeplinkWithApi,
+  deleteDeeplinksWithApi
 } from '@_src/api/factories/deeplinks.api.factory';
 import {
   superAdminsActivationCodesCreate,
@@ -78,6 +78,12 @@ test.describe('Feed Campaign Creation', () => {
 
     appIdForCampaignReciver =
       companyRegistrationResponseJson.data.recent_mobile_app_id;
+
+    // Validate appId was successfully extracted
+    expect(
+      appIdForCampaignReciver,
+      'recent_mobile_app_id must be present in company registration response'
+    ).toBeDefined();
 
     adminAliasForCampaignReciver =
       companyRegistrationResponseJson.data._id.$oid;
@@ -229,13 +235,14 @@ test.describe('Feed Campaign Creation', () => {
     feedPage,
     request
   }) => {
-    const deeplinkResponse = await createDeeplinkWithApiForUi(
+    const deeplinkResponse = await createDeeplinkWithApi(
       request,
       E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
         target: `https://www.${faker.internet.domainName()}`
-      }
+      },
+      appIdForCampaignReciver
     );
 
     deeplinkNickname = deeplinkResponse.nickname;
@@ -344,10 +351,11 @@ test.describe('Feed Campaign Creation', () => {
 
     await feedPage.verifyFeedWithPolling(deeplinkNickname, 30_000);
 
-    await deleteDeeplinksWithApiForUi(
+    await deleteDeeplinksWithApi(
       request,
       E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
-      [deeplinkId]
+      [deeplinkId],
+      appIdForCampaignReciver
     );
   });
 
@@ -641,13 +649,14 @@ test.describe('Feed Campaign Creation', () => {
     feedPage,
     request
   }) => {
-    const deeplinkResponse = await createDeeplinkWithApiForUi(
+    const deeplinkResponse = await createDeeplinkWithApi(
       request,
       E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
         target: `https://www.${faker.internet.domainName()}`
-      }
+      },
+      appIdForCampaignReciver
     );
 
     deeplinkNickname = deeplinkResponse.nickname;
@@ -785,10 +794,11 @@ test.describe('Feed Campaign Creation', () => {
 
     await feedPage.verifyFeedButtonWithPolling(deeplinkNickname, 30_000);
 
-    await deleteDeeplinksWithApiForUi(
+    await deleteDeeplinksWithApi(
       request,
       E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
-      [deeplinkId]
+      [deeplinkId],
+      appIdForCampaignReciver
     );
   });
 });
