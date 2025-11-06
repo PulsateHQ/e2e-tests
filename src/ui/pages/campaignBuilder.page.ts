@@ -2,7 +2,12 @@ import { BasePage } from '@_src/ui/pages/base.page';
 import { Locator, Page } from '@playwright/test';
 
 // Type for CTA (Call to Action) button types
-export type CTAButtonType = 'Deeplink' | 'URL' | 'Open Feed' | 'Dismiss';
+export type CTAButtonType =
+  | 'Deeplink'
+  | 'URL'
+  | 'Open Feed'
+  | 'Dismiss'
+  | 'Feed Post (Back)';
 
 export class CampaignBuilderPage extends BasePage {
   // =========================================================================
@@ -26,6 +31,7 @@ export class CampaignBuilderPage extends BasePage {
   imageSection = this.page.getByText('Image', { exact: true });
   headlineSection = this.page.getByText('Headline', { exact: true });
   textSection = this.page.getByText('Text', { exact: true });
+  tableSection = this.page.getByText('Table', { exact: true });
   callToActionSection = this.page.getByText('Call to action');
 
   mediaToggle = this.page
@@ -40,6 +46,11 @@ export class CampaignBuilderPage extends BasePage {
   textToggle = this.page
     .locator('div:has-text("Text") ~ div .react-switch-bg')
     .first();
+  tableToggle = this.page
+    .locator(
+      'div[data-testid="collapseDrag"]:has-text("Table") ~ div .react-switch-bg'
+    )
+    .first();
 
   headlineInput = this.page.locator('div:nth-child(2) > .collapse > div > div');
 
@@ -52,7 +63,7 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
   buttonCountDropdown = this.page
     .locator('.dropdown-toggle')
-    .filter({ hasText: /1 Button|2 Buttons/ })
+    .filter({ hasText: /1 Button|2 Buttons|Select Button Categories/ })
     .first();
   oneButtonOption = this.page.getByRole('menuitem', { name: '1 Button' });
   twoButtonsOption = this.page.getByRole('menuitem', { name: '2 Buttons' });
@@ -67,6 +78,9 @@ export class CampaignBuilderPage extends BasePage {
   dismissButton = this.page
     .getByTestId('cta-button')
     .filter({ hasText: 'Dismiss' });
+  feedPostBackButton = this.page
+    .getByTestId('cta-button')
+    .filter({ hasText: 'Feed Post (Back)' });
 
   buttonTextInput = this.page.getByRole('textbox', { name: 'Button Text' });
   urlInput = this.page.getByRole('textbox', {
@@ -192,6 +206,8 @@ export class CampaignBuilderPage extends BasePage {
         return this.openFeedButton.nth(buttonIndex);
       case 'Dismiss':
         return this.dismissButton.nth(buttonIndex);
+      case 'Feed Post (Back)':
+        return this.feedPostBackButton.nth(buttonIndex);
       default:
         throw new Error(`Unknown CTA button type: ${type}`);
     }
@@ -289,7 +305,7 @@ export class CampaignBuilderPage extends BasePage {
   }
 
   async toggleSectionSwitch(
-    section: 'Image' | 'Headline' | 'Text' | 'Media'
+    section: 'Image' | 'Headline' | 'Text' | 'Media' | 'Table'
   ): Promise<void> {
     let sectionToggle: Locator;
     switch (section) {
@@ -304,6 +320,9 @@ export class CampaignBuilderPage extends BasePage {
         break;
       case 'Media':
         sectionToggle = this.mediaToggle;
+        break;
+      case 'Table':
+        sectionToggle = this.tableToggle;
         break;
     }
     await sectionToggle.click();

@@ -87,9 +87,11 @@ export class SegmentsPage extends BasePage {
 
   getSegmentLinkByName(segmentName: string): Locator {
     // Helper to get the dynamic locator for a segment link
-    return this.page.getByRole('link', {
-      name: `Segment Name: ${segmentName}`
-    });
+    return this.page
+      .getByRole('link', {
+        name: `Segment Name: ${segmentName}`
+      })
+      .first();
   }
 
   async verifySegmentLinkIsVisible(segmentName: string): Promise<void> {
