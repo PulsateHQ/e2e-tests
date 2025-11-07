@@ -1,17 +1,18 @@
-import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
-import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import {
+  SUPER_ADMIN_ACCESS_TOKEN,
+  UI_E2E_ACCESS_TOKEN_ADMIN,
+  UI_E2E_APP_ID,
+  UI_E2E_LOGIN_ADMIN,
+  UI_E2E_PASSWORD_ADMIN
+} from '@_config/env.config';
 import {
   createDeeplinkWithApi,
   deleteDeeplinksWithApi
 } from '@_src/api/factories/deeplinks.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
+import { startWebSdkSessionWithApi } from '@_src/api/factories/web.sdk.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
-import { apiUrls } from '@_src/api/utils/api.util';
-import {
-  setupIsolatedCompany,
-  setupIsolatedCompanyForReceivingNotifications
-} from '@_src/api/utils/company-registration.util';
-import { createWebSdkHeaders } from '@_src/api/utils/headers.util';
-import { validateStatusCode } from '@_src/api/utils/response.util';
+import { setupIsolatedCompanyForReceivingNotifications } from '@_src/api/utils/company-registration.util';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { E2EAdminLoginCredentialsModel } from '@_src/ui/models/admin.model';
@@ -28,42 +29,23 @@ test.describe('In-App Campaign Creation', () => {
       `Test only runs in environments: ${SUPPORTED_ENVIRONMENTS.join(', ')}`
     );
   });
-
   // Creator company - isolated per test file (like API tests)
-  let APIE2ECreatorUserModel: APIE2ELoginUserModel;
-  let E2EAdminLoginCredentials: E2EAdminLoginCredentialsModel;
-  let creatorSdkAppId: string;
-  let creatorSdkAppKey: string;
+
+  const E2EAdminLoginCredentialsModel: E2EAdminLoginCredentialsModel = {
+    userEmail: `${UI_E2E_LOGIN_ADMIN}`,
+    userPassword: `${UI_E2E_PASSWORD_ADMIN}`,
+    uiE2EAppId: `${UI_E2E_APP_ID}`
+  };
+
+  const E2EAdminAuthDataModel: E2EAdminAuthDataModel = {
+    uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
+    uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
+  };
 
   // Receiver company - created per test for campaign delivery
   let APIE2EReceiverUserModel: APIE2ELoginUserModel;
   let deeplinkNickname: string;
   let deeplinkId: string;
-
-  test.beforeAll(async ({ request }) => {
-    // Create isolated creator company/app (like API tests pattern)
-    APIE2ECreatorUserModel = await setupIsolatedCompany(
-      request,
-      SUPER_ADMIN_ACCESS_TOKEN
-    );
-
-    // Get SDK credentials for creator's app (needed for Web SDK session)
-    const sdkCredentialsResponse = await getSdkCredentials(
-      request,
-      APIE2ECreatorUserModel.apiE2EAccessTokenAdmin,
-      APIE2ECreatorUserModel.apiE2EAppId
-    );
-    const sdkCredentialsJson = await sdkCredentialsResponse.json();
-    creatorSdkAppId = sdkCredentialsJson.app_id;
-    creatorSdkAppKey = sdkCredentialsJson.app_key;
-
-    // Setup creator login credentials
-    E2EAdminLoginCredentials = {
-      userEmail: APIE2ECreatorUserModel.username!,
-      userPassword: APIE2ECreatorUserModel.password!,
-      uiE2EAppId: APIE2ECreatorUserModel.apiE2EAppId
-    };
-  });
 
   test.beforeEach(async ({ request }) => {
     // Create isolated receiver company/app for campaign delivery
@@ -74,22 +56,21 @@ test.describe('In-App Campaign Creation', () => {
         SUPER_ADMIN_ACCESS_TOKEN
       );
 
-    // Setup Web SDK session for receiver using creator's app SDK credentials
-    // This ensures the user is created in the creator's app (where segments are created)
-    const headers = createWebSdkHeaders(creatorSdkAppId, creatorSdkAppKey);
-    const webSdkResponse = await request.post(apiUrls.webSdk.v1.start, {
-      headers,
-      data: JSON.stringify({
-        alias: APIE2EReceiverUserModel.companyAlias!,
-        guid: APIE2EReceiverUserModel.companyAlias!,
-        device: {
-          type: 'web',
-          location_permission: false,
-          push_permission: false
-        }
-      })
+    // Update feature flags for the new app
+    await superAdminsFeatureFLagDefaultBatchUpdate(
+      request,
+      SUPER_ADMIN_ACCESS_TOKEN,
+      [APIE2EReceiverUserModel.apiE2EAppId]
+    );
+    await startWebSdkSessionWithApi(request, {
+      alias: APIE2EReceiverUserModel.companyAlias!,
+      guid: APIE2EReceiverUserModel.companyAlias!,
+      device: {
+        type: 'web',
+        location_permission: false,
+        push_permission: false
+      }
     });
-    validateStatusCode(webSdkResponse, 200);
   });
 
   test('should create a new in-app full-screen campaign with URL button', async ({
@@ -100,7 +81,7 @@ test.describe('In-App Campaign Creation', () => {
     dashboardPage,
     accountSettingsPage
   }) => {
-    await loginPage.login(E2EAdminLoginCredentials);
+    await loginPage.login(E2EAdminLoginCredentialsModel);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
@@ -216,7 +197,7 @@ test.describe('In-App Campaign Creation', () => {
     dashboardPage,
     accountSettingsPage
   }) => {
-    await loginPage.login(E2EAdminLoginCredentials);
+    await loginPage.login(E2EAdminLoginCredentialsModel);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
@@ -332,18 +313,18 @@ test.describe('In-App Campaign Creation', () => {
   }) => {
     const deeplinkResponse = await createDeeplinkWithApi(
       request,
-      APIE2ECreatorUserModel.apiE2EAccessTokenAdmin,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
         target: `https://www.${faker.internet.domainName()}`
       },
-      APIE2ECreatorUserModel.apiE2EAppId
+      E2EAdminLoginCredentialsModel.uiE2EAppId
     );
 
     deeplinkNickname = deeplinkResponse.nickname;
     deeplinkId = deeplinkResponse.id;
 
-    await loginPage.login(E2EAdminLoginCredentials);
+    await loginPage.login(E2EAdminLoginCredentialsModel);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
@@ -452,9 +433,9 @@ test.describe('In-App Campaign Creation', () => {
 
     await deleteDeeplinksWithApi(
       request,
-      APIE2ECreatorUserModel.apiE2EAccessTokenAdmin,
+      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       [deeplinkId],
-      APIE2ECreatorUserModel.apiE2EAppId
+      E2EAdminLoginCredentialsModel.uiE2EAppId
     );
   });
 
@@ -467,7 +448,7 @@ test.describe('In-App Campaign Creation', () => {
     accountSettingsPage
     // feedPage
   }) => {
-    await loginPage.login(E2EAdminLoginCredentials);
+    await loginPage.login(E2EAdminLoginCredentialsModel);
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;

@@ -138,11 +138,6 @@ export async function setupIsolatedCompanyForReceivingNotifications(
   const email = companyRegistrationResponseJson.data.email;
   const companyAlias = companyRegistrationResponseJson.data._id.$oid;
 
-  // Update feature flags for the new app
-  await superAdminsFeatureFLagDefaultBatchUpdate(request, superAdminToken, [
-    appId
-  ]);
-
   return {
     apiE2EAccessTokenAdmin: adminAccessToken,
     apiE2EAccessTokenSuperAdmin: superAdminToken,

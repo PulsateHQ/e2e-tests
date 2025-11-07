@@ -1,11 +1,14 @@
 import {
   AppResponse,
   CreateAppRequest,
+  CreateWebSdkKeyResponse,
   DeleteAppRequest,
   GetAllAppsParams,
-  SdkCredentialsResponse
+  SdkCredentialsResponse,
+  WebSdkDomainPayload
 } from '../models/app.model';
 import { GetAllAppsResponse } from '../models/app.model';
+import { BASE_URL } from '@_config/env.config';
 import { apiUrls } from '@_src/api/utils/api.util';
 import {
   createAuthHeaders,
