@@ -1,5 +1,5 @@
 import { BasePage } from '@_src/ui/pages/base.page';
-import { Locator, Page } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 
 // Type for CTA (Call to Action) button types
 export type CTAButtonType =
@@ -183,7 +183,14 @@ export class CampaignBuilderPage extends BasePage {
   // Call To Action Methods
   // =========================================================================
   async openCallToActionSection(): Promise<void> {
-    await this.callToActionSection.click();
+    // Check if section is already open by verifying button inputs are visible
+    // Reason: Avoid collapsing section if already open
+    const isSectionOpen = await this.getButtonTextInput(1)
+      .isVisible()
+      .catch(() => false);
+    if (!isSectionOpen) {
+      await this.callToActionSection.click();
+    }
   }
 
   async selectButtonCount(count: 1 | 2): Promise<void> {
@@ -263,7 +270,46 @@ export class CampaignBuilderPage extends BasePage {
   async selectDeeplinkOption(
     optionName: string | string[] = 'AdminEdit'
   ): Promise<void> {
-    await this.openCallToActionSection(); // Ensure section is open
+    // Don't reopen section - it should already be open from setupDeeplinkButton
+    // Reason: Reopening can collapse the section if already open, hiding the dropdown
+
+    // Wait for mobile panel overlay to disappear if present
+    const mobilePanel = this.page.locator('.mobile-panel.card');
+    if (await mobilePanel.isVisible().catch(() => false)) {
+      await mobilePanel
+        .waitFor({ state: 'hidden', timeout: 5000 })
+        .catch(() => {
+          // If overlay doesn't disappear, continue anyway
+        });
+    }
+
+    // Wait for dropdown to be visible with polling approach
+    // Reason: Dropdown appears after Deeplink button type is selected, may need time for DOM update
+    // Increased timeout to 30s to match other waits in codebase and handle slower DOM updates
+    await expect(async () => {
+      const isVisible = await this.deeplinkDropdown.isVisible();
+      if (!isVisible) {
+        throw new Error('Deeplink dropdown is not visible yet');
+      }
+    }).toPass({ timeout: 30000, intervals: [500] });
+
+    // Ensure element is actionable (not intercepted) before clicking
+    await this.deeplinkDropdown.scrollIntoViewIfNeeded();
+
+    // Wait for element to be actionable (not intercepted by overlays)
+    await expect(async () => {
+      const isActionable = await this.deeplinkDropdown.evaluate((el) => {
+        const rect = el.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const elementAtPoint = document.elementFromPoint(centerX, centerY);
+        return elementAtPoint === el || el.contains(elementAtPoint);
+      });
+      if (!isActionable) {
+        throw new Error('Element is still intercepted by overlay');
+      }
+    }).toPass({ timeout: 10000, intervals: [200] });
+
     await this.deeplinkDropdown.click();
 
     if (Array.isArray(optionName)) {

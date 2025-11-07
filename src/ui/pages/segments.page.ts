@@ -114,8 +114,9 @@ export class SegmentsPage extends BasePage {
           const segmentRowLocator = this.page.getByRole('row').filter({
             has: segmentLinkLocator
           });
-          const totalUsersSpanInRow =
-            segmentRowLocator.getByLabel('Total Users');
+          const totalUsersSpanInRow = segmentRowLocator
+            .getByLabel('Total Users')
+            .first();
           return (
             (await totalUsersSpanInRow.isVisible()) &&
             (await totalUsersSpanInRow.textContent()) === expectedUserCount
