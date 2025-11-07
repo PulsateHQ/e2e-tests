@@ -194,7 +194,7 @@ export class CampaignBuilderPage extends BasePage {
     } else {
       await this.twoButtonsOption.click();
     }
-    
+
     // Wait for the button text input to be available after selecting count
     await this.getButtonTextInput(1).waitFor({ state: 'visible' });
   }
@@ -227,9 +227,7 @@ export class CampaignBuilderPage extends BasePage {
     // Find the button text input by placeholder
     // Since button number selection determines which input is visible, use nth index
     // Button 1 is index 0, Button 2 is index 1
-    return this.page
-      .getByPlaceholder('Button Text')
-      .nth(buttonNumber - 1);
+    return this.page.getByPlaceholder('Button Text').nth(buttonNumber - 1);
   }
 
   buttonOneTextInput = this.getButtonTextInput(1);
