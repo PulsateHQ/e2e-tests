@@ -38,7 +38,7 @@ export default defineConfig({
         timeout: 90_000
       },
       use: {
-        ...devices['Desktop Firefox']
+        ...devices['Desktop Chromium']
       }
     },
     {
@@ -53,31 +53,6 @@ export default defineConfig({
         ...devices['Desktop Firefox'],
         viewport: { width: 1920, height: 1080 }
       }
-    },
-    {
-      name: 'chrome',
-      testDir: './tests/api',
-      use: {
-        ...devices['Desktop Chrome']
-      }
-    },
-    {
-      name: 'webkit',
-      testDir: './tests/api',
-      use: {
-        ...devices['Desktop Safari']
-      }
-    },
-    {
-      name: 'chromium',
-      testDir: './tests/api',
-      use: {
-        ...devices['Desktop Chromium']
-      }
-    },
-    {
-      name: 'setup',
-      testMatch: '*.setup.ts'
     }
   ]
 });

@@ -91,7 +91,7 @@ test.describe('Login Functionality', () => {
     mainNavigationComponent,
     request
   }) => {
-    const APIE2ELoginUserModel: E2EAdminAuthDataModel = {
+    const e2EAdminAuthDataModel: E2EAdminAuthDataModel = {
       uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
       uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
     };
@@ -100,7 +100,7 @@ test.describe('Login Functionality', () => {
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(
         request,
-        APIE2ELoginUserModel.uiE2EAccessTokenSuperAdmin
+        e2EAdminAuthDataModel.uiE2EAccessTokenSuperAdmin
       );
     const supserAdminActivationCodeCreateResponseJson =
       await supserAdminActivationCodeCreateResponse.json();
@@ -112,7 +112,7 @@ test.describe('Login Functionality', () => {
     // 1. Register Company
     const companyRegistrationResponse = await registerCompany(
       request,
-      APIE2ELoginUserModel.uiE2EAccessTokenAdmin,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       registrationData
     );
 

@@ -3,6 +3,10 @@ export interface APIE2ELoginUserModel {
   apiE2EAccessTokenSuperAdmin?: string;
   apiE2EAppId: string;
   apiE2EFrontEndAccessToken?: string;
+  username?: string;
+  password?: string;
+  email?: string;
+  companyAlias?: string;
 }
 
 export interface APIE2ETokenSDKModel {
