@@ -15,7 +15,10 @@ import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { setupIsolatedCompanyForReceivingNotifications } from '@_src/api/utils/company-registration.util';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
-import { E2EAdminLoginCredentialsModel } from '@_src/ui/models/admin.model';
+import {
+  E2EAdminAuthDataModel,
+  E2EAdminLoginCredentialsModel
+} from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
 test.describe('In-App Campaign Creation', () => {
@@ -37,7 +40,7 @@ test.describe('In-App Campaign Creation', () => {
     uiE2EAppId: `${UI_E2E_APP_ID}`
   };
 
-  const E2EAdminAuthDataModel: E2EAdminAuthDataModel = {
+  const e2EAdminAuthDataModel: E2EAdminAuthDataModel = {
     uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
     uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
   };
@@ -121,7 +124,6 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignBuilderPage.imageSection).toBeVisible();
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
-    // await expect(campaignsPage.callToActionSection).toBeVisible();
 
     // Toggle of Image section
     await campaignBuilderPage.toggleSectionSwitch('Image');
@@ -313,7 +315,7 @@ test.describe('In-App Campaign Creation', () => {
   }) => {
     const deeplinkResponse = await createDeeplinkWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
         target: `https://www.${faker.internet.domainName()}`
@@ -355,7 +357,6 @@ test.describe('In-App Campaign Creation', () => {
     const campaignName = `InApp Large Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
-    // const buttonText = deeplinkNickname;
 
     await campaignBuilderPage.enterCampaignName(campaignName);
     await campaignBuilderPage.clickSaveAndContinue();
@@ -433,7 +434,7 @@ test.describe('In-App Campaign Creation', () => {
 
     await deleteDeeplinksWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       [deeplinkId],
       E2EAdminLoginCredentialsModel.uiE2EAppId
     );
@@ -446,7 +447,6 @@ test.describe('In-App Campaign Creation', () => {
     segmentsPage,
     dashboardPage,
     accountSettingsPage
-    // feedPage
   }) => {
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
@@ -487,7 +487,6 @@ test.describe('In-App Campaign Creation', () => {
     await expect(campaignBuilderPage.imageSection).toBeVisible();
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
-    // await expect(campaignsPage.callToActionSection).toBeVisible();
 
     // Toggle of Image section
     await campaignBuilderPage.toggleSectionSwitch('Image');
@@ -552,9 +551,5 @@ test.describe('In-App Campaign Creation', () => {
     await loginPage.login(loginCredentialsForReceiver);
 
     await dashboardPage.verifyInAppButtonUrlWithPolling(buttonText, 30_000);
-
-    // await dashboardPage.clickInAppButtonUrl(buttonText);
-
-    // await feedPage.verifyFeedPage();
   });
 });

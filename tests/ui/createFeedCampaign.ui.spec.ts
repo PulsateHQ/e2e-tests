@@ -5,17 +5,14 @@ import {
   UI_E2E_LOGIN_ADMIN,
   UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
-import { registerCompany } from '@_src/api/factories/admin.api.factory';
 import {
   createDeeplinkWithApi,
   deleteDeeplinksWithApi
 } from '@_src/api/factories/deeplinks.api.factory';
-import {
-  superAdminsActivationCodesCreate,
-  superAdminsFeatureFLagDefaultBatchUpdate
-} from '@_src/api/factories/super.admin.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
 import { startWebSdkSessionWithApi } from '@_src/api/factories/web.sdk.api.factory';
-import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
+import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
+import { setupIsolatedCompanyForReceivingNotifications } from '@_src/api/utils/company-registration.util';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import {
@@ -42,71 +39,40 @@ test.describe('Feed Campaign Creation', () => {
     uiE2EAppId: `${UI_E2E_APP_ID}`
   };
 
-  const E2EAdminAuthDataModel: E2EAdminAuthDataModel = {
+  const e2EAdminAuthDataModel: E2EAdminAuthDataModel = {
     uiE2EAccessTokenAdmin: `${UI_E2E_ACCESS_TOKEN_ADMIN}`,
     uiE2EAccessTokenSuperAdmin: `${SUPER_ADMIN_ACCESS_TOKEN}`
   };
 
-  let adminAliasForCampaignReciver: string;
-  let appIdForCampaignReciver: string;
-  let adminUserNameForCampaignReciver: string;
-  let adminPasswordForCampaignReciver: string;
+  // Receiver company - created per test for campaign delivery
+  let APIE2EReceiverUserModel: APIE2ELoginUserModel;
   let deeplinkNickname: string;
   let deeplinkId: string;
 
   test.beforeEach(async ({ request }) => {
-    // Arrange
-    const supserAdminActivationCodeCreateResponse =
-      await superAdminsActivationCodesCreate(
+    // Create isolated receiver company/app for campaign delivery
+    // Uses only SUPER_ADMIN_ACCESS_TOKEN for complete isolation (same as creator)
+    APIE2EReceiverUserModel =
+      await setupIsolatedCompanyForReceivingNotifications(
         request,
-        E2EAdminAuthDataModel.uiE2EAccessTokenSuperAdmin
+        SUPER_ADMIN_ACCESS_TOKEN
       );
-    const supserAdminActivationCodeCreateResponseJson =
-      await supserAdminActivationCodeCreateResponse.json();
-    const activationCode =
-      supserAdminActivationCodeCreateResponseJson.activation_code;
-    const registrationData = generateCompanyPayload(activationCode);
 
-    const companyRegistrationResponse = await registerCompany(
+    // Update feature flags for the new app
+    await superAdminsFeatureFLagDefaultBatchUpdate(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
-      registrationData
+      SUPER_ADMIN_ACCESS_TOKEN,
+      [APIE2EReceiverUserModel.apiE2EAppId]
     );
-
-    const companyRegistrationResponseJson =
-      await companyRegistrationResponse.json();
-
-    appIdForCampaignReciver =
-      companyRegistrationResponseJson.data.recent_mobile_app_id;
-
-    // Validate appId was successfully extracted
-    expect(
-      appIdForCampaignReciver,
-      'recent_mobile_app_id must be present in company registration response'
-    ).toBeDefined();
-
-    adminAliasForCampaignReciver =
-      companyRegistrationResponseJson.data._id.$oid;
-
-    adminUserNameForCampaignReciver = registrationData.username;
-
-    adminPasswordForCampaignReciver = registrationData.password;
-
     await startWebSdkSessionWithApi(request, {
-      alias: adminAliasForCampaignReciver,
-      guid: adminAliasForCampaignReciver,
+      alias: APIE2EReceiverUserModel.companyAlias!,
+      guid: APIE2EReceiverUserModel.companyAlias!,
       device: {
         type: 'web',
         location_permission: false,
         push_permission: false
       }
     });
-
-    await superAdminsFeatureFLagDefaultBatchUpdate(
-      request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenSuperAdmin,
-      [appIdForCampaignReciver]
-    );
   });
 
   test('should create a new feed campaign with URL button', async ({
@@ -122,7 +88,7 @@ test.describe('Feed Campaign Creation', () => {
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -168,7 +134,6 @@ test.describe('Feed Campaign Creation', () => {
 
     // Configure call to action
     await campaignBuilderPage.openCallToActionSection();
-    // await campaignBuilderPage.selectButtonCount(1);
     await campaignBuilderPage.enterButtonText(buttonText);
     await campaignBuilderPage.selectCTAButtonType('URL');
     await campaignBuilderPage.enterButtonUrl(buttonUrl);
@@ -214,8 +179,8 @@ test.describe('Feed Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -237,12 +202,12 @@ test.describe('Feed Campaign Creation', () => {
   }) => {
     const deeplinkResponse = await createDeeplinkWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
         target: `https://www.${faker.internet.domainName()}`
       },
-      appIdForCampaignReciver
+      E2EAdminLoginCredentialsModel.uiE2EAppId
     );
 
     deeplinkNickname = deeplinkResponse.nickname;
@@ -252,7 +217,7 @@ test.describe('Feed Campaign Creation', () => {
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -341,8 +306,8 @@ test.describe('Feed Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -353,9 +318,9 @@ test.describe('Feed Campaign Creation', () => {
 
     await deleteDeeplinksWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       [deeplinkId],
-      appIdForCampaignReciver
+      E2EAdminLoginCredentialsModel.uiE2EAppId
     );
   });
 
@@ -372,7 +337,7 @@ test.describe('Feed Campaign Creation', () => {
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -417,7 +382,6 @@ test.describe('Feed Campaign Creation', () => {
 
     // Configure call to action
     await campaignBuilderPage.openCallToActionSection();
-    // await campaignBuilderPage.selectButtonCount(1);
     await campaignBuilderPage.enterButtonText(buttonText);
     await campaignBuilderPage.selectCTAButtonType('Feed Post (Back)');
 
@@ -487,8 +451,8 @@ test.describe('Feed Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -511,7 +475,7 @@ test.describe('Feed Campaign Creation', () => {
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -557,7 +521,6 @@ test.describe('Feed Campaign Creation', () => {
 
     // Configure call to action
     await campaignBuilderPage.openCallToActionSection();
-    // await campaignBuilderPage.selectButtonCount(1);
     await campaignBuilderPage.enterButtonText(buttonText);
     await campaignBuilderPage.selectCTAButtonType('Feed Post (Back)');
 
@@ -628,8 +591,8 @@ test.describe('Feed Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -651,12 +614,12 @@ test.describe('Feed Campaign Creation', () => {
   }) => {
     const deeplinkResponse = await createDeeplinkWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
         target: `https://www.${faker.internet.domainName()}`
       },
-      appIdForCampaignReciver
+      E2EAdminLoginCredentialsModel.uiE2EAppId
     );
 
     deeplinkNickname = deeplinkResponse.nickname;
@@ -665,7 +628,7 @@ test.describe('Feed Campaign Creation', () => {
 
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
-    const aliasValue = `${adminAliasForCampaignReciver}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
 
     // Navigate to Targeting section
     await segmentsPage.clickSidebarCategoryTargeting();
@@ -709,7 +672,6 @@ test.describe('Feed Campaign Creation', () => {
 
     // Configure call to action
     await campaignBuilderPage.openCallToActionSection();
-    // await campaignBuilderPage.selectButtonCount(1);
     await campaignBuilderPage.enterButtonText(deeplinkNickname);
     await campaignBuilderPage.selectCTAButtonType('Feed Post (Back)');
 
@@ -741,7 +703,6 @@ test.describe('Feed Campaign Creation', () => {
       deeplinkNickname,
       deeplinkNickname
     );
-    // await campaignBuilderPage.enterButtonUrl(buttonUrl);
 
     // Save and continue
     await campaignBuilderPage.clickSaveAndContinue();
@@ -784,8 +745,8 @@ test.describe('Feed Campaign Creation', () => {
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
-      userEmail: adminUserNameForCampaignReciver,
-      userPassword: adminPasswordForCampaignReciver
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
     };
 
     await loginPage.login(loginCredentialsForReceiver);
@@ -796,9 +757,9 @@ test.describe('Feed Campaign Creation', () => {
 
     await deleteDeeplinksWithApi(
       request,
-      E2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       [deeplinkId],
-      appIdForCampaignReciver
+      E2EAdminLoginCredentialsModel.uiE2EAppId
     );
   });
 });
