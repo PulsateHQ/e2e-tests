@@ -38,7 +38,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Geofence In-App Campaign', () => {
+test.describe('In-App Geofence Campaigns', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -82,7 +82,7 @@ test.describe('Geofence In-App Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
   });
-  test('should create a enter geofence In-App Large campaign with a URL button and click it', async ({
+  test('should create enter geofence large in-app with URL button', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -268,7 +268,7 @@ test.describe('Geofence In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create a exit geofence In-App Small Top campaign with 2 users but only 1 user clicks the button', async ({
+  test('should create exit geofence small top in-app with 2 users, 1 clicks button', async ({
     request
   }) => {
     const numberOfUsers = 2;

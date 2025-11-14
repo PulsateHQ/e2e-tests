@@ -27,7 +27,7 @@ test.describe('Company Registration Page', () => {
     ).toBeVisible();
   });
 
-  test('should validate error messages for missing and incorrect fields in Personal Details page', async ({
+  test('should validate errors for missing and incorrect fields', async ({
     companyRegistrationPage
   }) => {
     await companyRegistrationPage.clickButtonNext();

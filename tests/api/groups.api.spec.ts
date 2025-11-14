@@ -25,7 +25,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Groups Management', () => {
+test.describe('Groups', () => {
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
@@ -59,7 +59,7 @@ test.describe('Groups Management', () => {
     );
   });
 
-  test('should manage group lifecycle with segment resource assignments', async ({
+  test('should create, update, and delete group with segments', async ({
     request
   }) => {
     // Arrange

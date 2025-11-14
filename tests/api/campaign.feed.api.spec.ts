@@ -29,7 +29,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Feed Campaign', () => {
+test.describe('Feed Campaigns', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -71,7 +71,7 @@ test.describe('Feed Campaign', () => {
     );
   });
 
-  test('should create an Feed Post campaign with a URL button and update mobile session user to click it', async ({
+  test('should create feed campaign with URL button', async ({
     request
   }) => {
     const numberOfUsers = 1;

@@ -26,7 +26,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Segment Management', () => {
+test.describe('Segments', () => {
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
@@ -55,7 +55,7 @@ test.describe('Segment Management', () => {
     );
   });
 
-  test('should create multiple segments, update one, remove one, and validate count', async ({
+  test('should create, update, and delete segments', async ({
     request
   }) => {
     // Arrange
@@ -173,7 +173,7 @@ test.describe('Segment Management', () => {
     expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(2);
   });
 
-  test('should create and duplicate segments with correct audience estimation', async ({
+  test('should duplicate segment and estimate audience', async ({
     request
   }) => {
     // Arrange
@@ -303,7 +303,7 @@ test.describe('Segment Management', () => {
     expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(3);
   });
 
-  test('should import users to segment via file upload and verify segment content', async ({
+  test('should import users via file to segment', async ({
     request
   }) => {
     // Arrange

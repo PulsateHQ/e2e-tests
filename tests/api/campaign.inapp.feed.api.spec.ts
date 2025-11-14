@@ -54,7 +54,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('In-App Feed Campaign', () => {
+test.describe('In-App Feed Campaigns', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -96,7 +96,7 @@ test.describe('In-App Feed Campaign', () => {
     );
   });
 
-  test('should create an In-App small campaign with button to open specific feed', async ({
+  test('should create small in-app with button to open feed', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -354,7 +354,7 @@ test.describe('In-App Feed Campaign', () => {
     // Note: front_impression and front_button_click_one are now validated in the factory with retry logic
   });
 
-  test('should create an In-App Large campaign with button to open feed inbox', async ({
+  test('should create large in-app with button to open inbox', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -574,7 +574,7 @@ test.describe('In-App Feed Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create a Large In-App campaign with button to open feed card with front and back sides', async ({
+  test('should create large in-app with button to open feed card', async ({
     request
   }) => {
     const numberOfUsers = 1;

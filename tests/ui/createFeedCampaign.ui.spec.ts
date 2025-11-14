@@ -21,7 +21,7 @@ import {
 } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-test.describe('Feed Campaign Creation', () => {
+test.describe('Create Feed Campaigns', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
 
@@ -75,7 +75,7 @@ test.describe('Feed Campaign Creation', () => {
     });
   });
 
-  test('should create a new feed campaign with URL button', async ({
+  test('should create feed with URL button', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
@@ -190,7 +190,7 @@ test.describe('Feed Campaign Creation', () => {
     await feedPage.verifyFeedWithPolling(buttonText, 30_000);
   });
 
-  test('should create a new feed campaign with Deeplink', async ({
+  test('should create feed with deeplink', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
@@ -324,7 +324,7 @@ test.describe('Feed Campaign Creation', () => {
     );
   });
 
-  test('should create a new feed campaign with feed post (back) and a dismiss button', async ({
+  test('should create feed with back post and dismiss button', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
@@ -462,7 +462,7 @@ test.describe('Feed Campaign Creation', () => {
     await feedPage.verifyFeedButtonWithPolling(buttonText, 30_000);
   });
 
-  test('should create a new feed campaign with feed post (back) and a URL button', async ({
+  test('should create feed with back post and URL button', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
@@ -602,7 +602,7 @@ test.describe('Feed Campaign Creation', () => {
     await feedPage.verifyFeedButtonWithPolling(buttonText, 30_000);
   });
 
-  test('should create a new feed campaign with feed post (back) and a Deeplink', async ({
+  test('should create feed with back post and deeplink', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
