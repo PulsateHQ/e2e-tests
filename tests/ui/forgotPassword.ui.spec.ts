@@ -3,7 +3,7 @@ import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { E2EAdminLoginCredentialsModel } from '@_src/ui/models/admin.model';
 
-test.describe('Forgot Password Functionality', () => {
+test.describe('Forgot Password', () => {
   const expectedURL = `${BASE_URL}/admins/forgot_password`;
   const incorrectEmail: E2EAdminLoginCredentialsModel = {
     userEmail: 'incorrect_email.com',
@@ -25,7 +25,7 @@ test.describe('Forgot Password Functionality', () => {
     await loginPage.forgotPasswordButton.click();
   });
 
-  test('should display an error message for incorrect email format', async ({
+  test('should show error for invalid email format', async ({
     forgotPasswordPage
   }) => {
     const loginURL = await forgotPasswordPage.validateUrl();

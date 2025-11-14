@@ -19,7 +19,7 @@ import {
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 import { faker } from '@faker-js/faker';
 
-test.describe('Admin Invitation Management', () => {
+test.describe('Admin Invites', () => {
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
@@ -53,7 +53,7 @@ test.describe('Admin Invitation Management', () => {
     );
   });
 
-  test('should invite new admin, edit privileges and delete admin', async ({
+  test('should invite admin, update privileges, and delete', async ({
     request
   }) => {
     const inviteAdminResponse = await inviteAdmin(

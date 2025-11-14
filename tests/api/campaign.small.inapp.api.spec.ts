@@ -38,7 +38,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Small In-App Campaign', () => {
+test.describe('In-App Small Campaigns', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -79,7 +79,7 @@ test.describe('Small In-App Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
   });
-  test('should create an In-App Small Top campaign with a URL banner and click it', async ({
+  test('should create small top in-app with URL banner', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -219,7 +219,7 @@ test.describe('Small In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Small Bottom campaign with a Deeplink banner and click it', async ({
+  test('should create small bottom in-app with deeplink banner', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -388,7 +388,7 @@ test.describe('Small In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create In-App Small Top campaign with dismiss banner and swipe to dismiss', async ({
+  test('should create small top in-app with dismiss banner', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -528,7 +528,7 @@ test.describe('Small In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Small Top campaign with 2 users but only 1 user clicks the button', async ({
+  test('should create small top in-app with 2 users, 1 clicks button', async ({
     request
   }) => {
     const numberOfUsers = 2;

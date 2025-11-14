@@ -53,7 +53,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('HTML Feed Campaign', () => {
+test.describe('HTML Feed Campaigns', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -95,9 +95,7 @@ test.describe('HTML Feed Campaign', () => {
     );
   });
 
-  test('should create an HTML Feed campaign with a URL button and click it', async ({
-    request
-  }) => {
+  test('should create HTML feed with URL button', async ({ request }) => {
     const numberOfUsers = 1;
 
     await importRandomUsers(
@@ -283,9 +281,7 @@ test.describe('HTML Feed Campaign', () => {
     );
   });
 
-  test('should create an HTML Feed campaign with a Deeplink button and click it', async ({
-    request
-  }) => {
+  test('should create HTML feed with deeplink button', async ({ request }) => {
     const numberOfUsers = 1;
 
     await importRandomUsers(
@@ -531,7 +527,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: front_impression and front_button_click_one are now validated in the factory with retry logic
   });
 
-  test('should create HTML Feed campaign with expiration and validate back button and dismiss', async ({
+  test('should create HTML feed with expiration and back button', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -879,7 +875,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: front and back stats are now validated in the factory with retry logic
   });
 
-  test('should create HTML Feed campaign with expiration and validate back button with two buttons', async ({
+  test('should create HTML feed with expiration and two buttons', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -1246,7 +1242,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: front and back stats are now validated in the factory with retry logic
   });
 
-  test('should create an HTML Feed campaign with 2 users but only 1 user clicks the button', async ({
+  test('should create HTML feed with 2 users, 1 clicks button', async ({
     request
   }) => {
     const numberOfUsers = 2;
@@ -1435,7 +1431,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: clicks, front_impression, and front_button_click_one are now validated in the factory with retry logic
   });
 
-  test('should create HTML Feed campaign with 2 users clicking different buttons', async ({
+  test('should create HTML feed with 2 users clicking different buttons', async ({
     request
   }) => {
     const numberOfUsers = 2;
@@ -1675,7 +1671,7 @@ test.describe('HTML Feed Campaign', () => {
     // Note: front and back stats are now validated in the factory with retry logic
   });
 
-  test('should create 2 HTML Feed campaign and validate number of feeds cards', async ({
+  test('should create 2 HTML feed campaigns and validate cards count', async ({
     request
   }) => {
     const numberOfUsers = 1;

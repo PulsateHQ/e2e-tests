@@ -17,7 +17,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@playwright/test';
 
-test.describe('Geofences Management', () => {
+test.describe('Geofences', () => {
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
@@ -53,9 +53,7 @@ test.describe('Geofences Management', () => {
     );
   });
 
-  test('should create multiple geofences, update one, remove one, and validate count', async ({
-    request
-  }) => {
+  test('should create, update, and delete geofences', async ({ request }) => {
     // Arrange
     const firstGeofencePayload = {
       ...createGeofencePayload(),

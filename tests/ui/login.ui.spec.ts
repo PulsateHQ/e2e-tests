@@ -15,7 +15,7 @@ import {
   E2EAdminLoginCredentialsModel
 } from '@_src/ui/models/admin.model';
 
-test.describe('Login Functionality', () => {
+test.describe('Login', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
 
@@ -27,7 +27,7 @@ test.describe('Login Functionality', () => {
     );
   });
 
-  test('should reject login with incorrect password and display error messages', async ({
+  test('should reject invalid credentials with errors', async ({
     loginPage
   }) => {
     const expectedURL = `${BASE_URL}/admins/sign_in`;
@@ -72,9 +72,7 @@ test.describe('Login Functionality', () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 
-  test('should validate the presence and functionality of the download banner', async ({
-    loginPage
-  }) => {
+  test('should validate download banner', async ({ loginPage }) => {
     await expect(loginPage.downloadButton).toHaveText(
       'Download Your Guide Now'
     );
@@ -85,7 +83,7 @@ test.describe('Login Functionality', () => {
     );
   });
 
-  test('should login successfully with correct credentials and navigate to dashboard', async ({
+  test('should login and navigate to dashboard', async ({
     loginPage,
     dashboardPage,
     mainNavigationComponent,

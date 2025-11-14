@@ -24,7 +24,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Company Registration and Admin Management', () => {
+test.describe('Admin Registration', () => {
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
@@ -57,9 +57,7 @@ test.describe('Company Registration and Admin Management', () => {
     );
   });
 
-  test('should complete company registration flow with admin and app management', async ({
-    request
-  }) => {
+  test('should register company with admin and app', async ({ request }) => {
     // Arrange
     const supserAdminActivationCodeCreateResponse =
       await superAdminsActivationCodesCreate(

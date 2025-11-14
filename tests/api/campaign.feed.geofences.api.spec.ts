@@ -40,7 +40,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Geofence Feed Campaign', () => {
+test.describe('Feed Geofence Campaigns', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -87,7 +87,7 @@ test.describe('Geofence Feed Campaign', () => {
     );
   });
 
-  test('should create a enter geofence an HTML Feed campaign with a URL button and click it', async ({
+  test('should create enter geofence HTML feed with URL button', async ({
     request
   }) => {
     const numberOfUsers = 1;

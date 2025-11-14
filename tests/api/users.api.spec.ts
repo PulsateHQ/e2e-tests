@@ -31,7 +31,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('User Management', () => {
+test.describe('Users', () => {
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
   test.beforeAll(async ({ request }) => {
@@ -60,9 +60,7 @@ test.describe('User Management', () => {
     );
   });
 
-  test('should import a single user and validate the user details', async ({
-    request
-  }) => {
+  test('should import and validate user', async ({ request }) => {
     // Arrange
     const numberOfUsers = 1;
     const { apiE2EAccessTokenAdmin, apiE2EAppId } = APIE2ELoginUserModel;
@@ -99,9 +97,7 @@ test.describe('User Management', () => {
     );
   });
 
-  test('should create a user, remove the user, and verify the user count', async ({
-    request
-  }) => {
+  test('should create and delete user', async ({ request }) => {
     // Arrange
     const { apiE2EAccessTokenAdmin } = APIE2ELoginUserModel;
 
@@ -160,7 +156,7 @@ test.describe('User Management', () => {
     expect(getAllUsersWithApiAfterUnsubscribeJson.data.length).toBe(1);
   });
 
-  test('should import users with segment creation and verify segment content including custom attributes', async ({
+  test('should import users with segment and custom attributes', async ({
     request
   }) => {
     // Arrange

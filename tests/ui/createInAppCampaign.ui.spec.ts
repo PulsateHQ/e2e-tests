@@ -21,7 +21,7 @@ import {
 } from '@_src/ui/models/admin.model';
 import { faker } from '@faker-js/faker/locale/en';
 
-test.describe('In-App Campaign Creation', () => {
+test.describe('Create In-App Campaigns', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
 
@@ -76,7 +76,7 @@ test.describe('In-App Campaign Creation', () => {
     });
   });
 
-  test('should create a new in-app full-screen campaign with URL button', async ({
+  test('should create full-screen with URL button', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
@@ -191,7 +191,7 @@ test.describe('In-App Campaign Creation', () => {
     await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
   });
 
-  test('should create a new in-app full-screen campaign with dismiss button', async ({
+  test('should create full-screen with dismiss button', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
@@ -304,7 +304,7 @@ test.describe('In-App Campaign Creation', () => {
     await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText, 30_000);
   });
 
-  test('should create a new in-app full-screen campaign with deeeplink', async ({
+  test('should create full-screen with deeplink', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,
@@ -440,7 +440,7 @@ test.describe('In-App Campaign Creation', () => {
     );
   });
 
-  test('should create a new in-app full-screen campaign with feed', async ({
+  test('should create full-screen with feed', async ({
     loginPage,
     campaignsPage,
     campaignBuilderPage,

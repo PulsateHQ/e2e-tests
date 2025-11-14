@@ -39,7 +39,7 @@ import {
 } from '@_src/api/utils/data.manager.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
-test.describe('Large In-App Campaign', () => {
+test.describe('In-App Large Campaigns', () => {
   let APIE2ETokenSDKModel: APIE2ETokenSDKModel;
   let APIE2ELoginUserModel: APIE2ELoginUserModel;
 
@@ -78,9 +78,7 @@ test.describe('Large In-App Campaign', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
   });
-  test('should create an In-App Large campaign with a URL button and click it', async ({
-    request
-  }) => {
+  test('should create large in-app with URL button', async ({ request }) => {
     const numberOfUsers = 1;
 
     await importRandomUsers(
@@ -218,7 +216,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Large campaign with a Deeplink button and click it', async ({
+  test('should create large in-app with deeplink button', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -387,7 +385,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create a In-App Large campaign with dismiss button and verify user clicks the X close button instead of action button', async ({
+  test('should create large in-app with dismiss button', async ({
     request
   }) => {
     const numberOfUsers = 1;
@@ -527,7 +525,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create an In-App Large campaign with 2 users but only 1 user clicks the button', async ({
+  test('should create large in-app with 2 users, 1 clicks button', async ({
     request
   }) => {
     const numberOfUsers = 2;
@@ -719,9 +717,7 @@ test.describe('Large In-App Campaign', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create In-App Large campaign with two buttons and different user actions', async ({
-    request
-  }) => {
+  test('should create large in-app with two buttons', async ({ request }) => {
     const numberOfUsers = 2;
 
     await importRandomUsers(
