@@ -55,9 +55,7 @@ test.describe('Segments', () => {
     );
   });
 
-  test('should create, update, and delete segments', async ({
-    request
-  }) => {
+  test('should create, update, and delete segments', async ({ request }) => {
     // Arrange
     const numberOfUsers = 3;
     await importRandomUsers(
@@ -303,9 +301,7 @@ test.describe('Segments', () => {
     expect(getSegmentsResponseJsonAfterCreation.data.length).toBe(3);
   });
 
-  test('should import users via file to segment', async ({
-    request
-  }) => {
+  test('should import users via file to segment', async ({ request }) => {
     // Arrange
     const numberOfUsers = 3;
     await importRandomUsers(

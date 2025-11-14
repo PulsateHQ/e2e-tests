@@ -53,9 +53,7 @@ test.describe('Geofences', () => {
     );
   });
 
-  test('should create, update, and delete geofences', async ({
-    request
-  }) => {
+  test('should create, update, and delete geofences', async ({ request }) => {
     // Arrange
     const firstGeofencePayload = {
       ...createGeofencePayload(),

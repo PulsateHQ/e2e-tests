@@ -60,9 +60,7 @@ test.describe('Users', () => {
     );
   });
 
-  test('should import and validate user', async ({
-    request
-  }) => {
+  test('should import and validate user', async ({ request }) => {
     // Arrange
     const numberOfUsers = 1;
     const { apiE2EAccessTokenAdmin, apiE2EAppId } = APIE2ELoginUserModel;
@@ -99,9 +97,7 @@ test.describe('Users', () => {
     );
   });
 
-  test('should create and delete user', async ({
-    request
-  }) => {
+  test('should create and delete user', async ({ request }) => {
     // Arrange
     const { apiE2EAccessTokenAdmin } = APIE2ELoginUserModel;
 

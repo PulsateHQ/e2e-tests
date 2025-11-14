@@ -95,9 +95,7 @@ test.describe('HTML Feed Campaigns', () => {
     );
   });
 
-  test('should create HTML feed with URL button', async ({
-    request
-  }) => {
+  test('should create HTML feed with URL button', async ({ request }) => {
     const numberOfUsers = 1;
 
     await importRandomUsers(
@@ -283,9 +281,7 @@ test.describe('HTML Feed Campaigns', () => {
     );
   });
 
-  test('should create HTML feed with deeplink button', async ({
-    request
-  }) => {
+  test('should create HTML feed with deeplink button', async ({ request }) => {
     const numberOfUsers = 1;
 
     await importRandomUsers(

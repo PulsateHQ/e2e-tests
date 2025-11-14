@@ -78,9 +78,7 @@ test.describe('In-App Large Campaigns', () => {
       APIE2ELoginUserModel.apiE2EAppId
     );
   });
-  test('should create large in-app with URL button', async ({
-    request
-  }) => {
+  test('should create large in-app with URL button', async ({ request }) => {
     const numberOfUsers = 1;
 
     await importRandomUsers(
@@ -719,9 +717,7 @@ test.describe('In-App Large Campaigns', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('should create large in-app with two buttons', async ({
-    request
-  }) => {
+  test('should create large in-app with two buttons', async ({ request }) => {
     const numberOfUsers = 2;
 
     await importRandomUsers(

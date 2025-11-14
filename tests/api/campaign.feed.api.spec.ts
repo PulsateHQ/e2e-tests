@@ -71,9 +71,7 @@ test.describe('Feed Campaigns', () => {
     );
   });
 
-  test('should create feed campaign with URL button', async ({
-    request
-  }) => {
+  test('should create feed campaign with URL button', async ({ request }) => {
     const numberOfUsers = 1;
 
     await importRandomUsers(

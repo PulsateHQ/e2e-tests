@@ -72,9 +72,7 @@ test.describe('Login', () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 
-  test('should validate download banner', async ({
-    loginPage
-  }) => {
+  test('should validate download banner', async ({ loginPage }) => {
     await expect(loginPage.downloadButton).toHaveText(
       'Download Your Guide Now'
     );
