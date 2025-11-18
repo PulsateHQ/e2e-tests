@@ -143,4 +143,32 @@ export class DashboardPage extends BasePage {
       )
       .toBeTruthy();
   }
+
+  /**
+   * Validates that an in-app button with specified text is visible
+   * @param timeoutMs Optional timeout in milliseconds (default: 60000)
+   */
+  async verifyInAppImageWithPolling(timeoutMs: number = 60000): Promise<void> {
+    const imgLocator = this.page.locator('.pws-img');
+
+    await expect
+      .poll(
+        async () => {
+          const imgEl = await imgLocator.elementHandle();
+          if (!imgEl) {
+            return false; // not even in the DOM yet
+          }
+
+          // Evaluate inside the browser: check load state
+          return await imgEl.evaluate((node: HTMLImageElement) => {
+            return node.complete && node.naturalWidth > 0;
+          });
+        },
+        {
+          message: 'Image should be fully loaded',
+          timeout: timeoutMs
+        }
+      )
+      .toBeTruthy();
+  }
 }

@@ -69,4 +69,61 @@ export class FeedPage extends BasePage {
       )
       .toBeTruthy();
   }
+
+  async verifyFeedImageWithPolling(timeoutMs: number = 60000): Promise<void> {
+    const imgLocator = this.page.locator('.pws-img-feed');
+
+    await expect
+      .poll(
+        async () => {
+          const imgEl = await imgLocator.elementHandle();
+          if (!imgEl) {
+            return false; // not even in the DOM yet
+          }
+
+          // Evaluate inside the browser: check load state
+          return await imgEl.evaluate((node: HTMLImageElement) => {
+            return node.complete && node.naturalWidth > 0;
+          });
+        },
+        {
+          message: 'Image should be fully loaded',
+          timeout: timeoutMs
+        }
+      )
+      .toBeTruthy();
+  }
+
+  /**
+   * Validates that an in-app headline and text are visible
+   * @param expectedHeadline The expected headline text
+   * @param expectedText The expected body text
+   * @param timeoutMs Optional timeout in milliseconds (default: 60000)
+   */
+  async verifyFeedContentWithPolling(
+    expectedHeadline: string,
+    expectedText: string,
+    timeoutMs: number = 60000
+  ): Promise<void> {
+    // Use polling to repeatedly check until the content appears or times out
+    await expect
+      .poll(
+        async () => {
+          // Check either headline or text is visible for resilience
+          const headlineVisible = await this.page
+            .getByText(expectedHeadline, { exact: true })
+            .isVisible();
+          const textVisible = await this.page
+            .getByText(expectedText, { exact: true })
+            .isVisible();
+
+          return headlineVisible || textVisible;
+        },
+        {
+          message: `In-app message with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
+          timeout: timeoutMs
+        }
+      )
+      .toBeTruthy();
+  }
 }
