@@ -175,40 +175,23 @@ export class DashboardPage extends BasePage {
       .toBeTruthy();
   }
 
-  /**
-   * Validates that an in-app url button navigates to the expected URL
-   * @param buttonText
-   * @param expectedUrl
-   * @param timeoutMs Optional timeout in milliseconds (default: 60000)
-   */
   async clickInAppUrlButtonAndVerifyNavigation(
     buttonText: string,
     expectedUrl: string
   ): Promise<void> {
-    const btn = this.page.getByRole('link', { name: buttonText });
-
     const [newPage] = await Promise.all([
       this.page.waitForEvent('popup'),
-      btn.click()
+      this.page.getByRole('link', { name: buttonText }).click()
     ]);
-
-    await newPage.waitForLoadState('domcontentloaded');
 
     await expect(newPage).toHaveURL(expectedUrl);
   }
 
-  /**
-   * Validates that an in-app deeplink button navigates and opens the deeplink in a new tab
-   * @param buttonText
-   * @param timeoutMs Optional timeout in milliseconds (default: 60000)
-   */
   async clickInAppDeeplinkButtonAndVerifyNavigation(
-    buttonText: string
+    buttonText: string,
+    expectedUrl: string
   ): Promise<void> {
-    await this.page
-      .getByRole('link', { name: buttonText })
-      .click()
-      .catch((e) => e);
-    expect(this.page).toBeTruthy();
+    await this.page.getByRole('link', { name: buttonText }).click();
+    await expect(this.page).toHaveURL(expectedUrl);
   }
 }

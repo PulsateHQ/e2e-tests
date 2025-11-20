@@ -1,4 +1,5 @@
 import {
+  BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
   UI_E2E_ACCESS_TOKEN_ADMIN,
   UI_E2E_APP_ID,
@@ -49,6 +50,7 @@ test.describe('Create Feed Campaigns', () => {
   let APIE2EReceiverUserModel: APIE2ELoginUserModel;
   let deeplinkNickname: string;
   let deeplinkId: string;
+  let deeplinkTarget: string;
 
   test.beforeEach(async ({ request }) => {
     // Create isolated receiver company/app for campaign delivery
@@ -74,6 +76,8 @@ test.describe('Create Feed Campaigns', () => {
         push_permission: false
       }
     });
+
+    deeplinkTarget = `${BASE_URL}/mobile/apps/${APIE2EReceiverUserModel.apiE2EAppId}/segments`;
   });
 
   test('should create feed with URL button', async ({
@@ -212,7 +216,7 @@ test.describe('Create Feed Campaigns', () => {
       e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
-        target: `https://www.${faker.internet.domainName()}`
+        target: deeplinkTarget
       },
       E2EAdminLoginCredentialsModel.uiE2EAppId
     );
@@ -327,7 +331,10 @@ test.describe('Create Feed Campaigns', () => {
 
     await feedPage.verifyFeedWithPolling(deeplinkNickname, 30_000);
 
-    await feedPage.clickFeedDeeplinkButtonAndVerifyNavigation(deeplinkNickname);
+    await feedPage.clickFeedDeeplinkButtonAndVerifyNavigation(
+      deeplinkNickname,
+      deeplinkTarget
+    );
 
     await deleteDeeplinksWithApi(
       request,
@@ -661,13 +668,14 @@ test.describe('Create Feed Campaigns', () => {
       e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
-        target: `https://www.${faker.internet.domainName()}`
+        target: deeplinkTarget
       },
       E2EAdminLoginCredentialsModel.uiE2EAppId
     );
 
     deeplinkNickname = deeplinkResponse.nickname;
     deeplinkId = deeplinkResponse.id;
+
     await loginPage.login(E2EAdminLoginCredentialsModel);
 
     // Create segment with required details
@@ -805,15 +813,13 @@ test.describe('Create Feed Campaigns', () => {
 
     await feedPage.verifyFeedImageWithPolling();
 
-    await feedPage.clickFeedBackPostDeeplinkButtonAndVerifyNavigation(
-      deeplinkNickname
-    );
+    await feedPage.clickFeedPostBackButton(deeplinkNickname);
 
-    await deleteDeeplinksWithApi(
-      request,
-      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
-      [deeplinkId],
-      E2EAdminLoginCredentialsModel.uiE2EAppId
+    await feedPage.verifyFeedBackPostImageWithPolling();
+
+    await feedPage.clickFeedBackPostDeeplinkButtonAndVerifyNavigation(
+      deeplinkNickname,
+      deeplinkTarget
     );
   });
 });

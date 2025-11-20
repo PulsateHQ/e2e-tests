@@ -222,31 +222,21 @@ export class FeedPage extends BasePage {
     await expect(newPage).toHaveURL(expectedUrl);
   }
 
-  /**
-   * Validates that feed post deeplink button navigates and opens the deeplink in a new tab
-   * @param buttonText
-   */
   async clickFeedDeeplinkButtonAndVerifyNavigation(
-    buttonText: string
+    buttonText: string,
+    expectedUrl: string
   ): Promise<void> {
-    await this.page
-      .getByRole('link', { name: buttonText })
-      .click()
-      .catch((e) => e);
-    expect(this.page).toBeTruthy();
+    await this.page.getByRole('link', { name: buttonText }).click();
+    await this.page.waitForLoadState('domcontentloaded');
+    await expect(this.page).toHaveURL(expectedUrl);
   }
 
-  /**
-   * Validates that feed back post deeplink button navigates and opens the deeplink in a new tab
-   * @param buttonText
-   */
   async clickFeedBackPostDeeplinkButtonAndVerifyNavigation(
-    buttonText: string
+    buttonText: string,
+    expectedUrl: string
   ): Promise<void> {
-    await this.page
-      .getByRole('button', { name: buttonText })
-      .click()
-      .catch((e) => e);
-    expect(this.page).toBeTruthy();
+    await this.page.getByRole('link', { name: buttonText }).click();
+    await this.page.waitForLoadState('domcontentloaded');
+    await expect(this.page).toHaveURL(expectedUrl);
   }
 }

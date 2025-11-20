@@ -1,4 +1,5 @@
 import {
+  BASE_URL,
   SUPER_ADMIN_ACCESS_TOKEN,
   UI_E2E_ACCESS_TOKEN_ADMIN,
   UI_E2E_APP_ID,
@@ -50,6 +51,7 @@ test.describe('Create In-App Campaigns', () => {
   let APIE2EReceiverUserModel: APIE2ELoginUserModel;
   let deeplinkNickname: string;
   let deeplinkId: string;
+  let deeplinkTarget: string;
 
   test.beforeEach(async ({ request }) => {
     // Create isolated receiver company/app for campaign delivery
@@ -75,6 +77,7 @@ test.describe('Create In-App Campaigns', () => {
         push_permission: false
       }
     });
+    deeplinkTarget = `${BASE_URL}/mobile/apps/${APIE2EReceiverUserModel.apiE2EAppId}/segments`;
   });
 
   test('should create full-screen with URL button', async ({
@@ -338,7 +341,7 @@ test.describe('Create In-App Campaigns', () => {
       e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
       {
         nickname: `Deeplink_${faker.lorem.word()}`,
-        target: `https://www.${faker.internet.domainName()}`
+        target: deeplinkTarget
       },
       E2EAdminLoginCredentialsModel.uiE2EAppId
     );
@@ -460,7 +463,8 @@ test.describe('Create In-App Campaigns', () => {
     );
 
     await dashboardPage.clickInAppDeeplinkButtonAndVerifyNavigation(
-      deeplinkNickname
+      deeplinkNickname,
+      deeplinkTarget
     );
 
     await deleteDeeplinksWithApi(
