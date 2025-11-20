@@ -237,7 +237,7 @@ export class FeedPage extends BasePage {
   }
 
   /**
-   * Validates that feed post deeplink button navigates and opens the deeplink in a new tab
+   * Validates that feed back post deeplink button navigates and opens the deeplink in a new tab
    * @param buttonText
    */
   async clickFeedBackPostDeeplinkButtonAndVerifyNavigation(
