@@ -58,6 +58,8 @@ export class CampaignBuilderPage extends BasePage {
     .locator('div')
     .filter({ hasText: /^Tell people more about your campaign\.\.\.$/ });
 
+  imageInput = this.page.getByTestId('file');
+
   // =========================================================================
   // Call To Action Locators
   // =========================================================================
@@ -177,6 +179,11 @@ export class CampaignBuilderPage extends BasePage {
     // Reverted to simpler version based on user's previous commits
     await this.textInput.click();
     await this.page.keyboard.type(text);
+  }
+
+  async uploadCampaignImage(imagePath: string): Promise<void> {
+    await this.imageSection.click();
+    await this.imageInput.setInputFiles(imagePath);
   }
 
   // =========================================================================

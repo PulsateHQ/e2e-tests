@@ -24,6 +24,7 @@ import { faker } from '@faker-js/faker/locale/en';
 test.describe('Create Feed Campaigns', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
+  const campaignImage = `src/ui/test-data/img/ui_automation_1.jpg`;
 
   test.beforeAll(async ({}) => {
     // eslint-disable-next-line playwright/no-skipped-test
@@ -123,8 +124,8 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.textSection).toBeVisible();
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -187,7 +188,13 @@ test.describe('Create Feed Campaigns', () => {
 
     await dashboardPage.clickNotificationButton();
 
+    await feedPage.verifyFeedContentWithPolling(campaignHeadline, campaignText);
+
+    await feedPage.verifyFeedImageWithPolling();
+
     await feedPage.verifyFeedWithPolling(buttonText, 30_000);
+
+    await feedPage.clickFeedButtonAndVerifyNavigation(buttonText, buttonUrl);
   });
 
   test('should create feed with deeplink', async ({
@@ -250,8 +257,8 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.textSection).toBeVisible();
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -314,6 +321,10 @@ test.describe('Create Feed Campaigns', () => {
 
     await dashboardPage.clickNotificationButton();
 
+    await feedPage.verifyFeedContentWithPolling(campaignHeadline, campaignText);
+
+    await feedPage.verifyFeedImageWithPolling();
+
     await feedPage.verifyFeedWithPolling(deeplinkNickname, 30_000);
 
     await deleteDeeplinksWithApi(
@@ -361,7 +372,8 @@ test.describe('Create Feed Campaigns', () => {
     const campaignName = `Feed Post Campaign ${Date.now()}`;
     const campaignHeadline = `Headline_${faker.lorem.word()}`;
     const campaignText = `Text_${faker.lorem.word()}`;
-    const buttonText = `Open Feed_${faker.lorem.word()}`;
+    const buttonText = `Feed Post (Back)_${faker.lorem.word()}`;
+    const dismissText = `Dismiss_${faker.lorem.word()}`;
 
     await campaignBuilderPage.enterCampaignName(campaignName);
     await campaignBuilderPage.clickSaveAndContinue();
@@ -371,8 +383,8 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.textSection).toBeVisible();
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -395,7 +407,7 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
     // Configure Feed Post (Back) button
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
     await campaignBuilderPage.toggleSectionSwitch('Table');
 
     // Enter Headline and Text for Feed Post (Back)
@@ -407,7 +419,7 @@ test.describe('Create Feed Campaigns', () => {
     // Configure call to action for Feed Post (Back)
     await campaignBuilderPage.openCallToActionSection();
     await campaignBuilderPage.selectButtonCount(1);
-    await campaignBuilderPage.enterButtonText(buttonText);
+    await campaignBuilderPage.enterButtonText(dismissText);
     await campaignBuilderPage.selectCTAButtonType('Dismiss');
 
     // Save and continue
@@ -458,6 +470,21 @@ test.describe('Create Feed Campaigns', () => {
     await loginPage.login(loginCredentialsForReceiver);
 
     await dashboardPage.clickNotificationButton();
+
+    await feedPage.clickFeedPostBackButton(buttonText);
+
+    await feedPage.verifyFeedBackPostImageWithPolling();
+
+    await feedPage.verifyFeedBackPostContentWithPolling(
+      campaignHeadline,
+      campaignText
+    );
+
+    await feedPage.clickDismissButton(dismissText);
+
+    await feedPage.verifyFeedContentWithPolling(campaignHeadline, campaignText);
+
+    await feedPage.verifyFeedImageWithPolling();
 
     await feedPage.verifyFeedButtonWithPolling(buttonText, 30_000);
   });
@@ -510,8 +537,8 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.textSection).toBeVisible();
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -534,7 +561,7 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
     // Configure Feed Post (Back) button
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
     await campaignBuilderPage.toggleSectionSwitch('Table');
 
     // Enter Headline and Text for Feed Post (Back)
@@ -599,7 +626,22 @@ test.describe('Create Feed Campaigns', () => {
 
     await dashboardPage.clickNotificationButton();
 
+    await feedPage.verifyFeedContentWithPolling(campaignHeadline, campaignText);
+
+    await feedPage.verifyFeedImageWithPolling();
+
     await feedPage.verifyFeedButtonWithPolling(buttonText, 30_000);
+
+    await feedPage.clickFeedPostBackButton(buttonText);
+
+    await feedPage.verifyFeedBackPostImageWithPolling();
+
+    await feedPage.verifyFeedBackPostContentWithPolling(
+      campaignHeadline,
+      campaignText
+    );
+
+    await feedPage.clickFeedButtonAndVerifyNavigation(buttonText, buttonUrl);
   });
 
   test('should create feed with back post and deeplink', async ({
@@ -661,8 +703,8 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.textSection).toBeVisible();
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -752,6 +794,10 @@ test.describe('Create Feed Campaigns', () => {
     await loginPage.login(loginCredentialsForReceiver);
 
     await dashboardPage.clickNotificationButton();
+
+    await feedPage.verifyFeedContentWithPolling(campaignHeadline, campaignText);
+
+    await feedPage.verifyFeedImageWithPolling();
 
     await feedPage.verifyFeedButtonWithPolling(deeplinkNickname, 30_000);
 

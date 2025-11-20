@@ -24,6 +24,7 @@ import { faker } from '@faker-js/faker/locale/en';
 test.describe('Create In-App Campaigns', () => {
   // Define the environments where this test should run
   const SUPPORTED_ENVIRONMENTS = ['sealion'];
+  const campaignImage = `src/ui/test-data/img/ui_automation_1.jpg`;
 
   test.beforeAll(async ({}) => {
     // eslint-disable-next-line playwright/no-skipped-test
@@ -125,8 +126,8 @@ test.describe('Create In-App Campaigns', () => {
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -188,7 +189,19 @@ test.describe('Create In-App Campaigns', () => {
 
     await loginPage.login(loginCredentialsForReceiver);
 
+    await dashboardPage.verifyInAppContentWithPolling(
+      campaignHeadline,
+      campaignText
+    );
+
+    await dashboardPage.verifyInAppImageWithPolling();
+
     await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
+
+    await dashboardPage.clickInAppUrlButtonAndVerifyNavigation(
+      buttonText,
+      buttonUrl
+    );
   });
 
   test('should create full-screen with dismiss button', async ({
@@ -239,8 +252,8 @@ test.describe('Create In-App Campaigns', () => {
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -301,7 +314,14 @@ test.describe('Create In-App Campaigns', () => {
 
     await loginPage.login(loginCredentialsForReceiver);
 
-    await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText, 30_000);
+    await dashboardPage.verifyInAppContentWithPolling(
+      campaignHeadline,
+      campaignText
+    );
+
+    await dashboardPage.verifyInAppImageWithPolling();
+
+    await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText);
   });
 
   test('should create full-screen with deeplink', async ({
@@ -365,8 +385,8 @@ test.describe('Create In-App Campaigns', () => {
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -426,6 +446,13 @@ test.describe('Create In-App Campaigns', () => {
     };
 
     await loginPage.login(loginCredentialsForReceiver);
+
+    await dashboardPage.verifyInAppContentWithPolling(
+      campaignHeadline,
+      campaignText
+    );
+
+    await dashboardPage.verifyInAppImageWithPolling();
 
     await dashboardPage.verifyInAppButtonUrlWithPolling(
       deeplinkNickname,
@@ -488,8 +515,8 @@ test.describe('Create In-App Campaigns', () => {
     await expect(campaignBuilderPage.headlineSection).toBeVisible();
     await expect(campaignBuilderPage.textSection).toBeVisible();
 
-    // Toggle of Image section
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
 
     // Enter Headline and Text
     await campaignBuilderPage.expandCollapseSection('Headline');
@@ -549,6 +576,13 @@ test.describe('Create In-App Campaigns', () => {
     };
 
     await loginPage.login(loginCredentialsForReceiver);
+
+    await dashboardPage.verifyInAppContentWithPolling(
+      campaignHeadline,
+      campaignText
+    );
+
+    await dashboardPage.verifyInAppImageWithPolling();
 
     await dashboardPage.verifyInAppButtonUrlWithPolling(buttonText, 30_000);
   });
