@@ -197,6 +197,11 @@ test.describe('Create In-App Campaigns', () => {
     await dashboardPage.verifyInAppImageWithPolling();
 
     await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
+
+    await dashboardPage.clickInAppUrlButtonAndVerifyNavigation(
+      buttonText,
+      buttonUrl
+    );
   });
 
   test('should create full-screen with dismiss button', async ({
@@ -316,7 +321,7 @@ test.describe('Create In-App Campaigns', () => {
 
     await dashboardPage.verifyInAppImageWithPolling();
 
-    await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText, 30_000);
+    await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText);
   });
 
   test('should create full-screen with deeplink', async ({
