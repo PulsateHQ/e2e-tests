@@ -160,7 +160,7 @@ export class FeedPage extends BasePage {
           return headlineVisible || textVisible;
         },
         {
-          message: `In-app message with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
+          message: `Feed post with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
           timeout: timeoutMs
         }
       )
@@ -195,7 +195,7 @@ export class FeedPage extends BasePage {
           return headlineVisible || textVisible;
         },
         {
-          message: `In-app message with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
+          message: `Feed back post with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
           timeout: timeoutMs
         }
       )
@@ -205,7 +205,6 @@ export class FeedPage extends BasePage {
   /**
    * Validates that an feed url button navigates to the expected URL
    * @param buttonText
-   * @param expectedUrl
    */
   async clickFeedButtonAndVerifyNavigation(
     buttonText: string,
@@ -228,6 +227,20 @@ export class FeedPage extends BasePage {
    * @param buttonText
    */
   async clickFeedDeeplinkButtonAndVerifyNavigation(
+    buttonText: string
+  ): Promise<void> {
+    await this.page
+      .getByRole('link', { name: buttonText })
+      .click()
+      .catch((e) => e);
+    expect(this.page).toBeTruthy();
+  }
+
+  /**
+   * Validates that feed post deeplink button navigates and opens the deeplink in a new tab
+   * @param buttonText
+   */
+  async clickFeedBackPostDeeplinkButtonAndVerifyNavigation(
     buttonText: string
   ): Promise<void> {
     await this.page

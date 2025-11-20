@@ -805,7 +805,9 @@ test.describe('Create Feed Campaigns', () => {
 
     await feedPage.verifyFeedImageWithPolling();
 
-    await feedPage.clickFeedDeeplinkButtonAndVerifyNavigation(deeplinkNickname);
+    await feedPage.clickFeedBackPostDeeplinkButtonAndVerifyNavigation(
+      deeplinkNickname
+    );
 
     await deleteDeeplinksWithApi(
       request,

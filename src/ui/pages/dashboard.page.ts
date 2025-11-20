@@ -179,6 +179,7 @@ export class DashboardPage extends BasePage {
    * Validates that an in-app url button navigates to the expected URL
    * @param buttonText
    * @param expectedUrl
+   * @param timeoutMs Optional timeout in milliseconds (default: 60000)
    */
   async clickInAppUrlButtonAndVerifyNavigation(
     buttonText: string,
@@ -199,6 +200,7 @@ export class DashboardPage extends BasePage {
   /**
    * Validates that an in-app deeplink button navigates and opens the deeplink in a new tab
    * @param buttonText
+   * @param timeoutMs Optional timeout in milliseconds (default: 60000)
    */
   async clickInAppDeeplinkButtonAndVerifyNavigation(
     buttonText: string
