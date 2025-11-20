@@ -327,6 +327,8 @@ test.describe('Create Feed Campaigns', () => {
 
     await feedPage.verifyFeedWithPolling(deeplinkNickname, 30_000);
 
+    await feedPage.clickFeedDeeplinkButtonAndVerifyNavigation(deeplinkNickname);
+
     await deleteDeeplinksWithApi(
       request,
       e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
@@ -727,7 +729,7 @@ test.describe('Create Feed Campaigns', () => {
     await expect(campaignBuilderPage.callToActionSection).toBeVisible();
 
     // Configure Feed Post (Back) button
-    await campaignBuilderPage.toggleSectionSwitch('Image');
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
     await campaignBuilderPage.toggleSectionSwitch('Table');
 
     // Enter Headline and Text for Feed Post (Back)
@@ -800,6 +802,10 @@ test.describe('Create Feed Campaigns', () => {
     await feedPage.verifyFeedImageWithPolling();
 
     await feedPage.verifyFeedButtonWithPolling(deeplinkNickname, 30_000);
+
+    await feedPage.verifyFeedImageWithPolling();
+
+    await feedPage.clickFeedDeeplinkButtonAndVerifyNavigation(deeplinkNickname);
 
     await deleteDeeplinksWithApi(
       request,

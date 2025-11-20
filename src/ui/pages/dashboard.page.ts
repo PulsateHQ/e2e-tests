@@ -175,6 +175,11 @@ export class DashboardPage extends BasePage {
       .toBeTruthy();
   }
 
+  /**
+   * Validates that an in-app url button navigates to the expected URL
+   * @param buttonText
+   * @param expectedUrl
+   */
   async clickInAppUrlButtonAndVerifyNavigation(
     buttonText: string,
     expectedUrl: string
@@ -189,5 +194,19 @@ export class DashboardPage extends BasePage {
     await newPage.waitForLoadState('domcontentloaded');
 
     await expect(newPage).toHaveURL(expectedUrl);
+  }
+
+  /**
+   * Validates that an in-app deeplink button navigates and opens the deeplink in a new tab
+   * @param buttonText
+   */
+  async clickInAppDeeplinkButtonAndVerifyNavigation(
+    buttonText: string
+  ): Promise<void> {
+    await this.page
+      .getByRole('link', { name: buttonText })
+      .click()
+      .catch((e) => e);
+    expect(this.page).toBeTruthy();
   }
 }

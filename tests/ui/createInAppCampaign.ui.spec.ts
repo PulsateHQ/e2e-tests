@@ -459,6 +459,10 @@ test.describe('Create In-App Campaigns', () => {
       30_000
     );
 
+    await dashboardPage.clickInAppDeeplinkButtonAndVerifyNavigation(
+      deeplinkNickname
+    );
+
     await deleteDeeplinksWithApi(
       request,
       e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
