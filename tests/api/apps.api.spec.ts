@@ -24,4 +24,3 @@ test.describe('Apps', () => {
     expect(response.status()).toBe(200);
   });
 });
-

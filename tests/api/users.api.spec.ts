@@ -340,9 +340,7 @@ test.describe('Users', () => {
     ).toBe(String(customAttribute.value));
   });
 
-  test('should return user subscriptions', async ({
-    request
-  }) => {
+  test('should return user subscriptions', async ({ request }) => {
     // Create a user first
     const userPayload = createUserRequestPayload();
     const createUserResponse = await createUserWithApi(

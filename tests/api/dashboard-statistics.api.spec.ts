@@ -18,9 +18,7 @@ test.describe('Dashboard Statistics', () => {
     );
   });
 
-  test('should return engagement statistics', async ({
-    request
-  }) => {
+  test('should return engagement statistics', async ({ request }) => {
     const response = await getDashboardEngagementStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -30,9 +28,7 @@ test.describe('Dashboard Statistics', () => {
     expect(response.status()).toBe(200);
   });
 
-  test('should return analytics statistics', async ({
-    request
-  }) => {
+  test('should return analytics statistics', async ({ request }) => {
     const response = await getDashboardAnalyticsStatsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -42,4 +38,3 @@ test.describe('Dashboard Statistics', () => {
     expect(response.status()).toBe(200);
   });
 });
-

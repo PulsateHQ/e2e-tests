@@ -15,9 +15,7 @@ test.describe('Events', () => {
     );
   });
 
-  test('should return events list', async ({
-    request
-  }) => {
+  test('should return events list', async ({ request }) => {
     const response = await getEventsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -27,4 +25,3 @@ test.describe('Events', () => {
     expect(response.status()).toBe(200);
   });
 });
-

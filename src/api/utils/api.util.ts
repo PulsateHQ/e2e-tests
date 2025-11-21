@@ -98,7 +98,8 @@ export const apiUrls = {
     notifications: {
       v4: {
         card: `${SDK_API_URL}/api/mobile/v4/notifications/card`,
-        render: (type: string) => `${SDK_API_URL}/api/mobile/v4/notifications/${type}`
+        render: (type: string): string =>
+          `${SDK_API_URL}/api/mobile/v4/notifications/${type}`
       }
     },
     geofences: {

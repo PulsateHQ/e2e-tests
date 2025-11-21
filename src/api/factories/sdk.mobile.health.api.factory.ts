@@ -65,4 +65,3 @@ export async function getMobileHealthCheckV2WithApi(
 
   return response;
 }
-

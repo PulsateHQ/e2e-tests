@@ -15,9 +15,7 @@ test.describe('Campaign Templates', () => {
     );
   });
 
-  test('should return campaign templates', async ({
-    request
-  }) => {
+  test('should return campaign templates', async ({ request }) => {
     const response = await getCampaignTemplatesWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -27,4 +25,3 @@ test.describe('Campaign Templates', () => {
     expect(response.status()).toBe(200);
   });
 });
-

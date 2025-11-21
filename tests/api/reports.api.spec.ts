@@ -15,9 +15,7 @@ test.describe('Reports', () => {
     );
   });
 
-  test('should return reports list', async ({
-    request
-  }) => {
+  test('should return reports list', async ({ request }) => {
     const response = await getReportsWithApi(
       request,
       APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
@@ -27,4 +25,3 @@ test.describe('Reports', () => {
     expect(response.status()).toBe(200);
   });
 });
-

@@ -43,4 +43,3 @@ export async function getEventsWithApi(
 
   return response;
 }
-

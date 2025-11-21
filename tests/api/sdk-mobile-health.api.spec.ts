@@ -54,9 +54,7 @@ test.describe('SDK Mobile Health Endpoints', () => {
     expect(response.status()).toBe(200);
   });
 
-  test('SDK: should pass v2 health check', async ({
-    request
-  }) => {
+  test('SDK: should pass v2 health check', async ({ request }) => {
     const response = await getMobileHealthCheckV2WithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk
@@ -65,4 +63,3 @@ test.describe('SDK Mobile Health Endpoints', () => {
     expect(response.status()).toBe(200);
   });
 });
-

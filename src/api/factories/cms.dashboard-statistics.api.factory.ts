@@ -50,4 +50,3 @@ export async function getDashboardAnalyticsStatsWithApi(
 
   return response;
 }
-

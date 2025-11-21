@@ -6,14 +6,14 @@ import {
 } from '@_src/api/factories/cms.campaigns.api.factory';
 import { createDeeplinkWithApi } from '@_src/api/factories/cms.deeplinks.api.factory';
 import { updateDeeplinkWithApi } from '@_src/api/factories/cms.deeplinks.api.factory';
+import { createSegmentWithApi } from '@_src/api/factories/cms.segments.api.factory';
+import { getInAppCampaignStatsWithApi } from '@_src/api/factories/cms.stats.api.factory';
+import { getAllUsersWithApi } from '@_src/api/factories/cms.users.api.factory';
 import { getMobileBrandingWithApi } from '@_src/api/factories/sdk.mobile.branding.api.factory';
 import { getMobileGeneralDataWithApi } from '@_src/api/factories/sdk.mobile.general.api.factory';
 import { getMobileLocalizationsDataWithApi } from '@_src/api/factories/sdk.mobile.localizations.api.factory';
 import { startMobileSessionsWithApi } from '@_src/api/factories/sdk.mobile.sessions.api.factory';
 import { updateMobileUserWithApi } from '@_src/api/factories/sdk.mobile.users.api.factory';
-import { createSegmentWithApi } from '@_src/api/factories/cms.segments.api.factory';
-import { getInAppCampaignStatsWithApi } from '@_src/api/factories/cms.stats.api.factory';
-import { getAllUsersWithApi } from '@_src/api/factories/cms.users.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
@@ -723,9 +723,7 @@ test.describe('In-App Small Campaigns', () => {
     ).toHaveProperty('total_uniq', 1);
   });
 
-  test('SDK: should return branding data', async ({
-    request
-  }) => {
+  test('SDK: should return branding data', async ({ request }) => {
     const response = await getMobileBrandingWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk
@@ -734,9 +732,7 @@ test.describe('In-App Small Campaigns', () => {
     expect(response.status()).toBe(200);
   });
 
-  test('SDK: should return general app data', async ({
-    request
-  }) => {
+  test('SDK: should return general app data', async ({ request }) => {
     const response = await getMobileGeneralDataWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk
@@ -745,9 +741,7 @@ test.describe('In-App Small Campaigns', () => {
     expect(response.status()).toBe(200);
   });
 
-  test('SDK: should return localization strings', async ({
-    request
-  }) => {
+  test('SDK: should return localization strings', async ({ request }) => {
     const response = await getMobileLocalizationsDataWithApi(
       request,
       APIE2ETokenSDKModel.apiE2EAccessTokenSdk
