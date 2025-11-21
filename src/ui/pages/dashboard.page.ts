@@ -34,6 +34,11 @@ export class DashboardPage extends BasePage {
     await buttonLocator.click();
   }
 
+  async clickInAppDismissButton(dismissText: string): Promise<void> {
+    await this.page.getByRole('button', { name: dismissText }).click();
+    await expect(this.page.locator('.pws-img')).toBeHidden();
+  }
+
   /**
    * Validates that an in-app headline and text are visible
    * @param expectedHeadline The expected headline text
@@ -128,20 +133,18 @@ export class DashboardPage extends BasePage {
     buttonText: string,
     timeoutMs: number = 60000
   ): Promise<void> {
-    // Use polling to repeatedly check until the button appears or times out
+    const btn = this.page.getByRole('button', { name: buttonText });
+
     await expect
-      .poll(
-        async () => {
-          return await this.page
-            .getByRole('button', { name: buttonText })
-            .isVisible();
-        },
-        {
-          message: `Button with text "${buttonText}" should be visible`,
-          timeout: timeoutMs
-        }
-      )
+      .poll(async () => btn.isVisible(), {
+        message: `Button with text "${buttonText}" should be visible`,
+        timeout: timeoutMs
+      })
       .toBeTruthy();
+
+    await btn.click();
+
+    await expect(this.page.locator('.pws-img')).toBeHidden();
   }
 
   /**
@@ -170,5 +173,25 @@ export class DashboardPage extends BasePage {
         }
       )
       .toBeTruthy();
+  }
+
+  async clickInAppUrlButtonAndVerifyNavigation(
+    buttonText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    const [newPage] = await Promise.all([
+      this.page.waitForEvent('popup'),
+      this.page.getByRole('link', { name: buttonText }).click()
+    ]);
+
+    await expect(newPage).toHaveURL(expectedUrl);
+  }
+
+  async clickInAppDeeplinkButtonAndVerifyNavigation(
+    buttonText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.getByRole('link', { name: buttonText }).click();
+    await expect(this.page).toHaveURL(expectedUrl);
   }
 }
