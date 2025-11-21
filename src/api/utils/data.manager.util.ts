@@ -1,26 +1,26 @@
 import {
   deleteDeeplinksWithApi,
   getAllDeeplinksWithApi
-} from '../factories/deeplinks.api.factory';
-import { deleteGroupWithApi } from '../factories/groups.api.factory';
-import { getAllGroupsWithApi } from '../factories/groups.api.factory';
+} from '../factories/cms.deeplinks.api.factory';
+import { deleteGroupWithApi } from '../factories/cms.groups.api.factory';
+import { getAllGroupsWithApi } from '../factories/cms.groups.api.factory';
 import {
   batchDeleteCampaignsWithApi,
   getCampaignsWithApi
-} from '@_src/api/factories/campaigns.api.factory';
+} from '@_src/api/factories/cms.campaigns.api.factory';
 import {
   batchDestroyGeofencesWithApi,
   listGeofencesWithApi
-} from '@_src/api/factories/geofences.api.factory';
-import { importUsersWithApi } from '@_src/api/factories/import-users.api.factory';
+} from '@_src/api/factories/cms.geofences.api.factory';
+import { importUsersWithApi } from '@_src/api/factories/cms.import-users.api.factory';
 import {
   batchDeleteSegmentsWithApi,
   getAllSegmentsWithApi
-} from '@_src/api/factories/segments.api.factory';
+} from '@_src/api/factories/cms.segments.api.factory';
 import {
   deleteUserWithApi,
   getAllUsersWithApi
-} from '@_src/api/factories/users.api.factory';
+} from '@_src/api/factories/cms.users.api.factory';
 import { generateCsvContentForUsersImport } from '@_src/api/test-data/cms/users/generate-random-users.payload';
 import { expect } from '@_src/ui/fixtures/merge.fixture';
 import { APIRequestContext, test } from '@playwright/test';

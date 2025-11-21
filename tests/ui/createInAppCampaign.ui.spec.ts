@@ -8,9 +8,9 @@ import {
 import {
   createDeeplinkWithApi,
   deleteDeeplinksWithApi
-} from '@_src/api/factories/deeplinks.api.factory';
-import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
-import { startWebSdkSessionWithApi } from '@_src/api/factories/web.sdk.api.factory';
+} from '@_src/api/factories/cms.deeplinks.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/cms.super-admin.api.factory';
+import { startWebSdkSessionWithApi } from '@_src/api/factories/sdk.web.sessions.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { setupIsolatedCompanyForReceivingNotifications } from '@_src/api/utils/company-registration.util';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';

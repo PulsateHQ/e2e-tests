@@ -69,3 +69,24 @@ export async function superAdminsActivationCodesCreate(
 
   return response;
 }
+
+/**
+ * Retrieves list of companies via super admin API.
+ * @param request - Playwright API request context
+ * @param authToken - Super admin authentication token
+ * @returns Promise resolving to the API response with companies list
+ */
+export async function getSuperAdminCompaniesWithApi(
+  request: APIRequestContext,
+  authToken: string
+): Promise<APIResponse> {
+  const headers = createSuperAdminHeadersWithJson(authToken);
+
+  const url = `${apiUrls.superAdmins.v2.base}/companies`;
+
+  const response = await request.get(url, { headers });
+
+  validateStatusCode(response, 200);
+
+  return response;
+}

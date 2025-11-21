@@ -1,16 +1,19 @@
 import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
-import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import { getSdkCredentials } from '@_src/api/factories/cms.apps.api.factory';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
-} from '@_src/api/factories/campaigns.api.factory';
-import { createDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
-import { updateDeeplinkWithApi } from '@_src/api/factories/deeplinks.api.factory';
-import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
-import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
-import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { getInAppCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
-import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
+} from '@_src/api/factories/cms.campaigns.api.factory';
+import { createDeeplinkWithApi } from '@_src/api/factories/cms.deeplinks.api.factory';
+import { updateDeeplinkWithApi } from '@_src/api/factories/cms.deeplinks.api.factory';
+import { getMobileBrandingWithApi } from '@_src/api/factories/sdk.mobile.branding.api.factory';
+import { getMobileGeneralDataWithApi } from '@_src/api/factories/sdk.mobile.general.api.factory';
+import { getMobileLocalizationsDataWithApi } from '@_src/api/factories/sdk.mobile.localizations.api.factory';
+import { startMobileSessionsWithApi } from '@_src/api/factories/sdk.mobile.sessions.api.factory';
+import { updateMobileUserWithApi } from '@_src/api/factories/sdk.mobile.users.api.factory';
+import { createSegmentWithApi } from '@_src/api/factories/cms.segments.api.factory';
+import { getInAppCampaignStatsWithApi } from '@_src/api/factories/cms.stats.api.factory';
+import { getAllUsersWithApi } from '@_src/api/factories/cms.users.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
@@ -718,5 +721,38 @@ test.describe('In-App Small Campaigns', () => {
     expect(
       getCampaignStatsWithWaitResponseJson.in_app.impression
     ).toHaveProperty('total_uniq', 1);
+  });
+
+  test('SDK: should return branding data', async ({
+    request
+  }) => {
+    const response = await getMobileBrandingWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk
+    );
+
+    expect(response.status()).toBe(200);
+  });
+
+  test('SDK: should return general app data', async ({
+    request
+  }) => {
+    const response = await getMobileGeneralDataWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk
+    );
+
+    expect(response.status()).toBe(200);
+  });
+
+  test('SDK: should return localization strings', async ({
+    request
+  }) => {
+    const response = await getMobileLocalizationsDataWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk
+    );
+
+    expect(response.status()).toBe(200);
   });
 });

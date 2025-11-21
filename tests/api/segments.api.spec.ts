@@ -11,8 +11,8 @@ import {
   getTotalAudienceForSegmentWithApi,
   getUserCountForAlias,
   updateSegmentWithApi
-} from '@_src/api/factories/segments.api.factory';
-import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
+} from '@_src/api/factories/cms.segments.api.factory';
+import { getAllUsersWithApi } from '@_src/api/factories/cms.users.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { generateUniqueCustomTag } from '@_src/api/test-data/cms/custom-attributes/custom-attribute.payload';
 import { createSegmentAllUsersPayload } from '@_src/api/test-data/cms/segment/create-segment-all-users.payload';

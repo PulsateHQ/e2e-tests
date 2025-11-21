@@ -97,13 +97,32 @@ export const apiUrls = {
     },
     notifications: {
       v4: {
-        card: `${SDK_API_URL}/api/mobile/v4/notifications/card`
+        card: `${SDK_API_URL}/api/mobile/v4/notifications/card`,
+        render: (type: string) => `${SDK_API_URL}/api/mobile/v4/notifications/${type}`
       }
     },
     geofences: {
       v2: {
         sendGeofenceEvent: `${SDK_API_URL}/api/mobile/v2/general/send_geofence_event`
       }
+    },
+    branding: {
+      v4: `${SDK_API_URL}/api/mobile/v4/branding`
+    },
+    general: {
+      v2: {
+        getData: `${SDK_API_URL}/api/mobile/v2/general/get_data`
+      }
+    },
+    localizations: {
+      v4: {
+        data: `${SDK_API_URL}/api/mobile/v4/localizations/data`
+      }
+    },
+    health: {
+      root: `${SDK_API_URL}/`,
+      v1Ping: `${SDK_API_URL}/api/mobile/v1/ping`,
+      v2HealthCheck: `${SDK_API_URL}/api/mobile/v2/health_check`
     }
   },
 

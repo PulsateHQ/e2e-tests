@@ -4,8 +4,8 @@ import {
   createGeofenceWithApi,
   listGeofencesWithApi,
   updateGeofenceWithApi
-} from '@_src/api/factories/geofences.api.factory';
-import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/super.admin.api.factory';
+} from '@_src/api/factories/cms.geofences.api.factory';
+import { superAdminsFeatureFLagDefaultBatchUpdate } from '@_src/api/factories/cms.super-admin.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import { createGeofencePayload } from '@_src/api/test-data/cms/geofence/geofence.payload';
 import { setupIsolatedCompany } from '@_src/api/utils/company-registration.util';

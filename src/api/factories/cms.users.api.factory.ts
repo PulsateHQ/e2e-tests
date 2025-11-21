@@ -366,3 +366,29 @@ export async function uploadUsersWithSegmentCreationApi(
 
   return response;
 }
+
+/**
+ * Retrieves user subscriptions by user ID.
+ * @param request - Playwright API request context
+ * @param authToken - Authentication token for API access
+ * @param appId - App ID for app-specific API endpoints
+ * @param userId - ID of the user to get subscriptions for
+ * @returns Promise resolving to the API response
+ */
+export async function getUserSubscriptionsWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  appId: string,
+  userId: string
+): Promise<APIResponse> {
+  const headers = createAuthHeaders(authToken);
+
+  const urls = getApiUrlsForApp(appId);
+  const url = `${urls.users.v2}/${userId}/subscriptions`;
+
+  const response = await request.get(url, { headers });
+
+  validateStatusCode(response, 200);
+
+  return response;
+}

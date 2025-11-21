@@ -1,18 +1,21 @@
 import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
-import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import { getSdkCredentials } from '@_src/api/factories/cms.apps.api.factory';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
-} from '@_src/api/factories/campaigns.api.factory';
-import { createGeofenceWithApi } from '@_src/api/factories/geofences.api.factory';
-import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
-import { startMobileSessionsForGeofenceWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
-import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
-import { getInAppCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
+} from '@_src/api/factories/cms.campaigns.api.factory';
+import { createGeofenceWithApi } from '@_src/api/factories/cms.geofences.api.factory';
+import { getMobileBrandingWithApi } from '@_src/api/factories/sdk.mobile.branding.api.factory';
+import { getMobileGeneralDataWithApi } from '@_src/api/factories/sdk.mobile.general.api.factory';
+import { sendGeofenceEventWithApi } from '@_src/api/factories/sdk.mobile.geofences.api.factory';
+import { getMobileLocalizationsDataWithApi } from '@_src/api/factories/sdk.mobile.localizations.api.factory';
+import { startMobileSessionsForGeofenceWithApi } from '@_src/api/factories/sdk.mobile.sessions.api.factory';
+import { updateMobileUserWithApi } from '@_src/api/factories/sdk.mobile.users.api.factory';
+import { getInAppCampaignStatsWithApi } from '@_src/api/factories/cms.stats.api.factory';
 import {
   getAllUsersWithApi,
   getUserGeofenceEventsWithApi
-} from '@_src/api/factories/users.api.factory';
+} from '@_src/api/factories/cms.users.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel
@@ -501,5 +504,38 @@ test.describe('In-App Geofence Campaigns', () => {
     expect(
       getCampaignStatsWithWaitResponseJson.in_app.impression
     ).toHaveProperty('total_uniq', 1);
+  });
+
+  test('SDK: should return branding data', async ({
+    request
+  }) => {
+    const response = await getMobileBrandingWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk
+    );
+
+    expect(response.status()).toBe(200);
+  });
+
+  test('SDK: should return general app data', async ({
+    request
+  }) => {
+    const response = await getMobileGeneralDataWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk
+    );
+
+    expect(response.status()).toBe(200);
+  });
+
+  test('SDK: should return localization strings', async ({
+    request
+  }) => {
+    const response = await getMobileLocalizationsDataWithApi(
+      request,
+      APIE2ETokenSDKModel.apiE2EAccessTokenSdk
+    );
+
+    expect(response.status()).toBe(200);
   });
 });

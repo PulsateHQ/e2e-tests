@@ -1,21 +1,22 @@
 import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
-import { getAllSegmentsWithApi } from '@_src/api/factories/segments.api.factory';
-import { getSingleSegmentUsersWithApi } from '@_src/api/factories/segments.api.factory';
+import { getAllSegmentsWithApi } from '@_src/api/factories/cms.segments.api.factory';
+import { getSingleSegmentUsersWithApi } from '@_src/api/factories/cms.segments.api.factory';
 import {
   createUserWithApi,
   deleteUserWithApi,
   getAllUsersWithApi,
   getUserSegmentsWithApi,
+  getUserSubscriptionsWithApi,
   getUserWithApi,
   updateUserNoteWithApi,
   uploadUsersWithSegmentCreationApi,
   upsertUserWithApi
-} from '@_src/api/factories/users.api.factory';
+} from '@_src/api/factories/cms.users.api.factory';
 import {
   deleteUserCustomAttributesWithApi,
   getUserCustomAttributesWithApi,
   setUserCustomAttributesWithApi
-} from '@_src/api/factories/users.custom.attributes.api.factory';
+} from '@_src/api/factories/cms.users.custom-attributes.api.factory';
 import { APIE2ELoginUserModel } from '@_src/api/models/admin.model';
 import {
   createCustomAttributePayload,
@@ -337,5 +338,29 @@ test.describe('Users', () => {
         ]
       )
     ).toBe(String(customAttribute.value));
+  });
+
+  test('should return user subscriptions', async ({
+    request
+  }) => {
+    // Create a user first
+    const userPayload = createUserRequestPayload();
+    const createUserResponse = await createUserWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      userPayload,
+      APIE2ELoginUserModel.apiE2EAppId
+    );
+    const createdUser = await createUserResponse.json();
+
+    // Test get subscriptions endpoint
+    const response = await getUserSubscriptionsWithApi(
+      request,
+      APIE2ELoginUserModel.apiE2EAccessTokenAdmin,
+      APIE2ELoginUserModel.apiE2EAppId,
+      createdUser.id
+    );
+
+    expect(response.status()).toBe(200);
   });
 });

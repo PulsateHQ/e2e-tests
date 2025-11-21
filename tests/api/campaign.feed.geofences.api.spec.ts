@@ -1,20 +1,20 @@
 import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
-import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import { getSdkCredentials } from '@_src/api/factories/cms.apps.api.factory';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
-} from '@_src/api/factories/campaigns.api.factory';
-import { createGeofenceWithApi } from '@_src/api/factories/geofences.api.factory';
-import { sendGeofenceEventWithApi } from '@_src/api/factories/mobile.geofence.api.factory';
-import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
-import { getCardWithApi } from '@_src/api/factories/mobile.notifications.api.factory';
-import { startMobileSessionsForGeofenceWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
-import { getCardCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
+} from '@_src/api/factories/cms.campaigns.api.factory';
+import { createGeofenceWithApi } from '@_src/api/factories/cms.geofences.api.factory';
+import { sendGeofenceEventWithApi } from '@_src/api/factories/sdk.mobile.geofences.api.factory';
+import { getInboxMessagesWithApi } from '@_src/api/factories/sdk.mobile.messages.api.factory';
+import { getCardWithApi } from '@_src/api/factories/sdk.mobile.notifications.api.factory';
+import { startMobileSessionsForGeofenceWithApi } from '@_src/api/factories/sdk.mobile.sessions.api.factory';
+import { getCardCampaignStatsWithApi } from '@_src/api/factories/cms.stats.api.factory';
 import {
   getAllUsersWithApi,
   getUserGeofenceEventsWithApi
-} from '@_src/api/factories/users.api.factory';
-import { createWebSdkStatistics } from '@_src/api/factories/web.sdk.api.factory';
+} from '@_src/api/factories/cms.users.api.factory';
+import { createWebSdkStatistics } from '@_src/api/factories/sdk.web.sessions.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel

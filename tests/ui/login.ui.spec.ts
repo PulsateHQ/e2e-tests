@@ -5,8 +5,8 @@ import {
   UI_E2E_LOGIN_ADMIN,
   UI_E2E_PASSWORD_ADMIN
 } from '@_config/env.config';
-import { registerCompany } from '@_src/api/factories/admin.api.factory';
-import { superAdminsActivationCodesCreate } from '@_src/api/factories/super.admin.api.factory';
+import { registerCompany } from '@_src/api/factories/cms.admin.api.factory';
+import { superAdminsActivationCodesCreate } from '@_src/api/factories/cms.super-admin.api.factory';
 import { generateCompanyPayload } from '@_src/api/test-data/cms/admins/company-registration.payload';
 import { isRunningInEnvironment } from '@_src/api/utils/skip.environment.util';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
