@@ -94,9 +94,6 @@ test.describe('Create In-App Campaigns', () => {
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
 
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
-
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
 
@@ -220,9 +217,6 @@ test.describe('Create In-App Campaigns', () => {
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
-
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
 
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
@@ -355,9 +349,6 @@ test.describe('Create In-App Campaigns', () => {
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
 
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
-
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
 
@@ -488,9 +479,6 @@ test.describe('Create In-App Campaigns', () => {
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias}`;
-
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
 
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();

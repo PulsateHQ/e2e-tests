@@ -95,9 +95,6 @@ test.describe('Create Feed Campaigns', () => {
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
 
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
-
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
 
@@ -230,9 +227,6 @@ test.describe('Create Feed Campaigns', () => {
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
 
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
-
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
 
@@ -278,9 +272,6 @@ test.describe('Create Feed Campaigns', () => {
 
     // Save and continue
     await campaignBuilderPage.clickSaveAndContinue();
-
-    // Select Target Segment
-    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
 
     await campaignBuilderPage.selectTargetSegment(segmentName);
 
@@ -358,9 +349,6 @@ test.describe('Create Feed Campaigns', () => {
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
-
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
 
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
@@ -512,9 +500,6 @@ test.describe('Create Feed Campaigns', () => {
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
-
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
 
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
@@ -681,9 +666,6 @@ test.describe('Create Feed Campaigns', () => {
     // Create segment with required details
     const segmentName = `Segment_${faker.lorem.word()}`;
     const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
-
-    // Navigate to Targeting section
-    await segmentsPage.clickSidebarCategoryTargeting();
 
     // Navigate to Segments section
     await segmentsPage.clickSidebarItemSegments();
