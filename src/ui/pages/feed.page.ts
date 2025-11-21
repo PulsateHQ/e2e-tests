@@ -135,7 +135,7 @@ export class FeedPage extends BasePage {
   }
 
   /**
-   * Validates that an in-app headline and text are visible
+   * Validates that feed headline and text are visible
    * @param expectedHeadline The expected headline text
    * @param expectedText The expected body text
    * @param timeoutMs Optional timeout in milliseconds (default: 60000)
@@ -160,7 +160,7 @@ export class FeedPage extends BasePage {
           return headlineVisible || textVisible;
         },
         {
-          message: `In-app message with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
+          message: `Feed post with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
           timeout: timeoutMs
         }
       )
@@ -168,7 +168,7 @@ export class FeedPage extends BasePage {
   }
 
   /**
-   * Validates that an in-app headline and text are visible
+   * Validates that feed back post headline and text are visible
    * @param expectedHeadline The expected headline text
    * @param expectedText The expected body text
    * @param timeoutMs Optional timeout in milliseconds (default: 60000)
@@ -195,13 +195,17 @@ export class FeedPage extends BasePage {
           return headlineVisible || textVisible;
         },
         {
-          message: `In-app message with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
+          message: `Feed back post with headline "${expectedHeadline}" or text "${expectedText}" should be visible`,
           timeout: timeoutMs
         }
       )
       .toBeTruthy();
   }
 
+  /**
+   * Validates that an feed url button navigates to the expected URL
+   * @param buttonText
+   */
   async clickFeedButtonAndVerifyNavigation(
     buttonText: string,
     expectedUrl: string
@@ -216,5 +220,23 @@ export class FeedPage extends BasePage {
     await newPage.waitForLoadState('domcontentloaded');
 
     await expect(newPage).toHaveURL(expectedUrl);
+  }
+
+  async clickFeedDeeplinkButtonAndVerifyNavigation(
+    buttonText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.getByRole('link', { name: buttonText }).click();
+    await this.page.waitForLoadState('domcontentloaded');
+    await expect(this.page).toHaveURL(expectedUrl);
+  }
+
+  async clickFeedBackPostDeeplinkButtonAndVerifyNavigation(
+    buttonText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.getByRole('link', { name: buttonText }).click();
+    await this.page.waitForLoadState('domcontentloaded');
+    await expect(this.page).toHaveURL(expectedUrl);
   }
 }

@@ -179,15 +179,19 @@ export class DashboardPage extends BasePage {
     buttonText: string,
     expectedUrl: string
   ): Promise<void> {
-    const btn = this.page.getByRole('link', { name: buttonText });
-
     const [newPage] = await Promise.all([
       this.page.waitForEvent('popup'),
-      btn.click()
+      this.page.getByRole('link', { name: buttonText }).click()
     ]);
 
-    await newPage.waitForLoadState('domcontentloaded');
-
     await expect(newPage).toHaveURL(expectedUrl);
+  }
+
+  async clickInAppDeeplinkButtonAndVerifyNavigation(
+    buttonText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.getByRole('link', { name: buttonText }).click();
+    await expect(this.page).toHaveURL(expectedUrl);
   }
 }

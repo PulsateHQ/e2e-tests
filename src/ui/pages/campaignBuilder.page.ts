@@ -402,8 +402,8 @@ export class CampaignBuilderPage extends BasePage {
     buttonIndex: number = 0
   ): Promise<void> {
     await this.openCallToActionSection();
-    await this.selectCTAButtonType('Deeplink', buttonIndex);
     await this.enterButtonText(buttonText, buttonIndex === 0 ? 1 : 2);
+    await this.selectCTAButtonType('Deeplink', buttonIndex);
     await this.selectDeeplinkOption(deeplinkOption);
   }
 
@@ -430,8 +430,6 @@ export class CampaignBuilderPage extends BasePage {
   // =========================================================================
 
   async selectTargetSegment(segmentName: string): Promise<void> {
-    await this.segmentsTargetingToggle.click();
-
     await this.segmentsSectionLabel.click();
 
     const segmentOption = this.getSegmentTargetingOption(segmentName);
