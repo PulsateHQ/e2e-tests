@@ -180,6 +180,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -187,17 +188,22 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
 
+    // Verify in-app content
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
+    // Verify in-app button
     await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
 
+    // Click in-app url button and verify navigation
     await dashboardPage.clickInAppUrlButtonAndVerifyNavigation(
       buttonText,
       buttonUrl
@@ -302,6 +308,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -309,15 +316,19 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
 
+    // Verify in-app content
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
+    // Verify in-app dismiss button
     await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText);
   });
 
@@ -432,6 +443,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -439,25 +451,31 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
 
+    // Verify in-app content
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
+    // Verify in-app deeplink button
     await dashboardPage.verifyInAppButtonUrlWithPolling(
       deeplinkNickname,
       30_000
     );
 
+    // Click in-app deeplink button and verify navigation
     await dashboardPage.clickInAppDeeplinkButtonAndVerifyNavigation(
       deeplinkNickname,
       deeplinkTarget
     );
 
+    // Delete deeplink
     await deleteDeeplinksWithApi(
       request,
       e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
@@ -564,6 +582,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -571,15 +590,19 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
 
+    // Verify in-app content
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
+    // Verify in-app feed button
     await dashboardPage.verifyInAppButtonUrlWithPolling(buttonText, 30_000);
   });
 });

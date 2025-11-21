@@ -391,8 +391,8 @@ export class CampaignBuilderPage extends BasePage {
     buttonIndex: number = 0
   ): Promise<void> {
     await this.openCallToActionSection();
-    await this.selectCTAButtonType('URL', buttonIndex);
     await this.enterButtonText(buttonText, buttonIndex === 0 ? 1 : 2);
+    await this.selectCTAButtonType('URL', buttonIndex);
     await this.enterButtonUrl(url);
   }
 
@@ -412,8 +412,8 @@ export class CampaignBuilderPage extends BasePage {
     buttonIndex: number = 0
   ): Promise<void> {
     await this.openCallToActionSection();
-    await this.selectCTAButtonType('Open Feed', buttonIndex);
     await this.enterButtonText(buttonText, buttonIndex === 0 ? 1 : 2);
+    await this.selectCTAButtonType('Open Feed', buttonIndex);
   }
 
   async setupDismissButton(
@@ -421,8 +421,8 @@ export class CampaignBuilderPage extends BasePage {
     buttonIndex: number = 0
   ): Promise<void> {
     await this.openCallToActionSection();
-    await this.selectCTAButtonType('Dismiss', buttonIndex);
     await this.enterButtonText(buttonText, buttonIndex === 0 ? 1 : 2);
+    await this.selectCTAButtonType('Dismiss', buttonIndex);
   }
 
   // =========================================================================
