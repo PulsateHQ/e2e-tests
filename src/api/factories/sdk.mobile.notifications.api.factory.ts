@@ -42,3 +42,26 @@ export async function getCardWithApi(
 
   return response;
 }
+
+/**
+ * Retrieves rendered notification content by type.
+ * @param request - Playwright API request context
+ * @param authToken - SDK authentication token
+ * @param type - Notification type (e.g., 'card')
+ * @returns Promise resolving to the API response
+ */
+export async function getMobileNotificationWithApi(
+  request: APIRequestContext,
+  authToken: string,
+  type: string
+): Promise<APIResponse> {
+  const headers = createAuthHeaders(authToken);
+
+  const url = apiUrls.sdk.notifications.v4.render(type);
+
+  const response = await request.get(url, { headers });
+
+  validateStatusCode(response, 200);
+
+  return response;
+}

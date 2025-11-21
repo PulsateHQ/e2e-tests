@@ -1,15 +1,15 @@
 import { SUPER_ADMIN_ACCESS_TOKEN } from '@_config/env.config';
-import { getSdkCredentials } from '@_src/api/factories/app.api.factory';
+import { getSdkCredentials } from '@_src/api/factories/cms.apps.api.factory';
 import {
   createCampaignWithApi,
   getCampaignDetailsWithApi
-} from '@_src/api/factories/campaigns.api.factory';
-import { getInboxMessagesWithApi } from '@_src/api/factories/mobile.messages.api.factory';
-import { startMobileSessionsWithApi } from '@_src/api/factories/mobile.sessions.api.factory';
-import { updateMobileUserWithApi } from '@_src/api/factories/mobile.users.api.factory';
-import { createSegmentWithApi } from '@_src/api/factories/segments.api.factory';
-import { getCardCampaignStatsWithApi } from '@_src/api/factories/stats.api.factory';
-import { getAllUsersWithApi } from '@_src/api/factories/users.api.factory';
+} from '@_src/api/factories/cms.campaigns.api.factory';
+import { createSegmentWithApi } from '@_src/api/factories/cms.segments.api.factory';
+import { getCardCampaignStatsWithApi } from '@_src/api/factories/cms.stats.api.factory';
+import { getAllUsersWithApi } from '@_src/api/factories/cms.users.api.factory';
+import { getInboxMessagesWithApi } from '@_src/api/factories/sdk.mobile.messages.api.factory';
+import { startMobileSessionsWithApi } from '@_src/api/factories/sdk.mobile.sessions.api.factory';
+import { updateMobileUserWithApi } from '@_src/api/factories/sdk.mobile.users.api.factory';
 import {
   APIE2ELoginUserModel,
   APIE2ETokenSDKModel

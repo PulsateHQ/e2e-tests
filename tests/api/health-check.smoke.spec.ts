@@ -1,7 +1,7 @@
 import {
   checkHealthWithApi,
   checkHealthWithTimeout
-} from '@_src/api/factories/health-check.api.factory';
+} from '@_src/api/factories/cms.health-check.api.factory';
 import { expect, test } from '@_src/ui/fixtures/merge.fixture';
 
 test.describe('Health Check Smoke Test', () => {
