@@ -180,6 +180,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -187,17 +188,22 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
 
+    // Verify in-app content
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
+    // Verify in-app button
     await dashboardPage.verifyInAppButtonWithPolling(buttonText, 30_000);
 
+    // Click in-app url button and verify navigation
     await dashboardPage.clickInAppUrlButtonAndVerifyNavigation(
       buttonText,
       buttonUrl
@@ -302,6 +308,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -309,15 +316,19 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
 
+    // Verify in-app content
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
+    // Verify in-app dismiss button
     await dashboardPage.verifyInAppDismissButtonWithPolling(buttonText);
   });
 
@@ -432,6 +443,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -439,25 +451,31 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
 
+    // Verify in-app content
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
+    // Verify in-app deeplink button
     await dashboardPage.verifyInAppButtonUrlWithPolling(
       deeplinkNickname,
       30_000
     );
 
+    // Click in-app deeplink button and verify navigation
     await dashboardPage.clickInAppDeeplinkButtonAndVerifyNavigation(
       deeplinkNickname,
       deeplinkTarget
     );
 
+    // Delete deeplink
     await deleteDeeplinksWithApi(
       request,
       e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
@@ -564,6 +582,7 @@ test.describe('Create In-App Campaigns', () => {
       60_000
     );
 
+    // Sign out from admin account
     await accountSettingsPage.signOut();
 
     const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
@@ -571,15 +590,177 @@ test.describe('Create In-App Campaigns', () => {
       userPassword: APIE2EReceiverUserModel.password!
     };
 
+    // Login to receiver account
     await loginPage.login(loginCredentialsForReceiver);
+
+    // Verify in-app content
+    await dashboardPage.verifyInAppContentWithPolling(
+      campaignHeadline,
+      campaignText
+    );
+
+    // Verify in-app image
+    await dashboardPage.verifyInAppImageWithPolling();
+
+    // Verify in-app feed button
+    await dashboardPage.verifyInAppButtonUrlWithPolling(buttonText, 30_000);
+  });
+
+  test('should create in app with 2 cta buttons', async ({
+    loginPage,
+    campaignsPage,
+    campaignBuilderPage,
+    segmentsPage,
+    dashboardPage,
+    accountSettingsPage,
+    request
+  }) => {
+    const deeplinkResponse = await createDeeplinkWithApi(
+      request,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      {
+        nickname: `Deeplink_${faker.lorem.word()}`,
+        target: deeplinkTarget
+      },
+      E2EAdminLoginCredentialsModel.uiE2EAppId
+    );
+
+    deeplinkNickname = deeplinkResponse.nickname;
+    deeplinkId = deeplinkResponse.id;
+
+    await loginPage.login(E2EAdminLoginCredentialsModel);
+
+    // Create segment with required details
+    const segmentName = `Segment_${faker.lorem.word()}`;
+    const aliasValue = `${APIE2EReceiverUserModel.companyAlias!}`;
+
+    // Navigate to Segments section
+    await segmentsPage.clickSidebarItemSegments();
+
+    // Create new segment
+    await segmentsPage.createSegmentWithAlias(aliasValue, segmentName);
+
+    // Navigate to campaigns section
+    await campaignsPage.navigateToCampaignsSection();
+
+    // Create new campaign
+    await campaignsPage.createNewCampaign();
+
+    // Select In-App campaign type
+    await campaignBuilderPage.selectInAppCampaignType();
+
+    // Select Full-Screen layout
+    await campaignBuilderPage.selectInAppLargeLayout();
+
+    // Create campaign with required details
+    const campaignName = `InApp Large Campaign ${Date.now()}`;
+    const campaignHeadline = `Headline_${faker.lorem.word()}`;
+    const campaignText = `Text_${faker.lorem.word()}`;
+    const buttonText1 = `URL_${faker.lorem.word()}`;
+    const buttonText2 = deeplinkNickname;
+    const buttonUrl = `https://www.google.com`;
+
+    await campaignBuilderPage.enterCampaignName(campaignName);
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    await expect(campaignBuilderPage.imageSection).toBeVisible();
+    await expect(campaignBuilderPage.headlineSection).toBeVisible();
+    await expect(campaignBuilderPage.textSection).toBeVisible();
+    await expect(campaignBuilderPage.callToActionSection).toBeVisible();
+
+    // Upload Campaign Image
+    await campaignBuilderPage.uploadCampaignImage(campaignImage);
+
+    // Enter Headline and Text
+    await campaignBuilderPage.expandCollapseSection('Headline');
+    await campaignBuilderPage.enterHeadline(campaignHeadline);
+    await campaignBuilderPage.expandCollapseSection('Text');
+    await campaignBuilderPage.enterText(campaignText);
+
+    // Configure call to action
+    await campaignBuilderPage.openCallToActionSection();
+    await campaignBuilderPage.selectButtonCount(2);
+
+    await campaignBuilderPage.setupDeeplinkButton(
+      buttonText2,
+      deeplinkNickname,
+      0
+    );
+
+    await campaignBuilderPage.setupUrlButton(buttonText1, buttonUrl, 1);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Target Segment
+    await expect(campaignBuilderPage.segmentsSectionLabel).toBeVisible();
+
+    await campaignBuilderPage.selectTargetSegment(segmentName);
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Delivery Settings
+    await expect(campaignBuilderPage.deliverStepHeading).toBeVisible();
+
+    await campaignBuilderPage.configureDeliverySettings();
+
+    // Save and continue
+    await campaignBuilderPage.clickSaveAndContinue();
+
+    // Select Review
+    await expect(campaignBuilderPage.notificationStepHeading).toBeVisible();
+
+    // Send Campaign
+    await campaignBuilderPage.sendCampaign();
+
+    // Verify that new campaign button is visible
+    await expect(campaignsPage.newCampaignButton).toBeVisible();
+
+    // Verify campaign is created
+    await campaignsPage.verifyCampaignIsCreated(campaignName);
+
+    // Verify campaign status using polling for more reliability
+    await campaignsPage.verifyCampaignStatusWithPolling(
+      campaignName,
+      'Delivered',
+      60_000
+    );
+
+    // Sign out from admin account
+    await accountSettingsPage.signOut();
+
+    const loginCredentialsForReceiver: E2EAdminLoginCredentialsModel = {
+      userEmail: APIE2EReceiverUserModel.username!,
+      userPassword: APIE2EReceiverUserModel.password!
+    };
+
+    // Login to receiver account
+    await loginPage.login(loginCredentialsForReceiver);
+
+    // Click notification button to open feed page
+    await dashboardPage.clickNotificationButton();
 
     await dashboardPage.verifyInAppContentWithPolling(
       campaignHeadline,
       campaignText
     );
 
+    // Verify in-app image
     await dashboardPage.verifyInAppImageWithPolling();
 
-    await dashboardPage.verifyInAppButtonUrlWithPolling(buttonText, 30_000);
+    // Verify in-app url button
+    await dashboardPage.verifyInAppButtonWithPolling(buttonText1, 30_000);
+
+    // Verify in-app deeplink button
+    await dashboardPage.verifyInAppButtonWithPolling(buttonText2, 30_000);
+
+    // Delete deeplink
+    await deleteDeeplinksWithApi(
+      request,
+      e2EAdminAuthDataModel.uiE2EAccessTokenAdmin,
+      [deeplinkId],
+      E2EAdminLoginCredentialsModel.uiE2EAppId
+    );
   });
 });

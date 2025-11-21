@@ -32,6 +32,11 @@ export class FeedPage extends BasePage {
     await this.page.getByRole('link', { name: buttonText }).click();
   }
 
+  async clickBackBrowserToFeedPage(): Promise<void> {
+    await this.page.goBack();
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
   /**
    * Validates that feed with specified text is visible
    * @param buttonText The expected button text
@@ -206,7 +211,7 @@ export class FeedPage extends BasePage {
    * Validates that an feed url button navigates to the expected URL
    * @param buttonText
    */
-  async clickFeedButtonAndVerifyNavigation(
+  async clickFeedUrlButtonAndVerifyNavigation(
     buttonText: string,
     expectedUrl: string
   ): Promise<void> {
